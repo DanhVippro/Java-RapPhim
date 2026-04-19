@@ -1,0 +1,57 @@
+Emtity:
+Phim
+public class Phim {
+    private String maPhim;
+    private String tenPhim;
+    private String theLoai;
+    private int thoiLuong; // phút
+    private String moTa;
+    private String hinhAnh;
+    private String trangThai; // Đang chiếu / Sắp chiếu
+}
+PhongChieu
+public class PhongChieu {
+    private String maPhong;
+    private String tenPhong;
+    private int sucChua;
+}
+Ghe
+public class Ghe {
+    private String maGhe;
+    private int maPhong;
+    private String soGhe; // A1, B2,...
+    private String loaiGhe; // Thường / VIP
+}
+
+KhachHang
+public class KhachHang {
+    private int maKhachHang;
+    private String ten;
+    private String soDienThoai;
+    private String email;
+}
+
+Ve
+public class Ve {
+    private String maVe;
+    private String maDatVe;
+    private int maGhe;
+    private double gia;
+}
+
+DatVe
+public class DatVe {
+    private int maDatVe;
+    private int maKhachHang;
+    private int maSuatChieu;
+    private LocalDateTime thoiDiemDat;
+    private double tongTien;
+    private String trangThai; // Đã thanh toán / Chưa / Hủy
+}
+TaiKhoan
+public class TaiKhoan {
+    private int maTaiKhoan;
+    private String tenDangNhap;
+    private String matKhau;
+    private String vaiTro; // ADMIN / CUSTOMER
+}
