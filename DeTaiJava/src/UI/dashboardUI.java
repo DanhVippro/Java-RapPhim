@@ -5,7 +5,6 @@ import javax.swing.table.*;
 
 import customerUI.CustomerUI;
 
-import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
