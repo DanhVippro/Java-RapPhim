@@ -5,12 +5,19 @@ import java.awt.Color;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
 public class QuanLyPhimUI extends JPanel {
-    public QuanLyPhimUI() {
-        setLayout(new BorderLayout());
-        setBackground(Color.WHITE);
+    public QuanLyPhimUI(String string) {
+        JTabbedPane tab = new JTabbedPane();
+        tab.add("Danh sách", new DanhSachPhimPanel());
+        tab.add("Thêm phim", new ThemPhimPanel());
 
-        add(new JLabel("Màn hình PHIM"), BorderLayout.CENTER);
+        Object mode = null;
+        if (mode.equals("add")) {
+            tab.setSelectedIndex(1);
+        }
+
+        add(tab);
     }
 }

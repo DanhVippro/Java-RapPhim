@@ -2,6 +2,7 @@ package UI;
 
 import javax.swing.*;
 import javax.swing.table.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import customerUI.CustomerUI;
 
@@ -34,7 +35,7 @@ public class dashboardUI extends JFrame {
         setContentPane(root);
     }
 
-    // ─── Top Bar (trắng, có border dưới) ──────────────────────────────────────
+    // ─── Top Bar ──────────────────────────────────────
     private JPanel buildTopBar() {
         JPanel bar = new JPanel(new BorderLayout()) {
             @Override
@@ -112,68 +113,91 @@ public class dashboardUI extends JFrame {
 
     // ─── Sidebar─────────────────────────
     private JPanel buildSidebar() {
-        JPanel side = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                g.setColor(CustomerUI.SIDEBAR_BG);
-                g.fillRect(0, 0, getWidth(), getHeight());
-            }
-        };
-        side.setOpaque(false);
-        side.setLayout(new BoxLayout(side, BoxLayout.Y_AXIS));
-        side.setPreferredSize(new Dimension(195, 0));
-        side.setBorder(BorderFactory.createEmptyBorder(12, 0, 16, 0));
+        JPanel side = new JPanel(new BorderLayout());
+        side.setPreferredSize(new Dimension(220, 0));
+        side.setBackground(CustomerUI.BG_WHITE);
 
-        String[][] nav = {
-                { "🏠", "Trang Chủ" },
-                { "🎟️", "Bán Vé" },
-                { "🎬", "Quản Lý Phim" },
-                { "👥", "Quản Lý Nhân Viên" },
-        };
+        // ===== TẠO NODE =====
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Menu");
 
-        for (String[] item : nav) {
-            boolean act = item[1].equals(activeNav);
-            JPanel n = CustomerUI.createNavItem(item[0], item[1], act);
-            final String navLabel = item[1];
-            n.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    activeNav = navLabel;
-                    if (navLabel.equals("Bán Vé")) {
-                        switchContent(new BanVeUI());
-                    } else if (navLabel.equals("Quản Lý Phim")) {
-                        switchContent(new QuanLyPhimUI());
-                    } else if (navLabel.equals("Quản Lý Nhân Viên")) {
-                        switchContent(new QuanLyNhanVienUI());
-                    } else {
-                        switchContent(buildContent());
-                    }
-                }
-            });
-            side.add(n);
+        DefaultMutableTreeNode trangChu = new DefaultMutableTreeNode("Trang chủ");
+
+        DefaultMutableTreeNode quanLy = new DefaultMutableTreeNode("Quản lí");
+        DefaultMutableTreeNode nhanVien = new DefaultMutableTreeNode("Nhân viên");
+        DefaultMutableTreeNode ve = new DefaultMutableTreeNode("Vé");
+
+        DefaultMutableTreeNode phim = new DefaultMutableTreeNode("Phim");
+        DefaultMutableTreeNode dsPhim = new DefaultMutableTreeNode("Danh sách");
+        DefaultMutableTreeNode themPhim = new DefaultMutableTreeNode("Thêm phim");
+
+        DefaultMutableTreeNode thongKe = new DefaultMutableTreeNode("Thống kê");
+
+        // ===== GHÉP CÂY =====
+        phim.add(dsPhim);
+        phim.add(themPhim);
+
+        quanLy.add(nhanVien);
+        quanLy.add(ve);
+        quanLy.add(phim);
+
+        root.add(trangChu);
+        root.add(quanLy);
+        root.add(thongKe);
+
+        // ===== TẠO TREE =====
+        JTree tree = new JTree(root);
+        tree.setRootVisible(false);
+        tree.setBackground(CustomerUI.BG_WHITE);
+        tree.setForeground(Color.RED);
+        tree.setRowHeight(30);
+
+        // Expand mặc định
+        for (int i = 0; i < tree.getRowCount(); i++) {
+            tree.expandRow(i);
         }
 
-        side.add(Box.createVerticalGlue());
+        // ===== XỬ LÝ CLICK =====
+        tree.addTreeSelectionListener(e -> {
+            DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 
-        // Đường phân cách
-        JSeparator sep = new JSeparator();
-        sep.setForeground(new Color(0x2D4255));
-        sep.setBackground(new Color(0x2D4255));
-        sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-        side.add(sep);
-        side.add(Box.createVerticalStrut(6));
+            if (selectedNode == null)
+                return;
 
-        JPanel logout = CustomerUI.createNavItem("🚪", "Đăng Xuất", false);
-        logout.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int r = JOptionPane.showConfirmDialog(dashboardUI.this,
-                        "Bạn có chắc muốn đăng xuất?", "Đăng Xuất", JOptionPane.YES_NO_OPTION);
-                if (r == JOptionPane.YES_OPTION)
-                    System.exit(0);
+            String value = selectedNode.toString();
+
+            switch (value) {
+                case "Trang chủ":
+                    switchContent(buildContent());
+                    break;
+
+                case "Nhân viên":
+                    switchContent(new QuanLyNhanVienUI());
+                    break;
+
+                case "Vé":
+                    switchContent(new BanVeUI());
+                    break;
+
+                case "Danh sách":
+                    switchContent(new QuanLyPhimUI("list"));
+                    break;
+
+                case "Thêm phim":
+                    switchContent(new QuanLyPhimUI("add"));
+                    break;
+
+                case "Thống kê":
+                    JOptionPane.showMessageDialog(this, "Chưa làm thống kê");
+                    break;
             }
         });
-        side.add(logout);
+
+        // ===== SCROLL =====
+        JScrollPane scroll = new JScrollPane(tree);
+        scroll.setBorder(null);
+
+        side.add(scroll, BorderLayout.CENTER);
+
         return side;
     }
 
