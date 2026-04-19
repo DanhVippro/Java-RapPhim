@@ -10,7 +10,6 @@ public class QuanLyNhanVienUI extends JPanel {
     public QuanLyNhanVienUI() {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
-
         add(new JLabel("Màn hình Nhân viên"), BorderLayout.CENTER);
     }
 }

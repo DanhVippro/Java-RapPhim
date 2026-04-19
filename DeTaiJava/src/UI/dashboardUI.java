@@ -16,11 +16,6 @@ public class dashboardUI extends JFrame {
     private JPanel contentArea;
     private JPanel root;
 
-    public static void main(String[] args) {
-        CustomerUI.applyTheme();
-        SwingUtilities.invokeLater(() -> new dashboardUI().setVisible(true));
-    }
-
     public dashboardUI() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1200, 750);
