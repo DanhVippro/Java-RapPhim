@@ -1,4 +1,4 @@
-package emtity;
+package entity;
 
 public class Phim {
     private String maPhim;
