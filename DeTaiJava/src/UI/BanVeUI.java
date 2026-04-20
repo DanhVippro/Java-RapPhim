@@ -12,7 +12,8 @@ public class BanVeUI extends JPanel {
        
         JPanel pnMain = new JPanel();
         pnMain.setLayout(new BorderLayout());
-        pnMain.setBackground(Color.YELLOW);
+      setBackground(Color.YELLOW);
+     
         add(pnMain);
         JPanel pnNorth = new JPanel();
         pnNorth.setLayout(new BorderLayout());
