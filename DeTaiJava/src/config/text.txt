@@ -1,0 +1,2 @@
+String url = "jdbc:sqlserver://localhost\\SQLEXPRESS;databaseName=cinema_db;encrypt=true;trustServerCertificate=true";
+Connection conn = DriverManager.getConnection(url, "admin", "123456");

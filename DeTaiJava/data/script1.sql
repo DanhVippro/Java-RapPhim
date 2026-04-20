@@ -76,9 +76,9 @@ INSERT INTO TaiKhoan VALUES
 ('TK002', 'staff1', '123456');
 
 INSERT INTO KhachHang VALUES
-('KH001', N'Nguy?n Vãn A', '0901111111', 'a@gmail.com'),
+('KH001', N'Nguy?n Vï¿½n A', '0901111111', 'a@gmail.com'),
 ('KH002', N'Tr?n Th? B', '0902222222', 'b@gmail.com'),
-('KH003', N'Tr?n Thành Danh', '0123456789', 'danh@gmail.com'),
+('KH003', N'Tr?n Thï¿½nh Danh', '0123456789', 'danh@gmail.com'),
 ('KH004', N'Tr?n Th? D', '0902222222', 'd@gmail.com');
 
 INSERT INTO PhongChieu VALUES
@@ -101,15 +101,15 @@ INSERT INTO Ghe VALUES
 ('G009', 'P004', 'B4', 'normal'),
 ('G010', 'P004', 'B6', 'vip');
 INSERT INTO Phim VALUES
-('PH001', N'Avengers', N'Hành ð?ng', 120, N'Siêu anh hùng c?u th? gi?i', '/res/img/avengers.jpg', N'Ðang chi?u'),
-('PH002', N'Conan', N'Trinh thám', 100, N'Thám t? l?ng danh', '/res/img/conan.jpg', N'S?p chi?u'),
-('PH003', N'Doreamon', N'Ho?t h?nh', 125, N'Chú mèo mày ð?n t? týõng lai', '/res/img/doreamon.jpg', N'S?p chi?u'),
-('PH004', N'Conan 2', N'Trinh thám', 100, N'Thám t? l?ng danh 2', '/res/img/conan2.jpg', N'S?p chi?u'),
-('PH005', N'X Men', N'Vi?n tý?ng', 100, N'Bi?t ð?i siêu anh hùng', '/res/img/xmen.jpg', N'S?p chi?u'),
-('PH006', N'B? già', N'Gia ð?nh', 100, N'B? già Tr?n Thành', '/res/img/bogia.jpg', N'Ðang chi?u'),
-('PH007', N'Spider Man: Go Home', N'Vi?n tý?ng', 100, N'Siêu nhân nh?n nh?n', '/res/img/spiderman.jpg', N'Ðang chi?u'),
-('PH008', N'Super Man', N'Vi?n tý?ng', 100, N'Siêu anh hùng SuperMan', '/res/img/superman.jpg', N'Ðang chi?u'),
-('PH009', N'Breaking Bad', N'Tâm l?', 100, N'T?i phàm bi?n ch?t', '/res/img/breakingbad.jpg', N'S?p chi?u');
+('PH001', N'Avengers', N'Hï¿½nh ï¿½?ng', 120, N'Siï¿½u anh hï¿½ng c?u th? gi?i', '/res/img/avengers.jpg', N'ï¿½ang chi?u'),
+('PH002', N'Conan', N'Trinh thï¿½m', 100, N'Thï¿½m t? l?ng danh', '/res/img/conan.jpg', N'S?p chi?u'),
+('PH003', N'Doreamon', N'Ho?t h?nh', 125, N'Chï¿½ mï¿½o mï¿½y ï¿½?n t? tï¿½ï¿½ng lai', '/res/img/doreamon.jpg', N'S?p chi?u'),
+('PH004', N'Conan 2', N'Trinh thï¿½m', 100, N'Thï¿½m t? l?ng danh 2', '/res/img/conan2.jpg', N'S?p chi?u'),
+('PH005', N'X Men', N'Vi?n tï¿½?ng', 100, N'Bi?t ï¿½?i siï¿½u anh hï¿½ng', '/res/img/xmen.jpg', N'S?p chi?u'),
+('PH006', N'B? giï¿½', N'Gia ï¿½?nh', 100, N'B? giï¿½ Tr?n Thï¿½nh', '/res/img/bogia.jpg', N'ï¿½ang chi?u'),
+('PH007', N'Spider Man: Go Home', N'Vi?n tï¿½?ng', 100, N'Siï¿½u nhï¿½n nh?n nh?n', '/res/img/spiderman.jpg', N'ï¿½ang chi?u'),
+('PH008', N'Super Man', N'Vi?n tï¿½?ng', 100, N'Siï¿½u anh hï¿½ng SuperMan', '/res/img/superman.jpg', N'ï¿½ang chi?u'),
+('PH009', N'Breaking Bad', N'Tï¿½m l?', 100, N'T?i phï¿½m bi?n ch?t', '/res/img/breakingbad.jpg', N'S?p chi?u');
 INSERT INTO SuatChieu VALUES
 ('SC001', 'PH001', 'P001', '2026-04-21 18:00:00', 75000),
 ('SC002', 'PH002', 'P002', '2026-04-21 20:00:00', 90000),
@@ -119,12 +119,12 @@ INSERT INTO SuatChieu VALUES
 ('SC006', 'PH006', 'P006', '2026-04-21 20:00:00', 90000);
 
 INSERT INTO DatVe VALUES
-('DV001', 'KH001', 'SC001', GETDATE(), 150000, N'Ð? thanh toán'),
-('DV002', 'KH002', 'SC002', GETDATE(), 90000, N'Chýa thanh toán'),
-('DV006', 'KH002', 'SC002', GETDATE(), 90000, N'Chýa thanh toán'),
-('DV003', 'KH003', 'SC002', GETDATE(), 150000, N'Ð? thanh toán'),
-('DV004', 'KH004', 'SC001', GETDATE(), 200000, N'Chýa thanh toán'),
-('DV005', 'KH004', 'SC003', GETDATE(), 150000, N'Chýa thanh toán');
+('DV001', 'KH001', 'SC001', GETDATE(), 150000, N'ï¿½? thanh toï¿½n'),
+('DV002', 'KH002', 'SC002', GETDATE(), 90000, N'Chï¿½a thanh toï¿½n'),
+('DV006', 'KH002', 'SC002', GETDATE(), 90000, N'Chï¿½a thanh toï¿½n'),
+('DV003', 'KH003', 'SC002', GETDATE(), 150000, N'ï¿½? thanh toï¿½n'),
+('DV004', 'KH004', 'SC001', GETDATE(), 200000, N'Chï¿½a thanh toï¿½n'),
+('DV005', 'KH004', 'SC003', GETDATE(), 150000, N'Chï¿½a thanh toï¿½n');
 INSERT INTO Ve VALUES
 ('V001', 'DV001', 'G001', 75000),
 ('V002', 'DV001', 'G002', 75000),
