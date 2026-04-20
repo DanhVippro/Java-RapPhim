@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import customerUI.CustomerUI;
+import customUI.CustomUI;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -20,10 +20,11 @@ public class dashboardUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1200, 750);
         setLocationRelativeTo(null);
-        setBackground(CustomerUI.BG_MAIN);
+        setBackground(CustomUI.BG_MAIN);
 
         root = new JPanel(new BorderLayout());
-        root.setBackground(CustomerUI.BG_MAIN);
+        root.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        root.setBackground(CustomUI.BG_MAIN);
 
         root.add(buildTopBar(), BorderLayout.NORTH);
         root.add(buildSidebar(), BorderLayout.WEST);
@@ -41,9 +42,9 @@ public class dashboardUI extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.setColor(CustomerUI.SIDEBAR_BG);
+                g.setColor(CustomUI.SIDEBAR_BG);
                 g.fillRect(0, 0, getWidth(), getHeight());
-                g.setColor(CustomerUI.BORDER);
+                g.setColor(CustomUI.BORDER);
                 g.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
             }
         };
@@ -55,10 +56,10 @@ public class dashboardUI extends JFrame {
         JPanel logoArea = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         logoArea.setOpaque(false);
         JLabel ico = new JLabel("🎬");// LOGO
-        ico.setFont(CustomerUI.plain(20));
+        ico.setFont(CustomUI.plain(20));
         JLabel nm = new JLabel("MEGADE Cinema");
-        nm.setFont(CustomerUI.bold(15));
-        nm.setForeground(CustomerUI.TEAL);
+        nm.setFont(CustomUI.bold(15));
+        nm.setForeground(CustomUI.TEAL);
         logoArea.add(ico);
         logoArea.add(nm);
         bar.add(logoArea, BorderLayout.WEST);
@@ -67,7 +68,7 @@ public class dashboardUI extends JFrame {
         JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 11));
         right.setOpaque(false);
 
-        JTextField search = CustomerUI.createTextField("Tìm kiếm...");
+        JTextField search = CustomUI.createTextField("Tìm kiếm...");
         search.setPreferredSize(new Dimension(220, 36));
         right.add(search);
 
@@ -92,17 +93,17 @@ public class dashboardUI extends JFrame {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(CustomerUI.TEAL);
+                g2.setColor(CustomUI.TEAL);
                 g2.fillOval(0, 0, 34, 34);
-                g2.setFont(CustomerUI.bold(13));
+                g2.setFont(CustomUI.bold(13));
                 g2.setColor(Color.WHITE);
                 g2.drawString("QT", 8, 23);
                 g2.dispose();
             }
         };
         JLabel uname = new JLabel("Quản Trị Viên");
-        uname.setFont(CustomerUI.plain(13));
-        uname.setForeground(CustomerUI.TEXT_LIGHT);
+        uname.setFont(CustomUI.plain(13));
+        uname.setForeground(CustomUI.TEXT_LIGHT);
         user.add(av);
         user.add(uname);
         right.add(user);
@@ -113,109 +114,152 @@ public class dashboardUI extends JFrame {
 
     // ─── Sidebar─────────────────────────
     private JPanel buildSidebar() {
-        JPanel side = new JPanel(new BorderLayout());
-        side.setPreferredSize(new Dimension(220, 0));
-        side.setBackground(CustomerUI.BG_WHITE);
+        final int W = 220;
 
-        // ===== TẠO NODE =====
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Menu");
-
-        DefaultMutableTreeNode trangChu = new DefaultMutableTreeNode("Trang chủ");
-
-        DefaultMutableTreeNode quanLy = new DefaultMutableTreeNode("Quản lí");
-        DefaultMutableTreeNode nhanVien = new DefaultMutableTreeNode("Nhân viên");
-        DefaultMutableTreeNode ve = new DefaultMutableTreeNode("Vé");
-
-        DefaultMutableTreeNode phim = new DefaultMutableTreeNode("Phim");
-        DefaultMutableTreeNode dsPhim = new DefaultMutableTreeNode("Danh sách");
-        DefaultMutableTreeNode themPhim = new DefaultMutableTreeNode("Thêm phim");
-
-        DefaultMutableTreeNode thongKe = new DefaultMutableTreeNode("Thống kê");
-
-        // ===== GHÉP CÂY =====
-        phim.add(dsPhim);
-        phim.add(themPhim);
-
-        quanLy.add(nhanVien);
-        quanLy.add(ve);
-        quanLy.add(phim);
-
-        root.add(trangChu);
-        root.add(quanLy);
-        root.add(thongKe);
-
-        // ===== TẠO TREE =====
-        JTree tree = new JTree(root);
-        tree.setRootVisible(false);
-        tree.setBackground(CustomerUI.BG_WHITE);
-        tree.setForeground(Color.RED);
-        tree.setRowHeight(30);
-
-        // Expand mặc định
-        for (int i = 0; i < tree.getRowCount(); i++) {
-            tree.expandRow(i);
-        }
-
-        // ===== XỬ LÝ CLICK =====
-        tree.addTreeSelectionListener(e -> {
-            DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-
-            if (selectedNode == null)
-                return;
-
-            String value = selectedNode.toString();
-
-            switch (value) {
-                case "Trang chủ":
-                    switchContent(buildContent());
-                    break;
-
-                case "Nhân viên":
-                    switchContent(new QuanLyNhanVienUI());
-                    break;
-
-                case "Vé":
-                    switchContent(new BanVeUI());
-                    break;
-
-                case "Danh sách":
-                    switchContent(new QuanLyPhimUI("list"));
-                    break;
-
-                case "Thêm phim":
-                    switchContent(new QuanLyPhimUI("add"));
-                    break;
-
-                case "Thống kê":
-                    JOptionPane.showMessageDialog(this, "Chưa làm thống kê");
-                    break;
+        // Wrapper dùng null layout để layeredPane có thể resize theo chiều cao
+        JPanel side = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.setColor(CustomUI.SIDEBAR_BG);
+                g.fillRect(0, 0, getWidth(), getHeight());
             }
+        };
+        side.setOpaque(false);
+        side.setPreferredSize(new Dimension(W, 0));
+
+        // ===== LayeredPane – toàn bộ chiều cao sidebar =====
+        JLayeredPane layered = new JLayeredPane() {
+            @Override
+            public void doLayout() {
+                int w = getWidth(), h = getHeight();
+                // Thanh icon menu cố định ở trên
+                // Không cần layout button vì setBounds tuyệt đối
+                for (Component c : getComponents()) {
+                    // chỉ resize scroll và menuPanel, button tự lo
+                    String name = c.getName();
+                    if ("scroll".equals(name))
+                        c.setBounds(0, 50, w, h - 50);
+                    else if ("menu".equals(name))
+                        c.setBounds(0, 50, w, Math.min(h - 50, 340));
+                    else if ("topbar".equals(name))
+                        c.setBounds(0, 0, w, 50);
+                }
+            }
+        };
+        layered.setOpaque(false);
+
+        // ===== TOP BAR icon (luôn hiển thị ở trên) =====
+        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8)) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.setColor(CustomUI.SIDEBAR_BG);
+                g.fillRect(0, 0, getWidth(), getHeight());
+                // gạch phân cách dưới topbar
+                g.setColor(new Color(0x2D4055));
+                g.drawLine(0, 49, getWidth(), 49);
+            }
+        };
+        topBar.setOpaque(false);
+        topBar.setName("topbar");
+
+        // Nút icon ☰
+        JButton btnMenu = new JButton("☰") {
+            boolean hov = false;
+            {
+                addMouseListener(new MouseAdapter() {
+                    public void mouseEntered(MouseEvent e) {
+                        hov = true;
+                        repaint();
+                    }
+
+                    public void mouseExited(MouseEvent e) {
+                        hov = false;
+                        repaint();
+                    }
+                });
+                setOpaque(false);
+                setContentAreaFilled(false);
+                setBorderPainted(false);
+                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if (hov) {
+                    g2.setColor(new Color(255, 255, 255, 18));
+                    g2.fill(new java.awt.geom.RoundRectangle2D.Float(1, 1, getWidth() - 2, getHeight() - 2, 8, 8));
+                }
+                g2.setFont(CustomUI.plain(18));
+                g2.setColor(Color.WHITE);
+                FontMetrics fm = g2.getFontMetrics();
+                g2.drawString("☰", (getWidth() - fm.stringWidth("☰")) / 2,
+                        (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
+                g2.dispose();
+            }
+        };
+        btnMenu.setPreferredSize(new Dimension(36, 34));
+        btnMenu.setToolTipText("Menu");
+
+        JLabel menuLabel = new JLabel("Menu");
+        menuLabel.setFont(CustomUI.bold(13));
+        menuLabel.setForeground(new Color(0x90A8BF));
+
+        topBar.add(btnMenu);
+        topBar.add(menuLabel);
+
+        // ===== TREE (LỚP DƯỚI) =====
+        JTree tree = createTree();
+        tree.setBackground(CustomUI.SIDEBAR_BG);
+        tree.setForeground(new Color(0x90A8BF));
+        tree.setOpaque(true);
+        tree.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+        JScrollPane scroll = new JScrollPane(tree);
+        scroll.setName("scroll");
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.getVerticalScrollBar().setOpaque(false);
+
+        // ===== MENU PANEL (LỚP TRÊN – che đè tree) =====
+        JPanel menuPanel = createMenuPanel();
+        menuPanel.setName("menu");
+        menuPanel.setVisible(false);
+
+        // ===== Ghép vào layered =====
+        layered.add(scroll, Integer.valueOf(0)); // đáy
+        layered.add(menuPanel, Integer.valueOf(1)); // giữa (che tree)
+        layered.add(topBar, Integer.valueOf(2)); // luôn trên cùng
+
+        // Toggle hiển thị menu
+        btnMenu.addActionListener(e -> {
+            boolean show = !menuPanel.isVisible();
+            menuPanel.setVisible(show);
+            menuLabel.setText(show ? "Đóng" : "Menu");
+            menuLabel.setForeground(show ? CustomUI.TEAL : new Color(0x90A8BF));
+            layered.repaint();
         });
 
-        // ===== SCROLL =====
-        JScrollPane scroll = new JScrollPane(tree);
-        scroll.setBorder(null);
-
-        side.add(scroll, BorderLayout.CENTER);
-
+        side.add(layered, BorderLayout.CENTER);
         return side;
     }
 
     // ─── Nội dung chính ──────────────────────────────────────────────────────
     private JPanel buildContent() {
         JPanel wrap = new JPanel(new BorderLayout());
-        wrap.setBackground(CustomerUI.BG_MAIN);
+        wrap.setBackground(CustomUI.BG_MAIN);
 
         // Header trang
         JPanel hdr = new JPanel(new BorderLayout());
         hdr.setOpaque(false);
         hdr.setBorder(BorderFactory.createEmptyBorder(22, 24, 12, 24));
         JLabel ttl = new JLabel("Bảng Điều Khiển");
-        ttl.setFont(CustomerUI.bold(24));
-        ttl.setForeground(CustomerUI.TEXT_DARK);
+        ttl.setFont(CustomUI.bold(24));
+        ttl.setForeground(CustomUI.TEXT_DARK);
         JLabel sub = new JLabel("Chào mừng trở lại, Quản Trị Viên  •  " + java.time.LocalDate.now());
-        sub.setFont(CustomerUI.plain(13));
-        sub.setForeground(CustomerUI.TEXT_MID);
+        sub.setFont(CustomUI.plain(13));
+        sub.setForeground(CustomUI.TEXT_MID);
         hdr.add(ttl, BorderLayout.NORTH);
         hdr.add(sub, BorderLayout.SOUTH);
         wrap.add(hdr, BorderLayout.NORTH);
@@ -223,16 +267,16 @@ public class dashboardUI extends JFrame {
         // Body cuộn
         JPanel body = new JPanel();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
-        body.setBackground(CustomerUI.BG_MAIN);
+        body.setBackground(CustomUI.BG_MAIN);
         body.setBorder(BorderFactory.createEmptyBorder(0, 24, 24, 24));
 
         // ── Stat cards (3 card teal như ảnh) ──────────────────────────────────
         JPanel statsRow = new JPanel(new GridLayout(1, 3, 14, 0));
         statsRow.setOpaque(false);
         statsRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 118));
-        statsRow.add(CustomerUI.createStatCard("Tổng Vé Đã Bán", "1,250", "K&H hôm nay +42", CustomerUI.CARD_1));
-        statsRow.add(CustomerUI.createStatCard("Doanh Thu Hôm Nay", "30,250,000", "VNĐ  ▲ 12%", CustomerUI.CARD_2));
-        statsRow.add(CustomerUI.createStatCard("Phim Đang Chiếu", "8", "Khách hàng — 3 sắp ra", CustomerUI.CARD_3));
+        statsRow.add(CustomUI.createStatCard("Tổng Vé Đã Bán", "1,250", "K&H hôm nay +42", CustomUI.CARD_1));
+        statsRow.add(CustomUI.createStatCard("Doanh Thu Hôm Nay", "30,250,000", "VNĐ  ▲ 12%", CustomUI.CARD_2));
+        statsRow.add(CustomUI.createStatCard("Phim Đang Chiếu", "8", "Khách hàng — 3 sắp ra", CustomUI.CARD_3));
         body.add(statsRow);
         body.add(Box.createVerticalStrut(18));
 
@@ -242,31 +286,31 @@ public class dashboardUI extends JFrame {
         midRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 255));
 
         // Biểu đồ doanh thu
-        JPanel chartCard = CustomerUI.createCard();
+        JPanel chartCard = CustomUI.createCard();
         chartCard.setLayout(new BorderLayout(0, 10));
         JPanel chHdr = new JPanel(new BorderLayout());
         chHdr.setOpaque(false);
-        chHdr.add(CustomerUI.createSectionTitle("Doanh Thu Theo Ngày"), BorderLayout.WEST);
+        chHdr.add(CustomUI.createSectionTitle("Doanh Thu Theo Ngày"), BorderLayout.WEST);
         JLabel chOpt = new JLabel("Chọn Tiếp ▼");
-        chOpt.setFont(CustomerUI.plain(12));
-        chOpt.setForeground(CustomerUI.TEXT_LIGHT);
+        chOpt.setFont(CustomUI.plain(12));
+        chOpt.setForeground(CustomUI.TEXT_LIGHT);
         chHdr.add(chOpt, BorderLayout.EAST);
         chartCard.add(chHdr, BorderLayout.NORTH);
         int[] vals = { 12, 22, 17, 38, 28, 42, 31 };
         String[] days = { "T2", "T3", "T4", "T5", "T6", "T7", "CN" };
-        chartCard.add(CustomerUI.createMiniBarChart(vals, days, CustomerUI.TEAL), BorderLayout.CENTER);
+        chartCard.add(CustomUI.createMiniBarChart(vals, days, CustomUI.TEAL), BorderLayout.CENTER);
         // legend
         JPanel leg = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 0));
         leg.setOpaque(false);
-        addLegend(leg, "Tổng tuần", "188M VNĐ", CustomerUI.TEAL);
-        addLegend(leg, "Cao nhất", "42M", CustomerUI.INFO);
+        addLegend(leg, "Tổng tuần", "188M VNĐ", CustomUI.TEAL);
+        addLegend(leg, "Cao nhất", "42M", CustomUI.INFO);
         chartCard.add(leg, BorderLayout.SOUTH);
         midRow.add(chartCard);
 
         // Top phim
-        JPanel movCard = CustomerUI.createCard();
+        JPanel movCard = CustomUI.createCard();
         movCard.setLayout(new BorderLayout(0, 10));
-        movCard.add(CustomerUI.createSectionTitle("Doanh Thu Theo Ngày"), BorderLayout.NORTH);
+        movCard.add(CustomUI.createSectionTitle("Doanh Thu Theo Ngày"), BorderLayout.NORTH);
         JPanel movList = new JPanel();
         movList.setLayout(new BoxLayout(movList, BoxLayout.Y_AXIS));
         movList.setOpaque(false);
@@ -286,14 +330,14 @@ public class dashboardUI extends JFrame {
         body.add(Box.createVerticalStrut(18));
 
         // ── Bảng lịch chiếu ────────────────────────────────────────────────────
-        JPanel tblCard = CustomerUI.createCard();
+        JPanel tblCard = CustomUI.createCard();
         tblCard.setLayout(new BorderLayout(0, 12));
         JPanel tblHdr = new JPanel(new BorderLayout());
         tblHdr.setOpaque(false);
-        tblHdr.add(CustomerUI.createSectionTitle("Lịch Chiếu Hôm Nay"), BorderLayout.WEST);
-        JPanel tblBtns = CustomerUI.row(
-                CustomerUI.createSecondaryButton("Lọc"),
-                CustomerUI.createPrimaryButton("+ Thêm Suất"));
+        tblHdr.add(CustomUI.createSectionTitle("Lịch Chiếu Hôm Nay"), BorderLayout.WEST);
+        JPanel tblBtns = CustomUI.row(
+                CustomUI.createSecondaryButton("Lọc"),
+                CustomUI.createPrimaryButton("+ Thêm Suất"));
         tblHdr.add(tblBtns, BorderLayout.EAST);
         tblCard.add(tblHdr, BorderLayout.NORTH);
         tblCard.add(buildScheduleTable(), BorderLayout.CENTER);
@@ -305,22 +349,22 @@ public class dashboardUI extends JFrame {
         botRow.setOpaque(false);
         botRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 220));
 
-        JPanel actCard = CustomerUI.createCard();
+        JPanel actCard = CustomUI.createCard();
         actCard.setLayout(new BorderLayout(0, 10));
-        actCard.add(CustomerUI.createSectionTitle("Hoạt Động Gần Đây"), BorderLayout.NORTH);
+        actCard.add(CustomUI.createSectionTitle("Hoạt Động Gần Đây"), BorderLayout.NORTH);
         actCard.add(buildActivityLog(), BorderLayout.CENTER);
         botRow.add(actCard);
 
-        JPanel qCard = CustomerUI.createCard();
+        JPanel qCard = CustomUI.createCard();
         qCard.setLayout(new BorderLayout(0, 10));
-        qCard.add(CustomerUI.createSectionTitle("Thao Tác Nhanh"), BorderLayout.NORTH);
+        qCard.add(CustomUI.createSectionTitle("Thao Tác Nhanh"), BorderLayout.NORTH);
         qCard.add(buildQuickActions(), BorderLayout.CENTER);
         botRow.add(qCard);
         body.add(botRow);
 
         JScrollPane scroll = new JScrollPane(body);
-        scroll.setBackground(CustomerUI.BG_MAIN);
-        scroll.getViewport().setBackground(CustomerUI.BG_MAIN);
+        scroll.setBackground(CustomUI.BG_MAIN);
+        scroll.getViewport().setBackground(CustomUI.BG_MAIN);
         scroll.setBorder(BorderFactory.createEmptyBorder());
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         wrap.add(scroll, BorderLayout.CENTER);
@@ -382,11 +426,11 @@ public class dashboardUI extends JFrame {
         JPanel info = new JPanel(new BorderLayout());
         info.setOpaque(false);
         JLabel nm = new JLabel(name);
-        nm.setFont(CustomerUI.bold(13));
-        nm.setForeground(CustomerUI.TEXT_DARK);
+        nm.setFont(CustomUI.bold(13));
+        nm.setForeground(CustomUI.TEXT_DARK);
         JLabel mt = new JLabel(meta);
-        mt.setFont(CustomerUI.plain(11));
-        mt.setForeground(CustomerUI.TEXT_LIGHT);
+        mt.setFont(CustomUI.plain(11));
+        mt.setForeground(CustomUI.TEXT_LIGHT);
         info.add(nm, BorderLayout.NORTH);
         info.add(mt, BorderLayout.SOUTH);
 
@@ -418,10 +462,10 @@ public class dashboardUI extends JFrame {
                 Component c = super.prepareRenderer(r, row, col);
                 // xen kẽ hàng
                 if (!isRowSelected(row))
-                    c.setBackground(row % 2 == 0 ? CustomerUI.BG_WHITE : CustomerUI.BG_ROW_ALT);
+                    c.setBackground(row % 2 == 0 ? CustomUI.BG_WHITE : CustomUI.BG_ROW_ALT);
                 else
-                    c.setBackground(CustomerUI.TEAL_LIGHT);
-                c.setForeground(CustomerUI.TEXT_DARK);
+                    c.setBackground(CustomUI.TEAL_LIGHT);
+                c.setForeground(CustomUI.TEXT_DARK);
                 if (c instanceof JLabel)
                     ((JLabel) c).setBorder(
                             BorderFactory.createEmptyBorder(8, 12, 8, 12));
@@ -429,33 +473,33 @@ public class dashboardUI extends JFrame {
                 if (col == 6) {
                     String v = (String) getValueAt(row, col);
                     if (v.contains("Hết"))
-                        c.setForeground(CustomerUI.DANGER);
+                        c.setForeground(CustomUI.DANGER);
                     else if (v.contains("Sắp"))
-                        c.setForeground(CustomerUI.WARNING);
+                        c.setForeground(CustomUI.WARNING);
                     else
-                        c.setForeground(CustomerUI.SUCCESS);
+                        c.setForeground(CustomUI.SUCCESS);
                 }
                 return c;
             }
         };
-        tbl.setBackground(CustomerUI.BG_WHITE);
-        tbl.setForeground(CustomerUI.TEXT_DARK);
-        tbl.setFont(CustomerUI.plain(13));
+        tbl.setBackground(CustomUI.BG_WHITE);
+        tbl.setForeground(CustomUI.TEXT_DARK);
+        tbl.setFont(CustomUI.plain(13));
         tbl.setRowHeight(40);
         tbl.setShowGrid(false);
         tbl.setIntercellSpacing(new Dimension(0, 1));
-        tbl.getTableHeader().setFont(CustomerUI.bold(12));
+        tbl.getTableHeader().setFont(CustomUI.bold(12));
         tbl.getTableHeader().setBackground(new Color(0xF1F5F9));
-        tbl.getTableHeader().setForeground(CustomerUI.TEXT_MID);
+        tbl.getTableHeader().setForeground(CustomUI.TEXT_MID);
         tbl.getTableHeader().setBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, CustomerUI.BORDER));
+                BorderFactory.createMatteBorder(0, 0, 1, 0, CustomUI.BORDER));
         int[] ws = { 70, 200, 60, 90, 100, 110, 110 };
         for (int i = 0; i < ws.length; i++)
             tbl.getColumnModel().getColumn(i).setPreferredWidth(ws[i]);
         JScrollPane sp = new JScrollPane(tbl);
         sp.setBorder(BorderFactory.createEmptyBorder());
-        sp.setBackground(CustomerUI.BG_WHITE);
-        sp.getViewport().setBackground(CustomerUI.BG_WHITE);
+        sp.setBackground(CustomUI.BG_WHITE);
+        sp.getViewport().setBackground(CustomUI.BG_WHITE);
         sp.setPreferredSize(new Dimension(0, 215));
         return sp;
     }
@@ -478,16 +522,16 @@ public class dashboardUI extends JFrame {
             row.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
             row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
             JLabel ic = new JLabel(a[0]);
-            ic.setFont(CustomerUI.plain(14));
+            ic.setFont(CustomUI.plain(14));
             ic.setPreferredSize(new Dimension(24, 20));
             JPanel inf = new JPanel(new BorderLayout());
             inf.setOpaque(false);
             JLabel msg = new JLabel(a[1]);
-            msg.setFont(CustomerUI.plain(12));
-            msg.setForeground(CustomerUI.TEXT_DARK);
+            msg.setFont(CustomUI.plain(12));
+            msg.setForeground(CustomUI.TEXT_DARK);
             JLabel tm = new JLabel(a[2]);
-            tm.setFont(CustomerUI.plain(11));
-            tm.setForeground(CustomerUI.TEXT_LIGHT);
+            tm.setFont(CustomUI.plain(11));
+            tm.setForeground(CustomUI.TEXT_LIGHT);
             inf.add(msg, BorderLayout.NORTH);
             inf.add(tm, BorderLayout.SOUTH);
             row.add(ic, BorderLayout.WEST);
@@ -530,16 +574,16 @@ public class dashboardUI extends JFrame {
                 protected void paintComponent(Graphics g) {
                     Graphics2D g2 = (Graphics2D) g.create();
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    g2.setColor(hov ? CustomerUI.TEAL_LIGHT : CustomerUI.BG_ROW_ALT);
+                    g2.setColor(hov ? CustomUI.TEAL_LIGHT : CustomUI.BG_ROW_ALT);
                     g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 12, 12));
-                    g2.setColor(hov ? CustomerUI.TEAL : CustomerUI.BORDER2);
+                    g2.setColor(hov ? CustomUI.TEAL : CustomUI.BORDER2);
                     g2.setStroke(new BasicStroke(1f));
                     g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, getWidth() - 1, getHeight() - 1, 12, 12));
-                    g2.setFont(CustomerUI.plain(22));
+                    g2.setFont(CustomUI.plain(22));
                     FontMetrics fm = g2.getFontMetrics();
                     g2.drawString(a[0], (getWidth() - fm.stringWidth(a[0])) / 2, getHeight() / 2 - 2);
-                    g2.setFont(CustomerUI.plain(12));
-                    g2.setColor(CustomerUI.TEXT_MID);
+                    g2.setFont(CustomUI.plain(12));
+                    g2.setColor(CustomUI.TEXT_MID);
                     fm = g2.getFontMetrics();
                     g2.drawString(a[1], (getWidth() - fm.stringWidth(a[1])) / 2, getHeight() / 2 + 18);
                     g2.dispose();
@@ -571,10 +615,10 @@ public class dashboardUI extends JFrame {
             }
         };
         JLabel lb = new JLabel(label + ": ");
-        lb.setFont(CustomerUI.plain(11));
-        lb.setForeground(CustomerUI.TEXT_LIGHT);
+        lb.setFont(CustomUI.plain(11));
+        lb.setForeground(CustomUI.TEXT_LIGHT);
         JLabel vl = new JLabel(value);
-        vl.setFont(CustomerUI.bold(12));
+        vl.setFont(CustomUI.bold(12));
         vl.setForeground(color);
         item.add(dot);
         item.add(lb);
@@ -589,5 +633,106 @@ public class dashboardUI extends JFrame {
 
         root.revalidate();
         root.repaint();
+    }
+
+    private JPanel createMenuPanel() {
+        JPanel panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(CustomUI.SIDEBAR_BG);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                // shadow nhẹ ở cuối
+                GradientPaint shadow = new GradientPaint(
+                        0, getHeight() - 14, new Color(0, 0, 0, 0),
+                        0, getHeight(), new Color(0, 0, 0, 60));
+                g2.setPaint(shadow);
+                g2.fillRect(0, getHeight() - 14, getWidth(), 14);
+                g2.dispose();
+            }
+        };
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+
+        JSeparator sep = CustomUI.createDivider();
+        sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+        panel.add(sep);
+        panel.add(Box.createVerticalStrut(4));
+
+        String[][] navItems = {
+                { "🏠", "Trang Chủ" },
+                { "🎟️", "Bán Vé" },
+                { "🎬", "Quản Lý Phim" },
+                { "👤", "Nhân Viên" },
+                { "📊", "Báo Cáo" },
+                { "⚙️", "Cài Đặt" },
+        };
+
+        for (String[] item : navItems) {
+            boolean isActive = item[1].equals(activeNav);
+            JPanel nav = CustomUI.createNavItem(item[0], item[1], isActive);
+            nav.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
+            nav.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    activeNav = item[1];
+                    JOptionPane.showMessageDialog(dashboardUI.this, "Chuyển đến: " + item[1]);
+                }
+            });
+            panel.add(nav);
+        }
+
+        panel.add(Box.createVerticalStrut(4));
+        JSeparator sep2 = CustomUI.createDivider();
+        sep2.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+        panel.add(sep2);
+
+        return panel;
+    }
+
+    private JTree createTree() {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Menu");
+
+        DefaultMutableTreeNode ql = new DefaultMutableTreeNode("📁 Quản lý");
+        ql.add(new DefaultMutableTreeNode("👤 Nhân viên"));
+        ql.add(new DefaultMutableTreeNode("🎟️ Vé"));
+        ql.add(new DefaultMutableTreeNode("🎬 Phim"));
+
+        DefaultMutableTreeNode rpt = new DefaultMutableTreeNode("📊 Báo cáo");
+        rpt.add(new DefaultMutableTreeNode("📅 Theo ngày"));
+        rpt.add(new DefaultMutableTreeNode("📆 Theo tháng"));
+
+        root.add(ql);
+        root.add(rpt);
+
+        JTree tree = new JTree(root);
+        tree.setRootVisible(false);
+        tree.setBackground(CustomUI.SIDEBAR_BG);
+        tree.setForeground(new Color(0x90A8BF));
+        tree.setFont(CustomUI.plain(13));
+        tree.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 4));
+
+        // Custom renderer – text sáng trên nền tối
+        tree.setCellRenderer(new javax.swing.tree.DefaultTreeCellRenderer() {
+            @Override
+            public Component getTreeCellRendererComponent(JTree t, Object val,
+                    boolean sel, boolean exp, boolean leaf, int row, boolean focus) {
+                super.getTreeCellRendererComponent(t, val, sel, exp, leaf, row, focus);
+                setBackground(sel ? new Color(43, 200, 163, 40) : CustomUI.SIDEBAR_BG);
+                setForeground(sel ? CustomUI.TEAL : new Color(0x90A8BF));
+                setFont(CustomUI.plain(13));
+                setBorderSelectionColor(new Color(0, 0, 0, 0));
+                setBackgroundSelectionColor(new Color(43, 200, 163, 40));
+                setOpaque(true);
+                return this;
+            }
+        });
+
+        // Mở rộng toàn bộ node
+        for (int i = 0; i < tree.getRowCount(); i++)
+            tree.expandRow(i);
+        return tree;
     }
 }
