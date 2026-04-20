@@ -5,16 +5,16 @@ import java.time.LocalDateTime;
 public class DatVe {
     private String maDatVe;
     private KhachHang khachHang;
-    private String maSuatChieu;
+    private SuatChieu suatChieu;
     private LocalDateTime thoiDiemDat;
     private double tongTien;
     private String trangThai; // Đã thanh toán / Chưa / Hủy
 
-    public DatVe(String maDatVe, KhachHang khachHang, String maSuatChieu, LocalDateTime thoiDiemDat, double tongTien,
+    public DatVe(String maDatVe, KhachHang khachHang, SuatChieu suatChieu, LocalDateTime thoiDiemDat, double tongTien,
             String trangThai) {
         this.maDatVe = maDatVe;
         this.khachHang = khachHang;
-        this.maSuatChieu = maSuatChieu;
+        this.suatChieu = suatChieu;
         this.thoiDiemDat = thoiDiemDat;
         this.tongTien = tongTien;
         this.trangThai = trangThai;
@@ -36,12 +36,12 @@ public class DatVe {
         this.khachHang = khachHang;
     }
 
-    public String getMaSuatChieu() {
-        return maSuatChieu;
+    public SuatChieu getSuatChieu() {
+        return suatChieu;
     }
 
-    public void setMaSuatChieu(String maSuatChieu) {
-        this.maSuatChieu = maSuatChieu;
+    public void setSuatChieu(SuatChieu suatChieu) {
+        this.suatChieu = suatChieu;
     }
 
     public LocalDateTime getThoiDiemDat() {
