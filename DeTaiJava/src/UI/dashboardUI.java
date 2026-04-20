@@ -21,9 +21,9 @@ public class dashboardUI extends JFrame {
         setSize(1200, 750);
         setLocationRelativeTo(null);
         setBackground(CustomUI.BG_MAIN);
-        root.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         root = new JPanel(new BorderLayout());
+        root.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         root.setBackground(CustomUI.BG_MAIN);
 
         root.add(buildTopBar(), BorderLayout.NORTH);
