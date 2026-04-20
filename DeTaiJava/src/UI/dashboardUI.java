@@ -1,8 +1,11 @@
 package UI;
 
 import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeSelectionModel;
 
 import customUI.CustomUI;
 
@@ -677,8 +680,7 @@ public class dashboardUI extends JFrame {
             nav.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    activeNav = item[1];
-                    JOptionPane.showMessageDialog(dashboardUI.this, "Chuyển đến: " + item[1]);
+                    navigate(item[1]);
                 }
             });
             panel.add(nav);
@@ -730,9 +732,38 @@ public class dashboardUI extends JFrame {
             }
         });
 
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+                if (node == null || !node.isLeaf())
+                    return;
+                String selected = node.getUserObject().toString();
+                if (selected.contains("Vé")) {
+                    navigate("Bán Vé");
+                } else if (selected.contains("Nhân viên")) {
+                    navigate("Nhân Viên");
+                } else if (selected.contains("Phim")) {
+                    navigate("Quản Lý Phim");
+                }
+            }
+        });
+
         // Mở rộng toàn bộ node
         for (int i = 0; i < tree.getRowCount(); i++)
             tree.expandRow(i);
         return tree;
+    }
+
+    private void navigate(String page) {
+        activeNav = page;
+        switch (page) {
+            case "Bán Vé" -> switchContent(new BanVeUI());
+            case "Nhân Viên" -> switchContent(new QuanLyNhanVienUI());
+            case "Quản Lý Phim" -> switchContent(new QuanLyNhanVienUI());
+            case "Trang Chủ" -> switchContent(buildContent());
+            default -> JOptionPane.showMessageDialog(this, "Chưa hỗ trợ trang: " + page);
+        }
     }
 }
