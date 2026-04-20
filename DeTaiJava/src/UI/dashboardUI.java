@@ -115,8 +115,6 @@ public class dashboardUI extends JFrame {
     // ─── Sidebar─────────────────────────
     private JPanel buildSidebar() {
         final int W = 220;
-
-        // Wrapper dùng null layout để layeredPane có thể resize theo chiều cao
         JPanel side = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -147,22 +145,18 @@ public class dashboardUI extends JFrame {
             }
         };
         layered.setOpaque(false);
-
         // ===== TOP BAR icon (luôn hiển thị ở trên) =====
         JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8)) {
             @Override
             protected void paintComponent(Graphics g) {
                 g.setColor(CustomUI.SIDEBAR_BG);
                 g.fillRect(0, 0, getWidth(), getHeight());
-                // gạch phân cách dưới topbar
                 g.setColor(new Color(0x2D4055));
                 g.drawLine(0, 49, getWidth(), 49);
             }
         };
         topBar.setOpaque(false);
         topBar.setName("topbar");
-
-        // Nút icon ☰
         JButton btnMenu = new JButton("☰") {
             boolean hov = false;
             {
@@ -666,8 +660,8 @@ public class dashboardUI extends JFrame {
                 { "🎟️", "Bán Vé" },
                 { "🎬", "Quản Lý Phim" },
                 { "👤", "Nhân Viên" },
-                { "📊", "Báo Cáo" },
-                { "⚙️", "Cài Đặt" },
+                { "📊", "Thống kê" },
+                { "", "Đăng xuất" },
         };
 
         for (String[] item : navItems) {
@@ -678,7 +672,32 @@ public class dashboardUI extends JFrame {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     activeNav = item[1];
-                    JOptionPane.showMessageDialog(dashboardUI.this, "Chuyển đến: " + item[1]);
+
+                    switch (item[1]) {
+                        case "Trang Chủ":
+                            switchContent(buildContent());
+                            break;
+
+                        case "Bán Vé":
+                            switchContent(new BanVeUI());
+                            break;
+
+                        case "Quản Lý Phim":
+                            switchContent(new QuanLyPhimUI("List"));
+                            break;
+
+                        case "Nhân Viên":
+                            switchContent(new QuanLyNhanVienUI());
+                            break;
+
+                        case "Thống kê":
+                            JOptionPane.showMessageDialog(dashboardUI.this, "Chưa làm báo cáo");
+                            break;
+
+                        case "Đăng xuất":
+                            switchContent(new dangNhapUI());
+                            break;
+                    }
                 }
             });
             panel.add(nav);
@@ -698,15 +717,13 @@ public class dashboardUI extends JFrame {
         DefaultMutableTreeNode ql = new DefaultMutableTreeNode("📁 Quản lý");
         ql.add(new DefaultMutableTreeNode("👤 Nhân viên"));
         ql.add(new DefaultMutableTreeNode("🎟️ Vé"));
-        ql.add(new DefaultMutableTreeNode("🎬 Phim"));
-
-        DefaultMutableTreeNode rpt = new DefaultMutableTreeNode("📊 Báo cáo");
-        rpt.add(new DefaultMutableTreeNode("📅 Theo ngày"));
-        rpt.add(new DefaultMutableTreeNode("📆 Theo tháng"));
+        DefaultMutableTreeNode qlPhim = new DefaultMutableTreeNode("🎬 Phim");
+        qlPhim.add(new DefaultMutableTreeNode("Thêm phim"));
+        qlPhim.add(new DefaultMutableTreeNode("Danh Sách"));
+        ql.add(qlPhim);
+        ql.add(new DefaultMutableTreeNode("📊 Thống kê"));
 
         root.add(ql);
-        root.add(rpt);
-
         JTree tree = new JTree(root);
         tree.setRootVisible(false);
         tree.setBackground(CustomUI.SIDEBAR_BG);
@@ -729,10 +746,40 @@ public class dashboardUI extends JFrame {
                 return this;
             }
         });
+        tree.addTreeSelectionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 
+            if (node == null)
+                return;
+
+            String value = node.toString();
+
+            switch (value) {
+                case "👤 Nhân viên":
+                    switchContent(new QuanLyNhanVienUI());
+                    break;
+
+                case "🎟️ Vé":
+                    switchContent(new BanVeUI());
+                    break;
+
+                case "Danh Sách":
+                    switchContent(new QuanLyPhimUI("list"));
+                    break;
+
+                case "Thêm phim":
+                    switchContent(new QuanLyPhimUI("add"));
+                    break;
+
+                case "📊 Thống kê":
+                    JOptionPane.showMessageDialog(this, "Chưa làm thống kê");
+                    break;
+            }
+        });
         // Mở rộng toàn bộ node
         for (int i = 0; i < tree.getRowCount(); i++)
             tree.expandRow(i);
         return tree;
+
     }
 }
