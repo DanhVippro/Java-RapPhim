@@ -1,11 +1,11 @@
-package customerUI;
+package customUI;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 
-public class CustomerUI {
+public class CustomUI {
 
     // ─── Màu nền ──────────────────────────────────────────────────────────────
     public static final Color BG_MAIN = new Color(0xEEF2F7); // nền tổng xám xanh nhạt

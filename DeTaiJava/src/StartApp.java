@@ -1,11 +1,11 @@
 import javax.swing.SwingUtilities;
 
 import UI.dashboardUI;
-import customerUI.CustomerUI;
+import customUI.CustomUI;
 
 public class StartApp {
     public static void main(String[] args) {
-        CustomerUI.applyTheme();
+        CustomUI.applyTheme();
         SwingUtilities.invokeLater(() -> new dashboardUI().setVisible(true));
     }
 }
