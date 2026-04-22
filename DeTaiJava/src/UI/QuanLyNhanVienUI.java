@@ -25,8 +25,8 @@ public class QuanLyNhanVienUI extends JPanel {
     public QuanLyNhanVienUI() {
        setLayout(new BorderLayout());
 
-        Color bgMain   = new Color(24, 39, 55);   
-Color panelBg  = new Color(33, 52, 72);   
+        Color bgMain   = new Color(0x2D4055);   
+Color panelBg  = new Color(0x2D4055);   
   
 Color headerBg = new Color(40, 60, 80);   
 Color textColor = Color.WHITE;
