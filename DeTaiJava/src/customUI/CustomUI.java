@@ -8,39 +8,39 @@ import java.awt.geom.*;
 public class CustomUI {
 
     // ─── Màu nền ──────────────────────────────────────────────────────────────
-    public static final Color BG_MAIN = new Color(0xEEF2F7); // nền tổng xám xanh nhạt
+    public static final Color BG_MAIN = new Color(0xF0F2FA); // nền tổng xám xanh nhạt
     public static final Color BG_WHITE = new Color(0xFFFFFF); // card trắng
-    public static final Color BG_ROW_ALT = new Color(0xF8FAFC); // hàng bảng xen kẽ
+    public static final Color BG_ROW_ALT = new Color(0xF7F8FC); // hàng bảng xen kẽ
 
-    // ─── Sidebar tối (như ảnh) ────────────────────────────────────────────────
-    public static final Color SIDEBAR_BG = new Color(0x1B2B3A); // nền sidebar
-    public static final Color SIDEBAR_ACT = new Color(0x2BC8A3); // teal active
+    // ─── Sidebar ───────────────────────────────────
+    public static final Color SIDEBAR_BG = new Color(95, 158, 160);
+    public static final Color SIDEBAR_ACT = new Color(0x7B9EE8); // cobalt sáng active
 
-    // ─── Teal chủ đạo ────────────────────────────────────────────────────────
-    public static final Color TEAL = new Color(0x2BC8A3);
-    public static final Color TEAL_DARK = new Color(0x1E9E80);
-    public static final Color TEAL_LIGHT = new Color(0xD0F5ED);
+    // ─── Màu chủ đạo: Cobalt nhạt hơn ────────────────────────────────────────
+    public static final Color TEAL = new Color(0x4169C8); // cobalt chính nhạt hơn
+    public static final Color TEAL_DARK = new Color(0x2E4799); // cobalt đậm hover
+    public static final Color TEAL_LIGHT = new Color(0xDDE5F8); // cobalt nhạt selection
 
-    // ─── Stat card 3 sắc độ teal như ảnh ─────────────────────────────────────
-    public static final Color CARD_1 = new Color(0x2BBAA8); // xanh đậm (Tổng vé)
-    public static final Color CARD_2 = new Color(0x32C5AF); // xanh vừa (Doanh thu)
-    public static final Color CARD_3 = new Color(0x3DD0BA); // xanh nhạt (Phim chiếu)
+    // ─── Stat card 3 sắc độ nhạt hơn ─────────────────────────────────────────
+    public static final Color CARD_1 = new Color(0x4169C8); // cobalt vừa (Tổng vé)
+    public static final Color CARD_2 = new Color(0x4A7090); // steel xanh vừa (Doanh thu)
+    public static final Color CARD_3 = new Color(0x4A3D80); // tím indigo vừa (Phim chiếu)
 
     // ─── Chữ ──────────────────────────────────────────────────────────────────
-    public static final Color TEXT_DARK = new Color(0x1C2D3E); // chữ tối chính
-    public static final Color TEXT_MID = new Color(0x4A6278); // chữ phụ
-    public static final Color TEXT_LIGHT = new Color(0x8FA5BB); // chữ mờ
+    public static final Color TEXT_DARK = new Color(0x1A2545); // chữ tối chính
+    public static final Color TEXT_MID = new Color(0x4A5A88); // chữ phụ
+    public static final Color TEXT_LIGHT = new Color(0x8A9ABF); // chữ mờ
     public static final Color TEXT_WHITE = Color.WHITE;
 
     // ─── Border ───────────────────────────────────────────────────────────────
-    public static final Color BORDER = new Color(0xDDE5EE);
-    public static final Color BORDER2 = new Color(0xC8D5E2);
+    public static final Color BORDER = new Color(0xD5DCED);
+    public static final Color BORDER2 = new Color(0xBCC8E2);
 
     // ─── Trạng thái ──────────────────────────────────────────────────────────
     public static final Color SUCCESS = new Color(0x22C55E);
     public static final Color WARNING = new Color(0xF59E0B);
     public static final Color DANGER = new Color(0xEF4444);
-    public static final Color INFO = new Color(0x3B82F6);
+    public static final Color INFO = new Color(0x7B9EE8);
 
     // ─── Font ─────────────────────────────────────────────────────────────────
     public static Font bold(int s) {
@@ -89,7 +89,7 @@ public class CustomUI {
         UIManager.put("Table.gridColor", BORDER);
         UIManager.put("Table.selectionBackground", TEAL_LIGHT);
         UIManager.put("Table.selectionForeground", TEXT_DARK);
-        UIManager.put("TableHeader.background", new Color(0xF1F5F9));
+        UIManager.put("TableHeader.background", new Color(0xF0F2FA));
         UIManager.put("TableHeader.foreground", TEXT_MID);
         UIManager.put("ScrollBar.background", BG_MAIN);
         UIManager.put("ScrollBar.thumb", BORDER2);
@@ -119,7 +119,7 @@ public class CustomUI {
         return p;
     }
 
-    // ─── Stat card màu teal (chữ trắng, trang trí vòng tròn) ────────────────
+    // ─── Stat card màu navy/indigo (chữ trắng, trang trí vòng tròn) ─────────
     public static JPanel createStatCard(String label, String value, String sub, Color bg) {
         JPanel card = new JPanel() {
             @Override
@@ -127,16 +127,16 @@ public class CustomUI {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 // shadow
-                g2.setColor(new Color(0, 0, 0, 20));
+                g2.setColor(new Color(0, 0, 30, 30));
                 g2.fill(new RoundRectangle2D.Float(2, 5, getWidth() - 2, getHeight() - 3, 14, 14));
-                // nền teal gradient
+                // nền gradient navy
                 GradientPaint gp = new GradientPaint(0, 0, bg.brighter(), getWidth(), getHeight(), bg.darker());
                 g2.setPaint(gp);
                 g2.fill(new RoundRectangle2D.Float(0, 0, getWidth() - 2, getHeight() - 3, 14, 14));
                 // vòng trang trí
-                g2.setColor(new Color(255, 255, 255, 18));
+                g2.setColor(new Color(255, 255, 255, 15));
                 g2.fillOval(getWidth() - 55, -15, 75, 75);
-                g2.setColor(new Color(255, 255, 255, 10));
+                g2.setColor(new Color(255, 255, 255, 8));
                 g2.fillOval(getWidth() - 35, getHeight() - 35, 65, 65);
                 g2.dispose();
             }
@@ -168,7 +168,7 @@ public class CustomUI {
         return card;
     }
 
-    // ─── Nút primary teal ────────────────────────────────────────────────────
+    // ─── Nút primary cobalt ───────────────────────────────────────────────────
     public static JButton createPrimaryButton(String text) {
         JButton btn = new JButton(text) {
             boolean hov = false;
@@ -195,7 +195,8 @@ public class CustomUI {
                 g2.setFont(getFont());
                 g2.setColor(Color.WHITE);
                 FontMetrics fm = g2.getFontMetrics();
-                g2.drawString(getText(), (getWidth() - fm.stringWidth(getText())) / 2,
+                g2.drawString(getText(),
+                        (getWidth() - fm.stringWidth(getText())) / 2,
                         (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
                 g2.dispose();
             }
@@ -239,7 +240,8 @@ public class CustomUI {
                 g2.setFont(getFont());
                 g2.setColor(TEXT_MID);
                 FontMetrics fm = g2.getFontMetrics();
-                g2.drawString(getText(), (getWidth() - fm.stringWidth(getText())) / 2,
+                g2.drawString(getText(),
+                        (getWidth() - fm.stringWidth(getText())) / 2,
                         (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
                 g2.dispose();
             }
@@ -283,7 +285,7 @@ public class CustomUI {
         return tf;
     }
 
-    // ─── Nav item sidebar (text sáng trên nền tối) ───────────────────────────
+    // ─── Nav item sidebar (nền navy đậm) ─────────────────────────────────────
     public static JPanel createNavItem(String icon, String label, boolean active) {
         JPanel p = new JPanel() {
             boolean hov = false;
@@ -306,13 +308,13 @@ public class CustomUI {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 if (active) {
-                    g2.setColor(new Color(43, 200, 163, 30));
+                    g2.setColor(new Color(91, 127, 212, 35)); // cobalt sáng mờ
                     g2.fill(new RoundRectangle2D.Float(6, 2, getWidth() - 12, getHeight() - 4, 10, 10));
                     g2.setColor(SIDEBAR_ACT);
                     g2.setStroke(new BasicStroke(3.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     g2.drawLine(4, 9, 4, getHeight() - 9);
                 } else if (hov) {
-                    g2.setColor(new Color(255, 255, 255, 8));
+                    g2.setColor(new Color(255, 255, 255, 6));
                     g2.fill(new RoundRectangle2D.Float(6, 2, getWidth() - 12, getHeight() - 4, 10, 10));
                 }
                 g2.dispose();
@@ -326,18 +328,18 @@ public class CustomUI {
 
         JLabel ic = new JLabel(icon);
         ic.setFont(plain(15));
-        ic.setForeground(active ? SIDEBAR_ACT : new Color(0x90A8BF));
+        ic.setForeground(active ? SIDEBAR_ACT : new Color(0x8096C0));
 
         JLabel lb = new JLabel(label);
         lb.setFont(active ? bold(13) : plain(13));
-        lb.setForeground(active ? Color.WHITE : new Color(0x90A8BF));
+        lb.setForeground(active ? Color.WHITE : new Color(0x8096C0));
 
         p.add(ic);
         p.add(lb);
         return p;
     }
 
-    // ─── Mini bar chart màu teal ──────────────────────────────────────────────
+    // ─── Mini bar chart màu cobalt ────────────────────────────────────────────
     public static JPanel createMiniBarChart(int[] values, String[] labels, Color barColor) {
         return new JPanel() {
             {
@@ -366,7 +368,7 @@ public class CustomUI {
                     int bh = (int) ((double) values[i] / maxV * chartH);
                     int bx = pad + i * (barW + gap), by = chartH - bh;
                     GradientPaint gp = new GradientPaint(bx, by, barColor,
-                            bx, chartH, new Color(barColor.getRed(), barColor.getGreen(), barColor.getBlue(), 90));
+                            bx, chartH, new Color(barColor.getRed(), barColor.getGreen(), barColor.getBlue(), 80));
                     g2.setPaint(gp);
                     g2.fill(new RoundRectangle2D.Float(bx, by, barW, bh, 4, 4));
                     g2.setFont(plain(9));
@@ -405,8 +407,8 @@ public class CustomUI {
     // ─── Divider ──────────────────────────────────────────────────────────────
     public static JSeparator createDivider() {
         JSeparator s = new JSeparator();
-        s.setForeground(new Color(0xFFFFFF, false)); // tối trên sidebar
-        s.setBackground(new Color(0x2D4055));
+        s.setForeground(new Color(0x2A3D6E));
+        s.setBackground(new Color(0x2A3D6E));
         s.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
         return s;
     }
