@@ -7,94 +7,94 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
-import customerUI.CustomerUI;
+import customUI.CustomUI;
 
 /**
  * BanVeUI – Trang bán vé rạp chiếu phim
  *
  * Tính năng:
- *  1. Chọn phim → cập nhật suất & phòng, hiển thị ảnh poster bên cạnh
- *  2. Click ghế → cập nhật ghế + loại + tổng tiền ở bảng thông tin đặt vé
- *  3. Chú thích màu ghế khớp với màu trên sơ đồ
- *  4. Xác nhận → màn hình chọn bắp & nước (có nút bỏ qua)
+ * 1. Chọn phim → cập nhật suất & phòng, hiển thị ảnh poster bên cạnh
+ * 2. Click ghế → cập nhật ghế + loại + tổng tiền ở bảng thông tin đặt vé
+ * 3. Chú thích màu ghế khớp với màu trên sơ đồ
+ * 4. Xác nhận → màn hình chọn bắp & nước (có nút bỏ qua)
  */
 public class BanVeUI extends JPanel {
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  DỮ LIỆU TĨNH
+    // DỮ LIỆU TĨNH
     // ══════════════════════════════════════════════════════════════════════════
 
     private static final String[] PHIM_LIST = {
-        "Avatar 2", "Kẻ Cắp Giấc Mơ", "Spider-Man"
+            "Avatar 2", "Kẻ Cắp Giấc Mơ", "Spider-Man"
     };
     private static final String[][] SUAT_BY_PHIM = {
-        {"19:00  Thứ 6, 21/6/2024", "14:00  Thứ 7, 22/6/2024", "21:30  Thứ 7, 22/6/2024"},
-        {"15:00  Thứ 6, 21/6/2024", "20:00  Thứ 6, 21/6/2024"},
-        {"10:00  Thứ 7, 22/6/2024", "16:30  Thứ 7, 22/6/2024", "22:00  CN, 23/6/2024"}
+            { "19:00  Thứ 6, 21/6/2024", "14:00  Thứ 7, 22/6/2024", "21:30  Thứ 7, 22/6/2024" },
+            { "15:00  Thứ 6, 21/6/2024", "20:00  Thứ 6, 21/6/2024" },
+            { "10:00  Thứ 7, 22/6/2024", "16:30  Thứ 7, 22/6/2024", "22:00  CN, 23/6/2024" }
     };
     private static final String[][] PHONG_BY_PHIM = {
-        {"Phòng chiếu 3  (2D)", "Phòng chiếu 5  (IMAX)"},
-        {"Phòng chiếu 1  (2D)", "Phòng chiếu 4  (3D)"},
-        {"Phòng chiếu 2  (3D)", "Phòng chiếu 6  (IMAX)"}
+            { "Phòng chiếu 3  (2D)", "Phòng chiếu 5  (IMAX)" },
+            { "Phòng chiếu 1  (2D)", "Phòng chiếu 4  (3D)" },
+            { "Phòng chiếu 2  (3D)", "Phòng chiếu 6  (IMAX)" }
     };
     private static final Color[][] POSTER_GRAD = {
-        {new Color(0x0D3B6E), new Color(0x00C6FB)},
-        {new Color(0x2D1B4E), new Color(0xF7971E)},
-        {new Color(0x7B0028), new Color(0xFF4E6A)}
+            { new Color(0x0D3B6E), new Color(0x00C6FB) },
+            { new Color(0x2D1B4E), new Color(0xF7971E) },
+            { new Color(0x7B0028), new Color(0xFF4E6A) }
     };
 
     // Giá vé
     private static final int GIA_THUONG = 90_000;
-    private static final int GIA_VIP    = 130_000;
+    private static final int GIA_VIP = 130_000;
 
     // Màu ghế – dùng cả trong legend lẫn trong nút (hoàn toàn khớp nhau)
-    private static final Color COLOR_EMPTY    = new Color(0x3E5065);
-    private static final Color COLOR_SOLD     = new Color(0x264359);
+    private static final Color COLOR_EMPTY = new Color(0x3E5065);
+    private static final Color COLOR_SOLD = new Color(0x264359);
     private static final Color COLOR_SELECTED = new Color(0x00B4D8);
-    private static final Color COLOR_VIP      = new Color(0x5B4DB8);
+    private static final Color COLOR_VIP = new Color(0x5B4DB8);
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  DỮ LIỆU BẮP & NƯỚC
+    // DỮ LIỆU BẮP & NƯỚC
     // ══════════════════════════════════════════════════════════════════════════
     // icon, tên, mô tả, giá hiển thị, giá int, màu
     private static final Object[][] SNACK_DATA = {
-        {"🍿","Bắp Nhỏ",  "50g  |  Bơ / Caramel",           "30.000 đ", 30_000, new Color(0xF59E0B)},
-        {"🍿","Bắp Vừa",  "80g  |  Bơ / Caramel",           "45.000 đ", 45_000, new Color(0xF59E0B)},
-        {"🍿","Bắp Lớn",  "120g |  Bơ / Caramel",           "60.000 đ", 60_000, new Color(0xF59E0B)},
-        {"🥤","Nước Nhỏ","250ml|  Cola / Sprite / Fanta",   "25.000 đ", 25_000, new Color(0x06B6D4)},
-        {"🥤","Nước Vừa","400ml|  Cola / Sprite / Fanta",   "35.000 đ", 35_000, new Color(0x06B6D4)},
-        {"🥤","Nước Lớn","550ml|  Cola / Sprite / Fanta",   "45.000 đ", 45_000, new Color(0x06B6D4)},
-        {"🎬","Combo 1",  "Bắp Vừa + Nước Vừa",             "70.000 đ", 70_000, new Color(0x8B5CF6)},
-        {"🎬","Combo 2",  "Bắp Lớn + 2 Nước Vừa",           "110.000 đ",110_000,new Color(0x8B5CF6)},
+            { "🍿", "Bắp Nhỏ", "50g  |  Bơ / Caramel", "30.000 đ", 30_000, new Color(0xF59E0B) },
+            { "🍿", "Bắp Vừa", "80g  |  Bơ / Caramel", "45.000 đ", 45_000, new Color(0xF59E0B) },
+            { "🍿", "Bắp Lớn", "120g |  Bơ / Caramel", "60.000 đ", 60_000, new Color(0xF59E0B) },
+            { "🥤", "Nước Nhỏ", "250ml|  Cola / Sprite / Fanta", "25.000 đ", 25_000, new Color(0x06B6D4) },
+            { "🥤", "Nước Vừa", "400ml|  Cola / Sprite / Fanta", "35.000 đ", 35_000, new Color(0x06B6D4) },
+            { "🥤", "Nước Lớn", "550ml|  Cola / Sprite / Fanta", "45.000 đ", 45_000, new Color(0x06B6D4) },
+            { "🎬", "Combo 1", "Bắp Vừa + Nước Vừa", "70.000 đ", 70_000, new Color(0x8B5CF6) },
+            { "🎬", "Combo 2", "Bắp Lớn + 2 Nước Vừa", "110.000 đ", 110_000, new Color(0x8B5CF6) },
     };
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  STATE
+    // STATE
     // ══════════════════════════════════════════════════════════════════════════
     private int selectedPhimIdx = 0;
-    private final List<String>  selectedSeats    = new ArrayList<>();
+    private final List<String> selectedSeats = new ArrayList<>();
     private final List<Boolean> selectedSeatsVip = new ArrayList<>();
 
     // Booking-card dynamic refs
-    private JLabel            moviePosterLabel;
+    private JLabel moviePosterLabel;
     private JComboBox<String> comboSuat, comboPhong;
-    private JLabel            infoGhe, infoLoai, infoTong;
+    private JLabel infoGhe, infoLoai, infoTong;
 
     // Snack-card dynamic refs
-    private int[]   snackQty;
+    private int[] snackQty;
     private JLabel[] snackQtyLabels;
-    private JLabel  snackTotalLabel;
+    private JLabel snackTotalLabel;
 
     // CardLayout
     private final CardLayout cardLayout = new CardLayout();
-    private final JPanel     cardHost   = new JPanel(cardLayout);
+    private final JPanel cardHost = new JPanel(cardLayout);
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  CONSTRUCTOR
+    // CONSTRUCTOR
     // ══════════════════════════════════════════════════════════════════════════
     public BanVeUI() {
         setLayout(new BorderLayout(0, 20));
-        setBackground(CustomerUI.SIDEBAR_BG);
+        setBackground(CustomUI.SIDEBAR_BG);
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         cardHost.setOpaque(false);
@@ -105,27 +105,27 @@ public class BanVeUI extends JPanel {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  HEADER
+    // HEADER
     // ══════════════════════════════════════════════════════════════════════════
     private JPanel buildHeader() {
         JPanel h = new JPanel(new BorderLayout());
         h.setOpaque(false);
         h.setPreferredSize(new Dimension(0, 60));
         JLabel title = new JLabel("Bán Vé");
-        title.setFont(CustomerUI.bold(28));
-        title.setForeground(CustomerUI.TEXT_LIGHT);
+        title.setFont(CustomUI.bold(28));
+        title.setForeground(CustomUI.TEXT_LIGHT);
         h.add(title, BorderLayout.WEST);
         return h;
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  CARD 1 – ĐẶT VÉ
+    // CARD 1 – ĐẶT VÉ
     // ══════════════════════════════════════════════════════════════════════════
     private JPanel buildBookingCard() {
         JPanel page = new JPanel(new BorderLayout(0, 16));
         page.setOpaque(false);
         page.add(buildSelectionBanner(), BorderLayout.NORTH);
-        page.add(buildBookingArea(),     BorderLayout.CENTER);
+        page.add(buildBookingArea(), BorderLayout.CENTER);
         return page;
     }
 
@@ -178,8 +178,8 @@ public class BanVeUI extends JPanel {
         // Film-strip holes
         g2.setColor(new Color(0, 0, 0, 70));
         for (int y = 6; y < h - 8; y += 16) {
-            g2.fillRoundRect(4,    y, 9, 9, 3, 3);
-            g2.fillRoundRect(w-13, y, 9, 9, 3, 3);
+            g2.fillRoundRect(4, y, 9, 9, 3, 3);
+            g2.fillRoundRect(w - 13, y, 9, 9, 3, 3);
         }
 
         // Title bar
@@ -207,22 +207,22 @@ public class BanVeUI extends JPanel {
 
     // ── Sơ đồ ghế ─────────────────────────────────────────────────────────────
     private final boolean[][] sold = {
-        {false,false,true, true, false,false,false,false,false,false,false},
-        {false,false,false,true, true, false,false,true, false,false,false},
-        {false,false,false,false,false,false,false,false,false,false,false},
-        {false,false,false,false,true, true, false,false,false,false,false},
-        {false,false,false,false,false,false,false,false,false,true, true },
-        {false,false,false,false,false,false,false,false,false,false,false},
-        {false,false,false,false,false,false,false,false,false,false,false}
+            { false, false, true, true, false, false, false, false, false, false, false },
+            { false, false, false, true, true, false, false, true, false, false, false },
+            { false, false, false, false, false, false, false, false, false, false, false },
+            { false, false, false, false, true, true, false, false, false, false, false },
+            { false, false, false, false, false, false, false, false, false, true, true },
+            { false, false, false, false, false, false, false, false, false, false, false },
+            { false, false, false, false, false, false, false, false, false, false, false }
     };
     private final boolean[][] vip = {
-        {false,false,false,false,false,false,false,false,false,false,true },
-        {false,false,false,false,false,false,false,false,false,true, true },
-        {false,false,false,false,false,false,false,false,false,false,false},
-        {false,false,false,false,false,false,false,false,false,false,false},
-        {false,false,false,false,false,false,false,false,false,false,false},
-        {false,false,false,false,false,false,false,false,false,false,false},
-        {false,false,false,false,false,false,false,false,false,false,false}
+            { false, false, false, false, false, false, false, false, false, false, true },
+            { false, false, false, false, false, false, false, false, false, true, true },
+            { false, false, false, false, false, false, false, false, false, false, false },
+            { false, false, false, false, false, false, false, false, false, false, false },
+            { false, false, false, false, false, false, false, false, false, false, false },
+            { false, false, false, false, false, false, false, false, false, false, false },
+            { false, false, false, false, false, false, false, false, false, false, false }
     };
 
     private JPanel buildSeatPanel() {
@@ -238,7 +238,7 @@ public class BanVeUI extends JPanel {
 
         JPanel grid = new JPanel(new GridLayout(7, 11, 7, 7));
         grid.setOpaque(false);
-        String[] rows = {"A","B","C","D","E","F","G"};
+        String[] rows = { "A", "B", "C", "D", "E", "F", "G" };
         for (int r = 0; r < rows.length; r++)
             for (int c = 0; c < 11; c++)
                 grid.add(createSeatButton(rows[r] + (c + 1), sold[r][c], vip[r][c]));
@@ -252,10 +252,10 @@ public class BanVeUI extends JPanel {
     private JPanel buildLegend() {
         JPanel legend = new JPanel(new FlowLayout(FlowLayout.CENTER, 18, 6));
         legend.setOpaque(false);
-        legend.add(legendItem(COLOR_EMPTY,    "Còn trống"));
-        legend.add(legendItem(COLOR_SOLD,     "Đã bán"));
+        legend.add(legendItem(COLOR_EMPTY, "Còn trống"));
+        legend.add(legendItem(COLOR_SOLD, "Đã bán"));
         legend.add(legendItem(COLOR_SELECTED, "Đang chọn"));
-        legend.add(legendItem(COLOR_VIP,      "VIP"));
+        legend.add(legendItem(COLOR_VIP, "VIP"));
         return legend;
     }
 
@@ -268,9 +268,10 @@ public class BanVeUI extends JPanel {
         dot.setOpaque(true);
         dot.setBorder(BorderFactory.createLineBorder(color.brighter(), 1));
         JLabel lbl = new JLabel(text);
-        lbl.setFont(CustomerUI.plain(11));
-        lbl.setForeground(CustomerUI.TEXT_LIGHT);
-        p.add(dot); p.add(lbl);
+        lbl.setFont(CustomUI.plain(11));
+        lbl.setForeground(CustomUI.TEXT_LIGHT);
+        p.add(dot);
+        p.add(lbl);
         return p;
     }
 
@@ -278,7 +279,7 @@ public class BanVeUI extends JPanel {
     private JToggleButton createSeatButton(String label, boolean isSold, boolean isVip) {
         JToggleButton btn = new JToggleButton(label);
         btn.setFont(new Font("Monospaced", Font.PLAIN, 9));
-        btn.setForeground(CustomerUI.TEXT_LIGHT);
+        btn.setForeground(CustomUI.TEXT_LIGHT);
         btn.setOpaque(true);
         btn.setFocusPainted(false);
         btn.setBorder(BorderFactory.createLineBorder(new Color(0x374B5C)));
@@ -286,7 +287,7 @@ public class BanVeUI extends JPanel {
 
         if (isSold) {
             btn.setEnabled(false);
-            btn.setBackground(COLOR_SOLD);         // exact same Color constant
+            btn.setBackground(COLOR_SOLD); // exact same Color constant
             btn.setForeground(new Color(0x5A7A90));
         } else {
             btn.setBackground(isVip ? COLOR_VIP : COLOR_EMPTY);
@@ -298,9 +299,12 @@ public class BanVeUI extends JPanel {
                     selectedSeatsVip.add(isVip);
                 } else {
                     btn.setBackground(isVip ? COLOR_VIP : COLOR_EMPTY);
-                    btn.setForeground(CustomerUI.TEXT_LIGHT);
+                    btn.setForeground(CustomUI.TEXT_LIGHT);
                     int i = selectedSeats.indexOf(label);
-                    if (i >= 0) { selectedSeats.remove(i); selectedSeatsVip.remove(i); }
+                    if (i >= 0) {
+                        selectedSeats.remove(i);
+                        selectedSeatsVip.remove(i);
+                    }
                 }
                 refreshSeatInfo();
             });
@@ -310,14 +314,16 @@ public class BanVeUI extends JPanel {
 
     private void refreshSeatInfo() {
         if (selectedSeats.isEmpty()) {
-            infoGhe.setText("-"); infoLoai.setText("-"); infoTong.setText("0 đ");
+            infoGhe.setText("-");
+            infoLoai.setText("-");
+            infoTong.setText("0 đ");
             return;
         }
         infoGhe.setText(String.join(", ", selectedSeats));
-        long vipCnt    = selectedSeatsVip.stream().filter(b -> b).count();
+        long vipCnt = selectedSeatsVip.stream().filter(b -> b).count();
         long thuongCnt = selectedSeats.size() - vipCnt;
         infoLoai.setText(vipCnt > 0 && thuongCnt > 0 ? "Thường + VIP"
-                       : vipCnt > 0 ? "VIP" : "Thường");
+                : vipCnt > 0 ? "VIP" : "Thường");
         infoTong.setText(formatVND(thuongCnt * GIA_THUONG + vipCnt * GIA_VIP));
     }
 
@@ -328,24 +334,26 @@ public class BanVeUI extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel hdr = new JLabel("THÔNG TIN ĐẶT VÉ");
-        hdr.setFont(CustomerUI.bold(13));
-        hdr.setForeground(CustomerUI.TEXT_LIGHT);
+        hdr.setFont(CustomUI.bold(13));
+        hdr.setForeground(CustomUI.TEXT_LIGHT);
         panel.add(hdr, BorderLayout.NORTH);
 
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setOpaque(false);
 
-        content.add(infoRowStatic("Phim",  PHIM_LIST[0]));
+        content.add(infoRowStatic("Phim", PHIM_LIST[0]));
         content.add(vgap(7));
-        content.add(infoRowStatic("Suất",  "19:00"));
+        content.add(infoRowStatic("Suất", "19:00"));
         content.add(vgap(7));
         content.add(infoRowStatic("Phòng", "Phòng chiếu 3 (2D)"));
         content.add(vgap(7));
 
-        infoGhe  = boldLabel("-"); content.add(infoRowDynamic("Ghế",  infoGhe));
+        infoGhe = boldLabel("-");
+        content.add(infoRowDynamic("Ghế", infoGhe));
         content.add(vgap(7));
-        infoLoai = boldLabel("-"); content.add(infoRowDynamic("Loại", infoLoai));
+        infoLoai = boldLabel("-");
+        content.add(infoRowDynamic("Loại", infoLoai));
         content.add(vgap(14));
 
         content.add(formField("Tên khách hàng..."));
@@ -356,10 +364,10 @@ public class BanVeUI extends JPanel {
         JPanel totalRow = new JPanel(new BorderLayout());
         totalRow.setOpaque(false);
         JLabel tl = new JLabel("Tổng cộng");
-        tl.setFont(CustomerUI.bold(15));
-        tl.setForeground(CustomerUI.TEXT_LIGHT);
+        tl.setFont(CustomUI.bold(15));
+        tl.setForeground(CustomUI.TEXT_LIGHT);
         infoTong = new JLabel("0 đ");
-        infoTong.setFont(CustomerUI.bold(18));
+        infoTong.setFont(CustomUI.bold(18));
         infoTong.setForeground(COLOR_SELECTED);
         totalRow.add(tl, BorderLayout.WEST);
         totalRow.add(infoTong, BorderLayout.EAST);
@@ -367,13 +375,13 @@ public class BanVeUI extends JPanel {
 
         panel.add(content, BorderLayout.CENTER);
 
-        JButton confirm = CustomerUI.createPrimaryButton("Xác nhận → Chọn bắp & nước");
+        JButton confirm = CustomUI.createPrimaryButton("Xác nhận → Chọn bắp & nước");
         confirm.setPreferredSize(new Dimension(0, 44));
         confirm.addActionListener(e -> {
             if (selectedSeats.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
-                    "Vui lòng chọn ít nhất một ghế trước khi tiếp tục.",
-                    "Chưa chọn ghế", JOptionPane.WARNING_MESSAGE);
+                        "Vui lòng chọn ít nhất một ghế trước khi tiếp tục.",
+                        "Chưa chọn ghế", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             openSnackScreen();
@@ -383,7 +391,7 @@ public class BanVeUI extends JPanel {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  CARD 2 – CHỌN BẮP & NƯỚC
+    // CARD 2 – CHỌN BẮP & NƯỚC
     // ══════════════════════════════════════════════════════════════════════════
     private void openSnackScreen() {
         snackQty = new int[SNACK_DATA.length];
@@ -405,7 +413,7 @@ public class BanVeUI extends JPanel {
 
         JButton back = new JButton("← Quay lại chọn ghế");
         back.setForeground(COLOR_SELECTED);
-        back.setFont(CustomerUI.bold(12));
+        back.setFont(CustomUI.bold(12));
         back.setBorder(BorderFactory.createEmptyBorder());
         back.setOpaque(false);
         back.setContentAreaFilled(false);
@@ -413,10 +421,10 @@ public class BanVeUI extends JPanel {
         back.addActionListener(e -> cardLayout.show(cardHost, "booking"));
 
         JLabel title = new JLabel("Chọn Bắp & Nước");
-        title.setFont(CustomerUI.bold(22));
-        title.setForeground(CustomerUI.TEXT_LIGHT);
+        title.setFont(CustomUI.bold(22));
+        title.setForeground(CustomUI.TEXT_LIGHT);
 
-        topBar.add(back,  BorderLayout.WEST);
+        topBar.add(back, BorderLayout.WEST);
         topBar.add(title, BorderLayout.CENTER);
         page.add(topBar, BorderLayout.NORTH);
 
@@ -436,11 +444,11 @@ public class BanVeUI extends JPanel {
     }
 
     private JPanel buildSnackItem(int idx) {
-        String icon  = (String) SNACK_DATA[idx][0];
-        String name  = (String) SNACK_DATA[idx][1];
-        String desc  = (String) SNACK_DATA[idx][2];
+        String icon = (String) SNACK_DATA[idx][0];
+        String name = (String) SNACK_DATA[idx][1];
+        String desc = (String) SNACK_DATA[idx][2];
         String price = (String) SNACK_DATA[idx][3];
-        Color  color = (Color)  SNACK_DATA[idx][5];
+        Color color = (Color) SNACK_DATA[idx][5];
 
         JPanel card = createDarkCard();
         card.setLayout(new BorderLayout(10, 0));
@@ -459,10 +467,18 @@ public class BanVeUI extends JPanel {
 
         JPanel texts = new JPanel(new GridLayout(3, 1, 0, 2));
         texts.setOpaque(false);
-        JLabel nl = new JLabel(name);  nl.setFont(CustomerUI.bold(12));  nl.setForeground(CustomerUI.TEXT_WHITE);
-        JLabel dl = new JLabel(desc);  dl.setFont(CustomerUI.plain(10)); dl.setForeground(CustomerUI.TEXT_LIGHT);
-        JLabel pl = new JLabel(price); pl.setFont(CustomerUI.bold(11));  pl.setForeground(color);
-        texts.add(nl); texts.add(dl); texts.add(pl);
+        JLabel nl = new JLabel(name);
+        nl.setFont(CustomUI.bold(12));
+        nl.setForeground(CustomUI.TEXT_WHITE);
+        JLabel dl = new JLabel(desc);
+        dl.setFont(CustomUI.plain(10));
+        dl.setForeground(CustomUI.TEXT_LIGHT);
+        JLabel pl = new JLabel(price);
+        pl.setFont(CustomUI.bold(11));
+        pl.setForeground(color);
+        texts.add(nl);
+        texts.add(dl);
+        texts.add(pl);
         info.add(texts, BorderLayout.CENTER);
 
         // Stepper +/−
@@ -470,8 +486,8 @@ public class BanVeUI extends JPanel {
         stepper.setOpaque(false);
         JButton minus = stepperBtn("−");
         snackQtyLabels[idx] = new JLabel("0", JLabel.CENTER);
-        snackQtyLabels[idx].setFont(CustomerUI.bold(14));
-        snackQtyLabels[idx].setForeground(CustomerUI.TEXT_WHITE);
+        snackQtyLabels[idx].setFont(CustomUI.bold(14));
+        snackQtyLabels[idx].setForeground(CustomUI.TEXT_WHITE);
         snackQtyLabels[idx].setPreferredSize(new Dimension(26, 26));
         JButton plus = stepperBtn("+");
 
@@ -489,7 +505,9 @@ public class BanVeUI extends JPanel {
             refreshSnackTotal();
         });
 
-        stepper.add(minus); stepper.add(snackQtyLabels[idx]); stepper.add(plus);
+        stepper.add(minus);
+        stepper.add(snackQtyLabels[idx]);
+        stepper.add(plus);
         info.add(stepper, BorderLayout.SOUTH);
         card.add(info, BorderLayout.CENTER);
         return card;
@@ -498,8 +516,8 @@ public class BanVeUI extends JPanel {
     private JButton stepperBtn(String text) {
         JButton btn = new JButton(text);
         btn.setPreferredSize(new Dimension(28, 28));
-        btn.setFont(CustomerUI.bold(14));
-        btn.setForeground(CustomerUI.TEXT_WHITE);
+        btn.setFont(CustomUI.bold(14));
+        btn.setForeground(CustomUI.TEXT_WHITE);
         btn.setBackground(new Color(0x243447));
         btn.setOpaque(true);
         btn.setBorder(BorderFactory.createLineBorder(new Color(0x3A5070)));
@@ -514,8 +532,8 @@ public class BanVeUI extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel hdr = new JLabel("TÓM TẮT ĐƠN HÀNG");
-        hdr.setFont(CustomerUI.bold(13));
-        hdr.setForeground(CustomerUI.TEXT_LIGHT);
+        hdr.setFont(CustomUI.bold(13));
+        hdr.setForeground(CustomUI.TEXT_LIGHT);
         panel.add(hdr, BorderLayout.NORTH);
 
         JPanel summary = new JPanel();
@@ -523,26 +541,26 @@ public class BanVeUI extends JPanel {
         summary.setOpaque(false);
 
         String gheText = selectedSeats.isEmpty() ? "-" : String.join(", ", selectedSeats);
-        long vipCnt    = selectedSeatsVip.stream().filter(b -> b).count();
+        long vipCnt = selectedSeatsVip.stream().filter(b -> b).count();
         long thuongCnt = selectedSeats.size() - vipCnt;
-        long totalVe   = thuongCnt * GIA_THUONG + vipCnt * GIA_VIP;
+        long totalVe = thuongCnt * GIA_THUONG + vipCnt * GIA_VIP;
 
-        summary.add(sumRow("Phim",    PHIM_LIST[selectedPhimIdx]));
+        summary.add(sumRow("Phim", PHIM_LIST[selectedPhimIdx]));
         summary.add(vgap(8));
-        summary.add(sumRow("Ghế",     gheText));
+        summary.add(sumRow("Ghế", gheText));
         summary.add(vgap(8));
         summary.add(sumRow("Tiền vé", formatVND(totalVe)));
         summary.add(vgap(8));
 
         snackTotalLabel = new JLabel("0 đ");
-        snackTotalLabel.setFont(CustomerUI.bold(13));
+        snackTotalLabel.setFont(CustomUI.bold(13));
         snackTotalLabel.setForeground(COLOR_SELECTED);
         JPanel snRow = new JPanel(new BorderLayout());
         snRow.setOpaque(false);
         snRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 22));
         JLabel snLbl = new JLabel("Bắp & Nước");
-        snLbl.setFont(CustomerUI.plain(12));
-        snLbl.setForeground(CustomerUI.TEXT_LIGHT);
+        snLbl.setFont(CustomUI.plain(12));
+        snLbl.setForeground(CustomUI.TEXT_LIGHT);
         snRow.add(snLbl, BorderLayout.WEST);
         snRow.add(snackTotalLabel, BorderLayout.EAST);
         summary.add(snRow);
@@ -558,10 +576,10 @@ public class BanVeUI extends JPanel {
         grandRow.setOpaque(false);
         grandRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
         JLabel gl = new JLabel("TỔNG CỘNG");
-        gl.setFont(CustomerUI.bold(14));
-        gl.setForeground(CustomerUI.TEXT_LIGHT);
+        gl.setFont(CustomUI.bold(14));
+        gl.setForeground(CustomUI.TEXT_LIGHT);
         JLabel gv = new JLabel(formatVND(totalVe));
-        gv.setFont(CustomerUI.bold(18));
+        gv.setFont(CustomUI.bold(18));
         gv.setForeground(COLOR_SELECTED);
         grandRow.add(gl, BorderLayout.WEST);
         grandRow.add(gv, BorderLayout.EAST);
@@ -573,32 +591,32 @@ public class BanVeUI extends JPanel {
         JPanel btns = new JPanel(new GridLayout(2, 1, 0, 10));
         btns.setOpaque(false);
 
-        JButton pay = CustomerUI.createPrimaryButton("✓  Thanh toán");
+        JButton pay = CustomUI.createPrimaryButton("✓  Thanh toán");
         pay.setPreferredSize(new Dimension(0, 44));
-        pay.addActionListener(e ->
-            JOptionPane.showMessageDialog(this,
+        pay.addActionListener(e -> JOptionPane.showMessageDialog(this,
                 "🎉  Đặt vé thành công!\nCảm ơn bạn đã sử dụng dịch vụ.",
                 "Thành công", JOptionPane.INFORMATION_MESSAGE));
 
         JButton skip = new JButton("Bỏ qua – không chọn bắp/nước");
-        skip.setFont(CustomerUI.plain(12));
-        skip.setForeground(CustomerUI.TEXT_LIGHT);
+        skip.setFont(CustomUI.plain(12));
+        skip.setForeground(CustomUI.TEXT_LIGHT);
         skip.setBackground(new Color(0x1A2A39));
         skip.setBorder(BorderFactory.createLineBorder(new Color(0x3A4C5E)));
         skip.setFocusPainted(false);
         skip.setPreferredSize(new Dimension(0, 36));
-        skip.addActionListener(e ->
-            JOptionPane.showMessageDialog(this,
+        skip.addActionListener(e -> JOptionPane.showMessageDialog(this,
                 "🎉  Đặt vé thành công!\nCảm ơn bạn đã sử dụng dịch vụ.",
                 "Thành công", JOptionPane.INFORMATION_MESSAGE));
 
-        btns.add(pay); btns.add(skip);
+        btns.add(pay);
+        btns.add(skip);
         panel.add(btns, BorderLayout.SOUTH);
         return panel;
     }
 
     private void refreshSnackTotal() {
-        if (snackTotalLabel == null || snackQty == null) return;
+        if (snackTotalLabel == null || snackQty == null)
+            return;
         long total = 0;
         for (int i = 0; i < snackQty.length; i++)
             total += (long) snackQty[i] * (int) SNACK_DATA[i][4];
@@ -606,12 +624,12 @@ public class BanVeUI extends JPanel {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  HELPERS DÙNG CHUNG
+    // HELPERS DÙNG CHUNG
     // ══════════════════════════════════════════════════════════════════════════
     private JLabel boldLabel(String text) {
         JLabel l = new JLabel(text);
-        l.setFont(CustomerUI.bold(13));
-        l.setForeground(CustomerUI.TEXT_WHITE);
+        l.setFont(CustomUI.bold(13));
+        l.setForeground(CustomUI.TEXT_WHITE);
         return l;
     }
 
@@ -624,8 +642,8 @@ public class BanVeUI extends JPanel {
         row.setOpaque(false);
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 22));
         JLabel l = new JLabel(label);
-        l.setFont(CustomerUI.plain(12));
-        l.setForeground(CustomerUI.TEXT_LIGHT);
+        l.setFont(CustomUI.plain(12));
+        l.setForeground(CustomUI.TEXT_LIGHT);
         row.add(l, BorderLayout.WEST);
         row.add(valueLabel, BorderLayout.EAST);
         return row;
@@ -636,17 +654,19 @@ public class BanVeUI extends JPanel {
         row.setOpaque(false);
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 22));
         JLabel l = new JLabel(label);
-        l.setFont(CustomerUI.plain(12));
-        l.setForeground(CustomerUI.TEXT_LIGHT);
+        l.setFont(CustomUI.plain(12));
+        l.setForeground(CustomUI.TEXT_LIGHT);
         JLabel v = new JLabel(value);
-        v.setFont(CustomerUI.bold(13));
-        v.setForeground(CustomerUI.TEXT_WHITE);
+        v.setFont(CustomUI.bold(13));
+        v.setForeground(CustomUI.TEXT_WHITE);
         row.add(l, BorderLayout.WEST);
         row.add(v, BorderLayout.EAST);
         return row;
     }
 
-    private Component vgap(int h) { return Box.createVerticalStrut(h); }
+    private Component vgap(int h) {
+        return Box.createVerticalStrut(h);
+    }
 
     private JPanel formField(String placeholder) {
         JPanel w = new JPanel(new BorderLayout());
@@ -654,12 +674,12 @@ public class BanVeUI extends JPanel {
         w.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
         JTextField f = new JTextField(placeholder);
         f.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(0x3A4C5E)),
-            BorderFactory.createEmptyBorder(8, 10, 8, 10)));
+                BorderFactory.createLineBorder(new Color(0x3A4C5E)),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)));
         f.setBackground(new Color(0x1A2A39));
-        f.setForeground(CustomerUI.TEXT_LIGHT);
-        f.setFont(CustomerUI.plain(12));
-        f.setCaretColor(CustomerUI.TEXT_WHITE);
+        f.setForeground(CustomUI.TEXT_LIGHT);
+        f.setFont(CustomUI.plain(12));
+        f.setCaretColor(CustomUI.TEXT_WHITE);
         w.add(f, BorderLayout.CENTER);
         return w;
     }
@@ -668,8 +688,8 @@ public class BanVeUI extends JPanel {
         JPanel p = new JPanel(new BorderLayout(0, 5));
         p.setOpaque(false);
         JLabel l = new JLabel(label);
-        l.setFont(CustomerUI.bold(11));
-        l.setForeground(CustomerUI.TEXT_LIGHT);
+        l.setFont(CustomUI.bold(11));
+        l.setForeground(CustomUI.TEXT_LIGHT);
         p.add(l, BorderLayout.NORTH);
         p.add(combo, BorderLayout.CENTER);
         return p;
@@ -677,8 +697,8 @@ public class BanVeUI extends JPanel {
 
     private void styleCombo(JComboBox<String> combo) {
         combo.setBackground(new Color(0x16212A));
-        combo.setForeground(CustomerUI.TEXT_LIGHT);
-        combo.setFont(CustomerUI.plain(12));
+        combo.setForeground(CustomUI.TEXT_LIGHT);
+        combo.setFont(CustomUI.plain(12));
         combo.setBorder(BorderFactory.createLineBorder(new Color(0x2D3F4F)));
     }
 
@@ -692,7 +712,7 @@ public class BanVeUI extends JPanel {
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
                 g2.setColor(new Color(255, 255, 255, 18));
                 g2.setStroke(new BasicStroke(1.2f));
-                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 18, 18);
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 18, 18);
                 g2.dispose();
             }
         };

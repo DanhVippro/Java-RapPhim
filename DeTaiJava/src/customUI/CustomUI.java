@@ -8,39 +8,39 @@ import java.awt.geom.*;
 public class CustomUI {
 
     // ─── Màu nền ──────────────────────────────────────────────────────────────
-    public static final Color BG_MAIN = new Color(0xF0F2FA); // nền tổng xám xanh nhạt
-    public static final Color BG_WHITE = new Color(0xFFFFFF); // card trắng
-    public static final Color BG_ROW_ALT = new Color(0xF7F8FC); // hàng bảng xen kẽ
+    public static final Color BG_MAIN = new Color(0xF5F7FF); // nền tổng xanh lavender rất nhạt
+    public static final Color BG_WHITE = new Color(0xFFFFFF); // card trắng tinh
+    public static final Color BG_ROW_ALT = new Color(0xF0F3FF); // hàng bảng xen kẽ
 
-    // ─── Sidebar ───────────────────────────────────
-    public static final Color SIDEBAR_BG = new Color(95, 158, 160);
-    public static final Color SIDEBAR_ACT = new Color(0x7B9EE8); // cobalt sáng active
+    // ─── Sidebar ───────────────────────────────────────────────────────────────
+    public static final Color SIDEBAR_BG = new Color(39, 40, 87); // xanh navy vừa phải - dễ chịu
+    public static final Color SIDEBAR_ACT = new Color(0x7ED6C1); // mint xanh active
 
-    // ─── Màu chủ đạo: Cobalt nhạt hơn ────────────────────────────────────────
-    public static final Color TEAL = new Color(0x4169C8); // cobalt chính nhạt hơn
-    public static final Color TEAL_DARK = new Color(0x2E4799); // cobalt đậm hover
-    public static final Color TEAL_LIGHT = new Color(0xDDE5F8); // cobalt nhạt selection
+    // ─── Màu chủ đạo: Xanh mint tươi ────────────────────────────────────────
+    public static final Color TEAL = new Color(0x3DBFA8); // mint xanh chính
+    public static final Color TEAL_DARK = new Color(0x2A9C8A); // mint đậm hover
+    public static final Color TEAL_LIGHT = new Color(0xD4F3EE); // mint nhạt selection
 
-    // ─── Stat card 3 sắc độ nhạt hơn ─────────────────────────────────────────
-    public static final Color CARD_1 = new Color(0x4169C8); // cobalt vừa (Tổng vé)
-    public static final Color CARD_2 = new Color(0x4A7090); // steel xanh vừa (Doanh thu)
-    public static final Color CARD_3 = new Color(0x4A3D80); // tím indigo vừa (Phim chiếu)
+    // ─── Stat card 3 sắc độ pastel dễ chịu ──────────────────────────────────
+    public static final Color CARD_1 = new Color(0x5B8DEF); // xanh dương pastel (Tổng vé)
+    public static final Color CARD_2 = new Color(0x3DBFA8); // mint xanh (Doanh thu)
+    public static final Color CARD_3 = new Color(0xA78BFA); // tím lavender (Phim chiếu)
 
     // ─── Chữ ──────────────────────────────────────────────────────────────────
-    public static final Color TEXT_DARK = new Color(0x1A2545); // chữ tối chính
-    public static final Color TEXT_MID = new Color(0x4A5A88); // chữ phụ
-    public static final Color TEXT_LIGHT = new Color(0x8A9ABF); // chữ mờ
+    public static final Color TEXT_DARK = new Color(0x1E2A45); // chữ tối chính
+    public static final Color TEXT_MID = new Color(0x4A5880); // chữ phụ
+    public static final Color TEXT_LIGHT = new Color(0x8A96B8); // chữ mờ
     public static final Color TEXT_WHITE = Color.WHITE;
 
     // ─── Border ───────────────────────────────────────────────────────────────
-    public static final Color BORDER = new Color(0xD5DCED);
-    public static final Color BORDER2 = new Color(0xBCC8E2);
+    public static final Color BORDER = new Color(0xDDE3F5); // viền nhạt nhẹ nhàng
+    public static final Color BORDER2 = new Color(0xC8D2EC); // viền rõ hơn chút
 
     // ─── Trạng thái ──────────────────────────────────────────────────────────
     public static final Color SUCCESS = new Color(0x22C55E);
     public static final Color WARNING = new Color(0xF59E0B);
     public static final Color DANGER = new Color(0xEF4444);
-    public static final Color INFO = new Color(0x7B9EE8);
+    public static final Color INFO = new Color(0x5B8DEF);
 
     // ─── Font ─────────────────────────────────────────────────────────────────
     public static Font bold(int s) {
@@ -89,7 +89,7 @@ public class CustomUI {
         UIManager.put("Table.gridColor", BORDER);
         UIManager.put("Table.selectionBackground", TEAL_LIGHT);
         UIManager.put("Table.selectionForeground", TEXT_DARK);
-        UIManager.put("TableHeader.background", new Color(0xF0F2FA));
+        UIManager.put("TableHeader.background", new Color(0xF0F3FF));
         UIManager.put("TableHeader.foreground", TEXT_MID);
         UIManager.put("ScrollBar.background", BG_MAIN);
         UIManager.put("ScrollBar.thumb", BORDER2);
@@ -407,8 +407,8 @@ public class CustomUI {
     // ─── Divider ──────────────────────────────────────────────────────────────
     public static JSeparator createDivider() {
         JSeparator s = new JSeparator();
-        s.setForeground(new Color(0x2A3D6E));
-        s.setBackground(new Color(0x2A3D6E));
+        s.setForeground(new Color(0xDDE3F5));
+        s.setBackground(new Color(0xDDE3F5));
         s.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
         return s;
     }
