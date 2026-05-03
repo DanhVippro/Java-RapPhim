@@ -8,23 +8,25 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
 import customUI.CustomUI;
+import entity.TaiKhoan;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 
 public class dashboardUI extends JFrame {
-
+    private final TaiKhoan currentUser;
     private String activeNav = "Trang Chủ";
     private JPanel contentArea;
     private JPanel root;
 
-    public dashboardUI() {
+    public dashboardUI(TaiKhoan user) {
+        this.currentUser = user;
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        setExtendedState(JFrame.MAXIMIZED_BOTH); 
-
-        setVisible(true); 
+        setVisible(true);
         setLocationRelativeTo(null);
         setBackground(CustomUI.BG_MAIN);
 
@@ -36,10 +38,37 @@ public class dashboardUI extends JFrame {
         root.add(buildSidebar(), BorderLayout.WEST);
 
         // content mặc định
-        contentArea = buildContent();
+        if (user.isAdmin()) {
+            activeNav = "Trang Chủ";
+            contentArea = buildHomeContent();
+        } else {
+            activeNav = "Bán Vé";
+            contentArea = new BanVeUI();
+        }
         root.add(contentArea, BorderLayout.CENTER);
-
         setContentPane(root);
+    }
+
+    private JPanel buildHomeContent() {
+        JPanel p = new JPanel(new BorderLayout(0, 20));
+        p.setBackground(CustomUI.BG_MAIN);
+        p.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Tiêu đề
+        JLabel title = new JLabel("Xin chào, " + currentUser.getHoTen() + " 👋");
+        title.setFont(CustomUI.bold(26));
+        title.setForeground(CustomUI.TEXT_DARK);
+        p.add(title, BorderLayout.NORTH);
+
+        // Stat cards
+        JPanel cards = new JPanel(new GridLayout(1, 3, 16, 0));
+        cards.setOpaque(false);
+        cards.add(CustomUI.createStatCard("TỔNG VÉ HÔM NAY", "128", "↑ 12% so với hôm qua", CustomUI.CARD_1));
+        cards.add(CustomUI.createStatCard("DOANH THU", "11.5M", "Tháng này", CustomUI.CARD_2));
+        cards.add(CustomUI.createStatCard("PHIM ĐANG CHIẾU", "3", "Cập nhật mới nhất", CustomUI.CARD_3));
+        p.add(cards, BorderLayout.CENTER);
+
+        return p;
     }
 
     // ─── Top Bar ──────────────────────────────────────

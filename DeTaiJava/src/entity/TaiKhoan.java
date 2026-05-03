@@ -1,63 +1,100 @@
 package entity;
 
+/**
+ * Entity ánh xạ bảng TaiKhoan – dùng để lưu thông tin user đang đăng nhập.
+ */
 public class TaiKhoan {
-    private String maTaiKhoan;
+
+    private int maTK;
     private String tenDangNhap;
-    private String matKhau;
+    private String vaiTro; // "ADMIN" | "NHANVIEN"
+    private String hoTen;
+    private String email;
+    private String soDT;
+    private boolean trangThai; // true = hoạt động
 
-    public TaiKhoan(String maTaiKhoan, String tenDangNhap, String matKhau) {
-        this.maTaiKhoan = maTaiKhoan;
+    public TaiKhoan() {
+    }
+
+    public TaiKhoan(int maTK, String tenDangNhap, String vaiTro,
+            String hoTen, String email, String soDT, boolean trangThai) {
+        this.maTK = maTK;
         this.tenDangNhap = tenDangNhap;
-        this.matKhau = matKhau;
+        this.vaiTro = vaiTro;
+        this.hoTen = hoTen;
+        this.email = email;
+        this.soDT = soDT;
+        this.trangThai = trangThai;
     }
 
-    public String getMaTaiKhoan() {
-        return maTaiKhoan;
-    }
-
-    public void setMaTaiKhoan(String maTaiKhoan) {
-        this.maTaiKhoan = maTaiKhoan;
+    // Getters
+    public int getMaTK() {
+        return maTK;
     }
 
     public String getTenDangNhap() {
         return tenDangNhap;
     }
 
-    public void setTenDangNhap(String tenDangNhap) {
-        this.tenDangNhap = tenDangNhap;
+    public String getVaiTro() {
+        return vaiTro;
     }
 
-    public String getMatKhau() {
-        return matKhau;
+    public String getHoTen() {
+        return hoTen;
     }
 
-    public void setMatKhau(String matKhau) {
-        this.matKhau = matKhau;
+    public String getEmail() {
+        return email;
+    }
+
+    public String getSoDT() {
+        return soDT;
+    }
+
+    public boolean isTrangThai() {
+        return trangThai;
+    }
+
+    // Setters
+    public void setMaTK(int maTK) {
+        this.maTK = maTK;
+    }
+
+    public void setTenDangNhap(String v) {
+        this.tenDangNhap = v;
+    }
+
+    public void setVaiTro(String v) {
+        this.vaiTro = v;
+    }
+
+    public void setHoTen(String v) {
+        this.hoTen = v;
+    }
+
+    public void setEmail(String v) {
+        this.email = v;
+    }
+
+    public void setSoDT(String v) {
+        this.soDT = v;
+    }
+
+    public void setTrangThai(boolean v) {
+        this.trangThai = v;
+    }
+
+    public boolean isAdmin() {
+        return "ADMIN".equals(vaiTro);
+    }
+
+    public boolean isNhanVien() {
+        return "NHANVIEN".equals(vaiTro);
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((maTaiKhoan == null) ? 0 : maTaiKhoan.hashCode());
-        return result;
+    public String toString() {
+        return hoTen + " (" + vaiTro + ")";
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        TaiKhoan other = (TaiKhoan) obj;
-        if (maTaiKhoan == null) {
-            if (other.maTaiKhoan != null)
-                return false;
-        } else if (!maTaiKhoan.equals(other.maTaiKhoan))
-            return false;
-        return true;
-    }
-
 }
