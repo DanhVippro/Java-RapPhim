@@ -12,6 +12,7 @@ public class DatabaseConnection {
 
     private static final String USER = "sa";
     private static final String PASSWORD = "123456";
+    // Sửa lại user/password cho phù hợp với
 
     private static Connection instance = null;
 
