@@ -25,6 +25,7 @@ public class DatabaseConnection {
         } catch (Exception e) {
             throw new RuntimeException("[DB] Lỗi: " + e.getMessage(), e);
         }
+       
         return instance;
     }
 
