@@ -199,30 +199,15 @@ public class BookingInfoPanel extends JPanel {
 
     // ── Poster ───────────────────────────────────────────────────────────────
     private ImageIcon buildPosterIcon(int idx, int w, int h) {
-        BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = img.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        Color c1 = new Color(CinemaData.POSTER_GRAD[idx][0]);
-        Color c2 = new Color(CinemaData.POSTER_GRAD[idx][1]);
-        g2.setPaint(new GradientPaint(0, 0, c1, w, h, c2));
-        g2.fillRoundRect(0, 0, w, h, 10, 10);
-        // Film holes
-        g2.setColor(new Color(0,0,0,70));
-        for (int y = 5; y < h-6; y += 14) {
-            g2.fillRoundRect(3, y, 7, 7, 3, 3);
-            g2.fillRoundRect(w-10, y, 7, 7, 3, 3);
-        }
-        // Title
-        g2.setColor(new Color(0,0,0,160));
-        g2.fillRect(0, h-28, w, 28);
-        g2.setColor(Color.WHITE);
-        g2.setFont(new Font("SansSerif", Font.BOLD, 9));
-        FontMetrics fm = g2.getFontMetrics();
-        String name = CinemaData.PHIM_LIST[idx];
-        g2.drawString(name, Math.max(2,(w-fm.stringWidth(name))/2), h-10);
-        g2.dispose();
+    try {
+        ImageIcon icon = new ImageIcon(getClass().getResource("/" + CinemaData.POSTER_PATH[idx]));
+        Image img = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
         return new ImageIcon(img);
+    } catch (Exception e) {
+        System.out.println("Lỗi load ảnh poster: " + e.getMessage());
+        return new ImageIcon();
     }
+}
 
     // ── UI Helpers ────────────────────────────────────────────────────────────
     private JLabel sectionLabel(String text) {
