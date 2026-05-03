@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class TaiKhoanDAO {
 
-    // ── Mã hoá mật khẩu SHA-256 ──────────────────────────────────────────────
+    // ── Mã hoá mật khẩu ──────────────────────────────────────────────
     public static String sha256(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -30,11 +30,6 @@ public class TaiKhoanDAO {
     }
 
     // ── ĐĂNG NHẬP ─────────────────────────────────────────────────────────────
-    /**
-     * Kiểm tra thông tin đăng nhập.
-     * 
-     * @return TaiKhoan nếu đúng, null nếu sai hoặc tài khoản bị khoá.
-     */
     public TaiKhoan dangNhap(String tenDangNhap, String matKhauRaw) {
         String sql = "SELECT maTK, tenDangNhap, vaiTro, hoTen, email, soDT, trangThai "
                 + "FROM TaiKhoan "
