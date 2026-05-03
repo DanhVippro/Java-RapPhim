@@ -20,8 +20,11 @@ public class dashboardUI extends JFrame {
     private JPanel root;
 
     public dashboardUI() {
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(1200, 750);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        setExtendedState(JFrame.MAXIMIZED_BOTH); 
+
+        setVisible(true); 
         setLocationRelativeTo(null);
         setBackground(CustomUI.BG_MAIN);
 

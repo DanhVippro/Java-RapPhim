@@ -71,12 +71,12 @@ public final class CinemaData {
         { false,false,false,false,false,false,false,false,false,false,false }
     };
     public static final boolean[][] VIP_SEATS = {
-        { false,false,false,false,false,false,false,false,false,false,true  },
-        { false,false,false,false,false,false,false,false,false,true, true  },
+        { false,false,false,false,false,false,false,false,false,false,false  },
+        { false,false,false,false,false,false,false,false,false,false,false  },
         { false,false,false,false,false,false,false,false,false,false,false },
-        { false,false,false,false,false,false,false,false,false,false,false },
-        { false,false,false,false,false,false,false,false,false,false,false },
-        { false,false,false,false,false,false,false,false,false,false,false },
+        { false,false,false,true ,true ,true ,true ,true ,false,false,false },
+        { false,false,false,true ,true ,true ,true ,true ,false,false,false },
+        { false,false,false,true ,true ,true ,true ,true ,false,false,false },
         { false,false,false,false,false,false,false,false,false,false,false }
     };
 
@@ -91,6 +91,13 @@ public final class CinemaData {
         { "🎬","Combo 1",  "Bắp Vừa + Nước Vừa",            "70.000 đ", 70_000,  0x8B5CF6 },
         { "🎬","Combo 2",  "Bắp Lớn + 2 Nước Vừa",          "110.000 đ",110_000, 0x8B5CF6 },
     };
-
+public static final String[] POSTER_PATH = {
+    "resources/avengers.jpg",
+    "resources/conan.jpg",
+    "resources/doraemon.jpg",
+    "resources/xmen.jpg",
+    "resources/spiderman.jpg",
+    "resources/bogia.jpg"
+};
     private CinemaData() {}
 }
