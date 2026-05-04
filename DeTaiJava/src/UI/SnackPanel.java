@@ -7,41 +7,27 @@ import customUI.CustomUI;
 import model.BookingState;
 import model.CinemaData;
 
-/**
- * SnackPanel – Card 2: chọn bắp & nước + chi tiết đặt vé đầy đủ.
- *
- * Layout:
- *   [LEFT]  Grid 4x2 snack items (có stepper +/−)
- *   [RIGHT] Chi tiết đơn hàng (scroll):
- *             - Phim / giờ / phòng / ghế / loại
- *             - Thông tin người nhận (tên / phone / email – gửi về Gmail)
- *             - Footer: tạm tính + nút Xác nhận
- *   [BOTTOM] Nút: "← Quay lại"  |  "Làm mới"
- */
 public class SnackPanel extends JPanel {
 
     private final BookingState state;
-    private final Runnable     onBack;
-
-    // Snack stepper refs
-    private int[]    qty;
+    private final Runnable onBack;
+    private int[] qty;
     private JLabel[] qtyLabels;
 
-    // Summary refs
     private JLabel lblSnackTotal, lblGrandTotal;
 
     public SnackPanel(BookingState state, Runnable onBack) {
-        this.state  = state;
+        this.state = state;
         this.onBack = onBack;
         state.resetSnack();
-        this.qty       = new int[CinemaData.SNACK_DATA.length];
+        this.qty = new int[CinemaData.SNACK_DATA.length];
         this.qtyLabels = new JLabel[CinemaData.SNACK_DATA.length];
 
         setOpaque(false);
         setLayout(new BorderLayout(0, 14));
 
-        add(buildTopBar(),    BorderLayout.NORTH);
-        add(buildBody(),      BorderLayout.CENTER);
+        add(buildTopBar(), BorderLayout.NORTH);
+        add(buildBody(), BorderLayout.CENTER);
         add(buildBottomBar(), BorderLayout.SOUTH);
     }
 
@@ -64,12 +50,11 @@ public class SnackPanel extends JPanel {
         title.setFont(CustomUI.bold(22));
         title.setForeground(CustomUI.TEXT_LIGHT);
 
-        bar.add(back,  BorderLayout.WEST);
+        bar.add(back, BorderLayout.WEST);
         bar.add(title, BorderLayout.CENTER);
         return bar;
     }
 
-    // ── Body: snack grid (trái) + chi tiết (phải) ────────────────────────────
     private JPanel buildBody() {
         JPanel body = new JPanel(new GridLayout(1, 2, 16, 0));
         body.setOpaque(false);
@@ -78,7 +63,6 @@ public class SnackPanel extends JPanel {
         return body;
     }
 
-    // ── Snack grid 4x2 ───────────────────────────────────────────────────────
     private JPanel buildSnackGrid() {
         JPanel grid = new JPanel(new GridLayout(4, 2, 10, 10));
         grid.setOpaque(false);
@@ -88,11 +72,11 @@ public class SnackPanel extends JPanel {
     }
 
     private JPanel buildSnackItem(int idx) {
-        String icon  = (String) CinemaData.SNACK_DATA[idx][0];
-        String name  = (String) CinemaData.SNACK_DATA[idx][1];
-        String desc  = (String) CinemaData.SNACK_DATA[idx][2];
+        String icon = (String) CinemaData.SNACK_DATA[idx][0];
+        String name = (String) CinemaData.SNACK_DATA[idx][1];
+        String desc = (String) CinemaData.SNACK_DATA[idx][2];
         String price = (String) CinemaData.SNACK_DATA[idx][3];
-        Color  color = new Color((int) CinemaData.SNACK_DATA[idx][5]);
+        Color color = new Color((int) CinemaData.SNACK_DATA[idx][5]);
 
         JPanel card = BanVeHelper.darkCard();
         card.setLayout(new BorderLayout(8, 0));
@@ -113,13 +97,20 @@ public class SnackPanel extends JPanel {
 
         JPanel texts = new JPanel(new GridLayout(3, 1, 0, 1));
         texts.setOpaque(false);
-        JLabel nl = new JLabel(name);  nl.setFont(CustomUI.bold(11));  nl.setForeground(CustomUI.TEXT_WHITE);
-        JLabel dl = new JLabel(desc);  dl.setFont(CustomUI.plain(9));  dl.setForeground(CustomUI.TEXT_LIGHT);
-        JLabel pl = new JLabel(price); pl.setFont(CustomUI.bold(10));  pl.setForeground(color);
-        texts.add(nl); texts.add(dl); texts.add(pl);
+        JLabel nl = new JLabel(name);
+        nl.setFont(CustomUI.bold(11));
+        nl.setForeground(CustomUI.TEXT_WHITE);
+        JLabel dl = new JLabel(desc);
+        dl.setFont(CustomUI.plain(9));
+        dl.setForeground(CustomUI.TEXT_LIGHT);
+        JLabel pl = new JLabel(price);
+        pl.setFont(CustomUI.bold(10));
+        pl.setForeground(color);
+        texts.add(nl);
+        texts.add(dl);
+        texts.add(pl);
         info.add(texts, BorderLayout.CENTER);
 
-        // Stepper
         JPanel stepper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0));
         stepper.setOpaque(false);
         JButton minus = stepperBtn("−");
@@ -145,7 +136,9 @@ public class SnackPanel extends JPanel {
             refreshTotals();
         });
 
-        stepper.add(minus); stepper.add(qtyLabels[idx]); stepper.add(plus);
+        stepper.add(minus);
+        stepper.add(qtyLabels[idx]);
+        stepper.add(plus);
         info.add(stepper, BorderLayout.SOUTH);
         card.add(info, BorderLayout.CENTER);
         return card;
@@ -165,17 +158,17 @@ public class SnackPanel extends JPanel {
         content.add(sectionLbl("📋  CHI TIẾT ĐẶT VÉ"));
         content.add(vgap(10));
 
-        content.add(sumRow("🎬  Phim",       CinemaData.PHIM_LIST[state.phimIdx]));
+        content.add(sumRow("🎬  Phim", CinemaData.PHIM_LIST[state.phimIdx]));
         content.add(vgap(5));
         content.add(sumRow("⏰  Suất chiếu", state.gioBatDau() + " – " + state.gioKetThuc()));
         content.add(vgap(5));
-        content.add(sumRow("📅  Ngày",       state.thuDisplay() + ", " + state.ngayChieu()));
+        content.add(sumRow("📅  Ngày", state.thuDisplay() + ", " + state.ngayChieu()));
         content.add(vgap(5));
-        content.add(sumRow("🏛️  Phòng",      CinemaData.PHONG_BY_PHIM[state.phimIdx][state.phongIdx]));
+        content.add(sumRow("🏛️  Phòng", CinemaData.PHONG_BY_PHIM[state.phimIdx][state.phongIdx]));
         content.add(vgap(5));
-        content.add(sumRow("🪑  Ghế",         state.gheDisplay() + "  (" + state.loaiGheDisplay() + ")"));
+        content.add(sumRow("🪑  Ghế", state.gheDisplay() + "  (" + state.loaiGheDisplay() + ")"));
         content.add(vgap(5));
-        content.add(sumRow("💰  Tiền vé",    BanVeHelper.formatVND(state.tienVe())));
+        content.add(sumRow("💰  Tiền vé", BanVeHelper.formatVND(state.tienVe())));
         content.add(vgap(10));
         content.add(divider());
         content.add(vgap(10));
@@ -183,11 +176,11 @@ public class SnackPanel extends JPanel {
         // ── Thông tin người nhận ─────────────────────────────────────────────
         content.add(sectionLbl("📨  THÔNG TIN NGƯỜI NHẬN"));
         content.add(vgap(6));
-        content.add(sumRow("👤  Họ tên",    emptyOrDash(state.tenKhachHang)));
+        content.add(sumRow("👤  Họ tên", emptyOrDash(state.tenKhachHang)));
         content.add(vgap(4));
         content.add(sumRow("📱  Điện thoại", emptyOrDash(state.soDienThoai)));
         content.add(vgap(4));
-        content.add(sumRow("📧  Email",      emptyOrDash(state.email)));
+        content.add(sumRow("📧  Email", emptyOrDash(state.email)));
         content.add(vgap(4));
 
         JLabel gmailNote = new JLabel("✉️  Vé sẽ được gửi qua email sau khi xác nhận");
@@ -226,8 +219,8 @@ public class SnackPanel extends JPanel {
         JPanel footer = new JPanel(new BorderLayout(0, 8));
         footer.setOpaque(false);
         footer.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(0x2D3F4F)),
-            BorderFactory.createEmptyBorder(10, 16, 12, 16)));
+                BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(0x2D3F4F)),
+                BorderFactory.createEmptyBorder(10, 16, 12, 16)));
 
         JPanel grandRow = new JPanel(new BorderLayout());
         grandRow.setOpaque(false);
@@ -237,7 +230,7 @@ public class SnackPanel extends JPanel {
         lblGrandTotal = new JLabel(BanVeHelper.formatVND(state.tienVe()));
         lblGrandTotal.setFont(CustomUI.bold(20));
         lblGrandTotal.setForeground(new Color(0x00B8D4));
-        grandRow.add(gl,            BorderLayout.WEST);
+        grandRow.add(gl, BorderLayout.WEST);
         grandRow.add(lblGrandTotal, BorderLayout.EAST);
         footer.add(grandRow, BorderLayout.NORTH);
 
@@ -276,15 +269,18 @@ public class SnackPanel extends JPanel {
         qty = new int[CinemaData.SNACK_DATA.length];
         state.resetSnack();
         for (int i = 0; i < qtyLabels.length; i++)
-            if (qtyLabels[i] != null) qtyLabels[i].setText("0");
+            if (qtyLabels[i] != null)
+                qtyLabels[i].setText("0");
         refreshTotals();
     }
 
     private void refreshTotals() {
         long snack = state.tienSnack();
         long grand = state.tongCong();
-        if (lblSnackTotal != null) lblSnackTotal.setText(BanVeHelper.formatVND(snack));
-        if (lblGrandTotal != null) lblGrandTotal.setText(BanVeHelper.formatVND(grand));
+        if (lblSnackTotal != null)
+            lblSnackTotal.setText(BanVeHelper.formatVND(snack));
+        if (lblGrandTotal != null)
+            lblGrandTotal.setText(BanVeHelper.formatVND(grand));
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -335,7 +331,7 @@ public class SnackPanel extends JPanel {
         JLabel l = new JLabel(label);
         l.setFont(CustomUI.plain(11));
         l.setForeground(CustomUI.TEXT_LIGHT);
-        row.add(l,      BorderLayout.WEST);
+        row.add(l, BorderLayout.WEST);
         row.add(valLbl, BorderLayout.EAST);
         return row;
     }
@@ -350,7 +346,9 @@ public class SnackPanel extends JPanel {
         return d;
     }
 
-    private Component vgap(int h) { return Box.createVerticalStrut(h); }
+    private Component vgap(int h) {
+        return Box.createVerticalStrut(h);
+    }
 
     private String emptyOrDash(String s) {
         return (s == null || s.isBlank()) ? "-" : s;
