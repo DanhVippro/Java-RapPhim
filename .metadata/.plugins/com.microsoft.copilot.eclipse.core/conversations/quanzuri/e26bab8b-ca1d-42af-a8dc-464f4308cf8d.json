@@ -1,0 +1,31 @@
+{
+  "conversationId": "e26bab8b-ca1d-42af-a8dc-464f4308cf8d",
+  "title": "nó đang sai lỗi gì vậy ạ",
+  "requesterUsername": "quanzuri",
+  "responderUsername": "GitHub Copilot",
+  "turns": [
+    {
+      "message": {
+        "text": "nó đang sai lỗi gì vậy ạ"
+      },
+      "currentDocument": {
+        "uri": "/DeTaiJava/src/UI/BookingInfoPanel.java"
+      },
+      "references": [
+        {
+          "uri": "/DeTaiJava/src"
+        }
+      ],
+      "ignoredSkills": [],
+      "userLanguage": "en",
+      "source": "panel",
+      "chatMode": "Agent",
+      "needToolCallConfirmation": true,
+      "turnId": "54dafe6f-1c5b-4c32-9c5a-e80790f0908f",
+      "role": "user",
+      "timestamp": "2026-05-04T06:07:11.765573900Z"
+    }
+  ],
+  "creationDate": "2026-05-04T06:07:11.747059100Z",
+  "lastMessageDate": "2026-05-04T06:07:11.747059100Z"
+}

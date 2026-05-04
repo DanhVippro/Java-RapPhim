@@ -1,0 +1,5 @@
+INDEX VERSION 1.134+D:\Java\BAI_TAP_LON\.metadata\.plugins\org.eclipse.jdt.core
+1865797976.index
+3340191762.index
+631988467.index
+1398888063.index
