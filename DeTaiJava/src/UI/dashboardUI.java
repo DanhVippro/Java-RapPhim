@@ -1,6 +1,7 @@
 package UI;
 
 import DAO.PhimDAO;
+import DAO.TaiKhoanDAO;
 import customUI.CustomUI;
 import entity.TaiKhoan;
 
@@ -20,10 +21,8 @@ public class dashboardUI extends JFrame {
     private JPanel contentArea;
     private JPanel root;
     private ChatAssistantUI assistant;
-    private JPanel menuOverlay;
-    private JLayeredPane layeredSidebar;
-    private JButton menuToggleBtn;
     private JScrollPane treeScroll;
+    private JPanel accountPanel;
 
     public dashboardUI(TaiKhoan user) {
         this.currentUser = user;
@@ -336,32 +335,13 @@ public class dashboardUI extends JFrame {
         side.setOpaque(false);
         side.setPreferredSize(new Dimension(W, 0));
 
-        layeredSidebar = new JLayeredPane() {
-            @Override
-            public void doLayout() {
-                int w = getWidth(), h = getHeight();
-                for (Component c : getComponents()) {
-                    if ("logo".equals(c.getName()))
-                        c.setBounds(0, 0, w, 90);
-                    else if ("menuBtn".equals(c.getName()))
-                        c.setBounds(0, 90, w, 50);
-                    else if ("tree".equals(c.getName()))
-                        c.setBounds(0, 140, w, h - 240);
-                    else if ("account".equals(c.getName()))
-                        c.setBounds(0, h - 100, w, 100);
-                    else if ("menuOverlay".equals(c.getName()))
-                        c.setBounds(0, 140, w, h - 240);
-                }
-            }
-        };
-        layeredSidebar.setOpaque(false);
-        layeredSidebar.setBackground(CustomUI.SIDEBAR_BG);
+        JPanel sidebarContainer = new JPanel(new BorderLayout());
+        sidebarContainer.setOpaque(false);
 
         // LOGO
         JPanel logoArea = new JPanel(new BorderLayout());
         logoArea.setOpaque(false);
-        logoArea.setName("logo");
-        logoArea.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
+        logoArea.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         URL logoUrl = getClass().getResource("/resources/logo.png");
         if (logoUrl != null) {
@@ -372,97 +352,30 @@ public class dashboardUI extends JFrame {
             logoArea.add(logoImg, BorderLayout.CENTER);
         } else {
             JLabel nm = new JLabel("MEGADE Cinema");
-            nm.setFont(CustomUI.bold(16));
+            nm.setFont(CustomUI.bold(18));
             nm.setForeground(CustomUI.PRIMARY);
             nm.setHorizontalAlignment(SwingConstants.CENTER);
             logoArea.add(nm, BorderLayout.CENTER);
         }
-        layeredSidebar.add(logoArea, Integer.valueOf(1));
-        logoArea.setName("logo");
+        sidebarContainer.add(logoArea, BorderLayout.NORTH);
 
-        // NÚT MENU (HIỂN THỊ CHO CẢ ADMIN VÀ NHÂN VIÊN)
-        JPanel menuBtnPanel = new JPanel(new BorderLayout());
-        menuBtnPanel.setOpaque(false);
-        menuBtnPanel.setName("menuBtn");
-        menuBtnPanel.setBorder(BorderFactory.createEmptyBorder(5, 16, 5, 16));
-
-        menuToggleBtn = new JButton("MENU") {
-            boolean hover = false;
-            {
-                setOpaque(false);
-                setContentAreaFilled(false);
-                setBorderPainted(false);
-                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                setFocusPainted(false);
-                setFont(CustomUI.bold(13));
-                setForeground(Color.WHITE);
-                addMouseListener(new MouseAdapter() {
-                    public void mouseEntered(MouseEvent e) {
-                        hover = true;
-                        repaint();
-                    }
-
-                    public void mouseExited(MouseEvent e) {
-                        hover = false;
-                        repaint();
-                    }
-                });
-            }
-
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(hover ? CustomUI.PRIMARY : new Color(43, 200, 163, 20));
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
-
-                g2.setColor(Color.WHITE);
-                int startX = (getWidth() - 60) / 2;
-                int startY = getHeight() / 2 - 5;
-                g2.fillRect(startX, startY, 14, 2);
-                g2.fillRect(startX, startY + 5, 14, 2);
-                g2.fillRect(startX, startY + 10, 14, 2);
-
-                g2.setFont(CustomUI.bold(13));
-                FontMetrics fm = g2.getFontMetrics();
-                g2.drawString("MENU", startX + 22, (getHeight() + fm.getAscent() - fm.getDescent()) / 2 - 1);
-                g2.dispose();
-            }
-        };
-        menuToggleBtn.setPreferredSize(new Dimension(0, 38));
-        menuBtnPanel.add(menuToggleBtn, BorderLayout.CENTER);
-        layeredSidebar.add(menuBtnPanel, Integer.valueOf(1));
-        menuBtnPanel.setName("menuBtn");
-
-        // TREE NAVIGATION (HIỂN THỊ CHO CẢ HAI, NHƯNG NỘI DUNG KHÁC NHAU)
+        // TREE NAVIGATION (CHỈ GIỮ LẠI JTREE)
         treeScroll = buildNavTree();
-        treeScroll.setName("tree");
-        layeredSidebar.add(treeScroll, Integer.valueOf(0));
-        treeScroll.setName("tree");
+        sidebarContainer.add(treeScroll, BorderLayout.CENTER);
 
-        // MENU OVERLAY (HIỂN THỊ CHO CẢ HAI, NHƯNG NỘI DUNG KHÁC NHAU)
-        menuOverlay = createMenuOverlay();
-        menuOverlay.setName("menuOverlay");
-        menuOverlay.setVisible(false);
-        layeredSidebar.add(menuOverlay, Integer.valueOf(1));
-        menuOverlay.setName("menuOverlay");
+        // ACCOUNT PANEL (CÓ THỂ NHẤN VÀO)
+        accountPanel = buildAccountPanel();
+        sidebarContainer.add(accountPanel, BorderLayout.SOUTH);
 
-        // SỰ KIỆN BẬT/TẮT MENU (CHO CẢ HAI)
-        menuToggleBtn.addActionListener(e -> {
-            boolean showMenu = !menuOverlay.isVisible();
-            menuOverlay.setVisible(showMenu);
-            treeScroll.setVisible(!showMenu);
-            menuToggleBtn.setText(showMenu ? "✖ ĐÓNG" : "☰ MENU");
-            layeredSidebar.revalidate();
-            layeredSidebar.repaint();
-        });
+        side.add(sidebarContainer, BorderLayout.CENTER);
+        return side;
+    }
 
-        // ACCOUNT
+    private JPanel buildAccountPanel() {
         JPanel accountArea = new JPanel();
         accountArea.setLayout(new BoxLayout(accountArea, BoxLayout.Y_AXIS));
         accountArea.setOpaque(false);
-        accountArea.setName("account");
-        accountArea.setBorder(BorderFactory.createEmptyBorder(12, 16, 16, 16));
+        accountArea.setBorder(BorderFactory.createEmptyBorder(12, 16, 20, 16));
 
         JSeparator sep = new JSeparator();
         sep.setForeground(new Color(0x2D4055));
@@ -470,8 +383,9 @@ public class dashboardUI extends JFrame {
         accountArea.add(sep);
         accountArea.add(Box.createVerticalStrut(12));
 
-        JPanel accountPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        accountPanel.setOpaque(false);
+        JPanel accountClickPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        accountClickPanel.setOpaque(false);
+        accountClickPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         JPanel avatarPanel = new JPanel() {
             {
@@ -516,15 +430,203 @@ public class dashboardUI extends JFrame {
         infoPanel.add(Box.createVerticalStrut(3));
         infoPanel.add(userRole);
 
-        accountPanel.add(avatarPanel);
-        accountPanel.add(infoPanel);
-        accountArea.add(accountPanel);
+        accountClickPanel.add(avatarPanel);
+        accountClickPanel.add(infoPanel);
 
-        layeredSidebar.add(accountArea, Integer.valueOf(1));
-        accountArea.setName("account");
+        // Thêm sự kiện click cho account panel
+        accountClickPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                showAccountPopup(accountClickPanel);
+            }
+        });
 
-        side.add(layeredSidebar, BorderLayout.CENTER);
-        return side;
+        accountArea.add(accountClickPanel);
+        return accountArea;
+    }
+
+    private void showAccountPopup(Component invoker) {
+        JPopupMenu popup = new JPopupMenu();
+        popup.setBackground(new Color(0x1E2A3A));
+        popup.setBorder(BorderFactory.createLineBorder(new Color(0x2D4055)));
+
+        JMenuItem infoItem = new JMenuItem("Thông tin người dùng");
+        styleMenuItem(infoItem);
+        infoItem.addActionListener(e -> loadUserFromDBAndShow());
+
+        JMenuItem logoutItem = new JMenuItem("Đăng xuất");
+        styleMenuItem(logoutItem);
+        logoutItem.addActionListener(e -> logout());
+
+        popup.add(infoItem);
+        popup.addSeparator();
+        popup.add(logoutItem);
+        popup.pack();
+        popup.show(invoker, 0, -popup.getPreferredSize().height);
+    }
+
+    private void styleMenuItem(JMenuItem item) {
+        item.setFont(CustomUI.plain(12));
+        item.setForeground(Color.WHITE);
+        item.setBackground(new Color(0x1E2A3A));
+        item.setFocusPainted(false);
+    }
+
+    private void loadUserFromDBAndShow() {
+        try {
+            TaiKhoanDAO dao = new TaiKhoanDAO();
+
+            // load lại từ DB theo username
+            TaiKhoan freshUser = dao.findByUsername(currentUser.getTenDangNhap());
+
+            if (freshUser != null) {
+                showUserInfoDialog(freshUser);
+            } else {
+                JOptionPane.showMessageDialog(this, "Không tìm thấy user!");
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi load dữ liệu!");
+        }
+    }
+
+    private ImageIcon createMenuItemIcon(String iconPath) {
+        try {
+            URL url = getClass().getResource(iconPath);
+            if (url != null) {
+                ImageIcon icon = new ImageIcon(url);
+                Image scaled = icon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+                return new ImageIcon(scaled);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void showUserInfoDialog(TaiKhoan user) {
+        JDialog dialog = new JDialog(this, "Thông tin tài khoản", true);
+        dialog.setSize(400, 350);
+        dialog.setLocationRelativeTo(this);
+        dialog.setBackground(CustomUI.BG_MAIN);
+
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Header
+        JLabel titleLabel = new JLabel("THÔNG TIN TÀI KHOẢN");
+        titleLabel.setFont(CustomUI.bold(16));
+        titleLabel.setForeground(CustomUI.PRIMARY);
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
+
+        // Info panel
+        JPanel infoPanel = new JPanel(new GridBagLayout());
+        infoPanel.setBackground(Color.WHITE);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 10, 8, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+
+        // Avatar
+        JPanel avatarBig = new JPanel() {
+            {
+                setPreferredSize(new Dimension(80, 80));
+                setOpaque(false);
+            }
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(CustomUI.PRIMARY);
+                g2.fillOval(0, 0, 80, 80);
+                g2.setFont(CustomUI.bold(28));
+                g2.setColor(Color.WHITE);
+                String text = user.isAdmin() ? "AD"
+                        : (user.getHoTen().length() >= 2 ? user.getHoTen().substring(0, 2).toUpperCase()
+                                : user.getHoTen().substring(0, 1).toUpperCase());
+                FontMetrics fm = g2.getFontMetrics();
+                int textWidth = fm.stringWidth(text);
+                int textHeight = fm.getAscent();
+                g2.drawString(text, (80 - textWidth) / 2, (80 + textHeight) / 2 - 4);
+                g2.dispose();
+            }
+        };
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        infoPanel.add(avatarBig, gbc);
+
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+
+        // Họ tên
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        JLabel nameLabel = new JLabel("Họ và tên:");
+        nameLabel.setFont(CustomUI.bold(13));
+        nameLabel.setForeground(new Color(0x6B8099));
+        infoPanel.add(nameLabel, gbc);
+
+        gbc.gridx = 1;
+        JLabel nameValue = new JLabel(user.getHoTen());
+        nameValue.setFont(CustomUI.plain(13));
+        nameValue.setForeground(new Color(0x1E3A5F));
+        infoPanel.add(nameValue, gbc);
+
+        // Tên đăng nhập
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        JLabel usernameLabel = new JLabel("Tên đăng nhập:");
+        usernameLabel.setFont(CustomUI.bold(13));
+        usernameLabel.setForeground(new Color(0x6B8099));
+        infoPanel.add(usernameLabel, gbc);
+
+        gbc.gridx = 1;
+        JLabel usernameValue = new JLabel(currentUser.getTenDangNhap());
+        usernameValue.setFont(CustomUI.plain(13));
+        usernameValue.setForeground(new Color(0x1E3A5F));
+        infoPanel.add(usernameValue, gbc);
+
+        // Vai trò
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        JLabel roleLabel = new JLabel("Vai trò:");
+        roleLabel.setFont(CustomUI.bold(13));
+        roleLabel.setForeground(new Color(0x6B8099));
+        infoPanel.add(roleLabel, gbc);
+
+        gbc.gridx = 1;
+        JLabel roleValue = new JLabel(currentUser.isAdmin() ? "Quản trị viên" : "Nhân viên");
+        roleValue.setFont(CustomUI.plain(13));
+        roleValue.setForeground(new Color(0x1E3A5F));
+        infoPanel.add(roleValue, gbc);
+
+        mainPanel.add(infoPanel, BorderLayout.CENTER);
+
+        // Button đóng
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(Color.WHITE);
+
+        JButton closeBtn = new JButton("Đóng");
+        closeBtn.setFont(CustomUI.bold(12));
+        closeBtn.setBackground(CustomUI.PRIMARY);
+        closeBtn.setForeground(Color.WHITE);
+        closeBtn.setBorderPainted(false);
+        closeBtn.setFocusPainted(false);
+        closeBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        closeBtn.addActionListener(e -> dialog.dispose());
+
+        buttonPanel.add(closeBtn);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.add(mainPanel);
+        dialog.setVisible(true);
     }
 
     private JScrollPane buildNavTree() {
@@ -664,11 +766,7 @@ public class dashboardUI extends JFrame {
 
             // XỬ LÝ ĐIỀU HƯỚNG
             if (val.equals("Trang Chủ")) {
-                // NHÂN VIÊN CŨNG CÓ THỂ XEM TRANG CHỦ
-                if (currentUser.isAdmin())
-                    switchContent(buildHomeContent());
-                else
-                    switchContent(buildHomeContent()); // NHÂN VIÊN VẪN XEM ĐƯỢC TRANG CHỦ
+                switchContent(buildHomeContent());
             } else if (val.equals("Vé Phim") || val.equals("Bán Vé")) {
                 switchContent(new BanVeUI());
             } else if (val.equals("Đồ Ăn")) {
@@ -698,72 +796,6 @@ public class dashboardUI extends JFrame {
         return sp;
     }
 
-    private JPanel createMenuOverlay() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(CustomUI.SIDEBAR_BG);
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 8, 10, 8));
-
-        java.util.ArrayList<String> items = new java.util.ArrayList<>();
-        items.add("Trang Chủ");
-        items.add("Bán Vé");
-
-        if (currentUser.isAdmin()) {
-            items.add("Quản Lý Nhân Viên");
-            items.add("Quản Lý Phim");
-            items.add("Thống Kê");
-        }
-        items.add("Đăng xuất");
-
-        for (String name : items) {
-            JPanel item = CustomUI.createNavItem("", name, false);
-            item.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    handleNavigationFromMenu(name);
-                }
-            });
-
-            panel.add(item);
-            panel.add(Box.createVerticalStrut(6));
-        }
-
-        panel.add(Box.createVerticalGlue());
-        return panel;
-    }
-
-    private void handleNavigationFromMenu(String itemName) {
-        switch (itemName) {
-            case "Trang Chủ":
-                switchContent(buildHomeContent()); // CẢ ADMIN VÀ NHÂN VIÊN ĐỀU XEM ĐƯỢC
-                break;
-            case "Bán Vé":
-                switchContent(new BanVeUI());
-                break;
-            case "Quản Lý Nhân Viên":
-                if (currentUser.isAdmin())
-                    switchContent(new QuanLyNhanVienUI());
-                break;
-            case "Quản Lý Phim":
-                if (currentUser.isAdmin())
-                    switchContent(new QuanLyPhimUI("List"));
-                break;
-            case "Thống Kê":
-                if (currentUser.isAdmin())
-                    switchContent(new ThongKeUI());
-                break;
-            case "Đăng xuất":
-                int confirm = JOptionPane.showConfirmDialog(dashboardUI.this,
-                        "Bạn có chắc muốn đăng xuất?", "Xác nhận",
-                        JOptionPane.YES_NO_OPTION);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    dispose();
-                    new dangNhapUI().setVisible(true);
-                }
-                break;
-        }
-    }
-
     private void switchContent(JPanel newContent) {
         if (contentArea != null)
             root.remove(contentArea);
@@ -771,5 +803,18 @@ public class dashboardUI extends JFrame {
         root.add(contentArea, BorderLayout.CENTER);
         root.revalidate();
         root.repaint();
+    }
+
+    private void logout() {
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Bạn có chắc muốn đăng xuất?",
+                "Xác nhận",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            this.dispose();
+            new dangNhapUI().setVisible(true);
+        }
     }
 }

@@ -148,4 +148,26 @@ public class TaiKhoanDAO {
         }
         return -1;
     }
+
+    public TaiKhoan findByUsername(String username) {
+        String sql = "SELECT * FROM TaiKhoan WHERE TenDangNhap = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                TaiKhoan tk = new TaiKhoan();
+                tk.setTenDangNhap(rs.getString("TenDangNhap"));
+                tk.setHoTen(rs.getString("HoTen"));
+                tk.setVaiTro(rs.getString("VaiTro"));
+                return tk;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

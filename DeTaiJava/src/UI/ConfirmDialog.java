@@ -3,8 +3,9 @@ package UI;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
-import customUI.CustomUI;
+
 import DAO.VeDAO;
+import customUI.CustomUI;
 import model.BookingState;
 import model.CinemaData;
 
@@ -12,10 +13,10 @@ import model.CinemaData;
  * ConfirmDialog – Dialog xác nhận đặt vé.
  *
  * THAY ĐỔI SO VỚI BẢN CŨ:
- *  • Nút "XÁC NHẬN & THANH TOÁN" gọi VeDAO.saveVe() để lưu vào DB.
- *  • Nếu lưu thất bại → hiện thông báo lỗi, không đóng dialog.
- *  • Nếu lưu thành công → reload SeatMapPanel (qua callback) để
- *    tô ngay các ghế vừa bán, tránh người khác chọn lại.
+ * • Nút "XÁC NHẬN & THANH TOÁN" gọi VeDAO.saveVe() để lưu vào DB.
+ * • Nếu lưu thất bại → hiện thông báo lỗi, không đóng dialog.
+ * • Nếu lưu thành công → reload SeatMapPanel (qua callback) để
+ * tô ngay các ghế vừa bán, tránh người khác chọn lại.
  */
 public class ConfirmDialog extends JDialog {
 
@@ -66,9 +67,9 @@ public class ConfirmDialog extends JDialog {
         rapLbl.setFont(CustomUI.plain(11));
         rapLbl.setForeground(CustomUI.TEXT_LIGHT);
 
-        titleWrap.add(title,  BorderLayout.NORTH);
+        titleWrap.add(title, BorderLayout.NORTH);
         titleWrap.add(rapLbl, BorderLayout.CENTER);
-        header.add(icon,      BorderLayout.WEST);
+        header.add(icon, BorderLayout.WEST);
         header.add(titleWrap, BorderLayout.CENTER);
         root.add(header, BorderLayout.NORTH);
 
@@ -90,10 +91,10 @@ public class ConfirmDialog extends JDialog {
         JLabel payLbl = new JLabel("💳  Thanh toán");
         payLbl.setFont(CustomUI.plain(12));
         payLbl.setForeground(CustomUI.TEXT_LIGHT);
-        paymentMethod = new JComboBox<>(new String[]{"Tiền mặt", "Chuyển khoản QR"});
+        paymentMethod = new JComboBox<>(new String[] { "Tiền mặt", "Chuyển khoản QR" });
         paymentMethod.setFont(CustomUI.plain(12));
-        payRow.add(payLbl,         BorderLayout.WEST);
-        payRow.add(paymentMethod,  BorderLayout.CENTER);
+        payRow.add(payLbl, BorderLayout.WEST);
+        payRow.add(paymentMethod, BorderLayout.CENTER);
         body.add(payRow);
         body.add(Box.createVerticalStrut(12));
 
@@ -104,19 +105,19 @@ public class ConfirmDialog extends JDialog {
         body.add(Box.createVerticalStrut(12));
 
         // Chi tiết vé
-        body.add(infoRow("🎬  Phim",         CinemaData.PHIM_LIST[state.phimIdx]));
+        body.add(infoRow("🎬  Phim", CinemaData.PHIM_LIST[state.phimIdx]));
         body.add(Box.createVerticalStrut(8));
-        body.add(infoRow("🏛️  Phòng chiếu",  CinemaData.PHONG_BY_PHIM[state.phimIdx][state.phongIdx]));
+        body.add(infoRow("🏛️  Phòng chiếu", CinemaData.PHONG_BY_PHIM[state.phimIdx][state.phongIdx]));
         body.add(Box.createVerticalStrut(8));
-        body.add(infoRow("🪑  Ghế",           state.gheDisplay() + "  (" + state.loaiGheDisplay() + ")"));
+        body.add(infoRow("🪑  Ghế", state.gheDisplay() + "  (" + state.loaiGheDisplay() + ")"));
         body.add(Box.createVerticalStrut(8));
-        body.add(infoRow("👤  Khách hàng",    nameOrGuest(state.tenKhachHang)));
+        body.add(infoRow("👤  Khách hàng", nameOrGuest(state.tenKhachHang)));
         body.add(Box.createVerticalStrut(8));
-        body.add(infoRow("📱  Điện thoại",    emptyOrDash(state.soDienThoai)));
+        body.add(infoRow("📱  Điện thoại", emptyOrDash(state.soDienThoai)));
         body.add(Box.createVerticalStrut(8));
-        body.add(infoRow("📧  Email",          emptyOrDash(state.email)));
+        body.add(infoRow("📧  Email", emptyOrDash(state.email)));
         body.add(Box.createVerticalStrut(10));
-        body.add(infoRow("🍿  Bắp & Nước",    state.snackSummary()));
+        body.add(infoRow("🍿  Bắp & Nước", state.snackSummary()));
         body.add(Box.createVerticalStrut(12));
         body.add(divider());
         body.add(Box.createVerticalStrut(12));
@@ -166,9 +167,9 @@ public class ConfirmDialog extends JDialog {
             if (!ok) {
                 JOptionPane.showMessageDialog(this,
                         "⚠️  Không thể lưu vé vào cơ sở dữ liệu.\n"
-                      + "Vui lòng kiểm tra kết nối SQL Server và thử lại.",
+                                + "Vui lòng kiểm tra kết nối SQL Server và thử lại.",
                         "Lỗi Lưu Vé", JOptionPane.ERROR_MESSAGE);
-                return;   // giữ nguyên dialog, không đóng
+                return; // giữ nguyên dialog, không đóng
             }
 
             // Đóng dialog
@@ -181,7 +182,7 @@ public class ConfirmDialog extends JDialog {
 
             JOptionPane.showMessageDialog(null,
                     "🎉  Đặt vé thành công!\nVé điện tử đã được gửi tới:\n"
-                  + emptyOrDash(state.email),
+                            + emptyOrDash(state.email),
                     "Đặt Vé Thành Công", JOptionPane.INFORMATION_MESSAGE);
         });
 
@@ -192,7 +193,8 @@ public class ConfirmDialog extends JDialog {
         // Listener combo thanh toán
         paymentMethod.addActionListener(e -> {
             boolean qr = "Chuyển khoản QR".equals(paymentMethod.getSelectedItem());
-            if (qr) showQR();
+            if (qr)
+                showQR();
             qrLabel.setVisible(qr);
             body.revalidate();
             body.repaint();
@@ -244,9 +246,9 @@ public class ConfirmDialog extends JDialog {
         JLabel ngay = new JLabel(state.ngayChieu(), JLabel.CENTER);
         ngay.setFont(CustomUI.plain(12));
         ngay.setForeground(CustomUI.TEXT_LIGHT);
-        dw.add(thu,  BorderLayout.NORTH);
+        dw.add(thu, BorderLayout.NORTH);
         dw.add(ngay, BorderLayout.CENTER);
-        p.add(l,  BorderLayout.NORTH);
+        p.add(l, BorderLayout.NORTH);
         p.add(dw, BorderLayout.CENTER);
         return p;
     }
@@ -271,7 +273,8 @@ public class ConfirmDialog extends JDialog {
     private void showQR() {
         try {
             java.net.URL url = getClass().getResource("/resources/qr.png");
-            if (url == null) throw new Exception("QR not found");
+            if (url == null)
+                throw new Exception("QR not found");
             Image img = new javax.swing.ImageIcon(url)
                     .getImage().getScaledInstance(220, 220, Image.SCALE_SMOOTH);
             qrLabel.setIcon(new javax.swing.ImageIcon(img));
@@ -289,6 +292,11 @@ public class ConfirmDialog extends JDialog {
         return d;
     }
 
-    private String emptyOrDash(String s)  { return (s == null || s.isBlank()) ? "-" : s; }
-    private String nameOrGuest(String s)  { return (s == null || s.isBlank()) ? "Khách vãng lai" : s; }
+    private String emptyOrDash(String s) {
+        return (s == null || s.isBlank()) ? "-" : s;
+    }
+
+    private String nameOrGuest(String s) {
+        return (s == null || s.isBlank()) ? "Khách vãng lai" : s;
+    }
 }

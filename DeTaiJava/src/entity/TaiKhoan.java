@@ -97,4 +97,14 @@ public class TaiKhoan {
     public String toString() {
         return hoTen + " (" + vaiTro + ")";
     }
+
+    public char[] getId() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getId'");
+    }
+
+    public Object getSoDienThoai() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSoDienThoai'");
+    }
 }
