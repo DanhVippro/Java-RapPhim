@@ -12,33 +12,37 @@ import model.CinemaData;
  * SeatMapPanel – Sơ đồ ghế + chú thích màu.
  *
  * THAY ĐỔI SO VỚI BẢN CŨ:
- *  • Không dùng CinemaData.SOLD[][] (dữ liệu tĩnh) nữa.
- *  • Gọi VeDAO.getSoldSeats() mỗi lần load/rebuild để lấy ghế đã bán thực từ DB.
+ * • Không dùng CinemaData.SOLD[][] (dữ liệu tĩnh) nữa.
+ * • Gọi VeDAO.getSoldSeats() mỗi lần load/rebuild để lấy ghế đã bán thực từ DB.
  */
 public class SeatMapPanel extends JPanel {
 
     // ── Màu ghế ─────────────────────────────────────────────
-    public static final Color SEAT_EMPTY    = new Color(0x3E5065);
-    public static final Color SEAT_SOLD     = new Color(0x2A3F52);
-    public static final Color SEAT_SELECTED = new Color(0xFFFFFF);
-    public static final Color SEAT_VIP      = new Color(0x5B4DB8);
+    public static final Color SEAT_EMPTY = BanVeHelper.SEAT_EMPTY;
+    public static final Color SEAT_SOLD = BanVeHelper.SEAT_SOLD;
+    public static final Color SEAT_SELECTED = BanVeHelper.SEAT_SELECTED;
+    public static final Color SEAT_VIP = BanVeHelper.SEAT_VIP;
 
     private final BookingState state;
     private Runnable onSeatChange;
 
     // ── Constructor ─────────────────────────────────────────
     public SeatMapPanel(BookingState state, Runnable onSeatChange) {
-        this.state        = state;
+        this.state = state;
         this.onSeatChange = onSeatChange;
 
         setLayout(new BorderLayout());
         add(buildCard(), BorderLayout.CENTER);
     }
 
-    public void setOnSeatChange(Runnable r) { this.onSeatChange = r; }
+    public void setOnSeatChange(Runnable r) {
+        this.onSeatChange = r;
+    }
 
     // ── Reload khi đổi phòng ────────────────────────────────
-    public void loadRoom(int roomKey) { reloadSeatMap(); }
+    public void loadRoom(int roomKey) {
+        reloadSeatMap();
+    }
 
     public void reloadSeatMap() {
         removeAll();
@@ -47,7 +51,9 @@ public class SeatMapPanel extends JPanel {
         repaint();
     }
 
-    public void rebuild(int roomKey) { loadRoom(roomKey); }
+    public void rebuild(int roomKey) {
+        loadRoom(roomKey);
+    }
 
     // ── Card chính ──────────────────────────────────────────
     private JPanel buildCard() {
@@ -77,7 +83,7 @@ public class SeatMapPanel extends JPanel {
 
                 // ★ Thay CinemaData.SOLD[r][c] bằng check từ DB
                 boolean isSold = soldFromDB.contains(label);
-                boolean isVip  = CinemaData.VIP_SEATS[r][c];
+                boolean isVip = CinemaData.VIP_SEATS[r][c];
 
                 grid.add(createSeatBtn(label, isSold, isVip));
             }
@@ -92,10 +98,10 @@ public class SeatMapPanel extends JPanel {
     private JPanel buildLegend() {
         JPanel legend = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 4));
         legend.setOpaque(false);
-        legend.add(legendItem(SEAT_EMPTY,    "Còn trống"));
-        legend.add(legendItem(SEAT_SOLD,     "Đã bán"));
+        legend.add(legendItem(SEAT_EMPTY, "Còn trống"));
+        legend.add(legendItem(SEAT_SOLD, "Đã bán"));
         legend.add(legendItem(SEAT_SELECTED, "Đang chọn"));
-        legend.add(legendItem(SEAT_VIP,      "VIP"));
+        legend.add(legendItem(SEAT_VIP, "VIP"));
         return legend;
     }
 
@@ -117,9 +123,15 @@ public class SeatMapPanel extends JPanel {
     // ── Tạo ghế ─────────────────────────────────────────────
     private JToggleButton createSeatBtn(String label, boolean isSold, boolean isVip) {
         JToggleButton btn = new JToggleButton(label);
+
         btn.setFont(new Font("Monospaced", Font.BOLD, 12));
         btn.setForeground(new Color(0xCCDDEE));
-        btn.setOpaque(true);
+
+        // 🔥 QUAN TRỌNG
+        btn.setContentAreaFilled(false); // 🔥 thêm
+        btn.setOpaque(true); // 🔥 thêm
+        btn.setUI(new javax.swing.plaf.basic.BasicToggleButtonUI());
+
         btn.setFocusPainted(false);
         btn.setBorder(BorderFactory.createLineBorder(new Color(0x374B5C)));
         btn.setPreferredSize(new Dimension(40, 38));
@@ -140,15 +152,20 @@ public class SeatMapPanel extends JPanel {
                 } else {
                     btn.setBackground(isVip ? SEAT_VIP : SEAT_EMPTY);
                     btn.setForeground(new Color(0xCCDDEE));
+
                     int i = state.seats.indexOf(label);
                     if (i >= 0) {
                         state.seats.remove(i);
                         state.seatsVip.remove(i);
                     }
                 }
-                if (onSeatChange != null) onSeatChange.run();
+
+                btn.repaint(); // 🔥 giữ lại
+                if (onSeatChange != null)
+                    onSeatChange.run();
             });
         }
+
         return btn;
     }
 }
