@@ -23,6 +23,25 @@ public class dashboardUI extends JFrame {
     private ChatAssistantUI assistant;
     private JScrollPane treeScroll;
     private JPanel accountPanel;
+    private boolean isProgrammaticSelection = false;
+
+    public void setSelectedSidebarNode(String nodeName) {
+        if (treeScroll != null && treeScroll.getViewport().getView() instanceof JTree) {
+            JTree tree = (JTree) treeScroll.getViewport().getView();
+            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+            DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+            java.util.Enumeration<?> e = root.breadthFirstEnumeration();
+            while (e.hasMoreElements()) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
+                if (nodeName.equals(node.toString().trim())) {
+                    isProgrammaticSelection = true;
+                    tree.setSelectionPath(new javax.swing.tree.TreePath(node.getPath()));
+                    isProgrammaticSelection = false;
+                    return;
+                }
+            }
+        }
+    }
 
     public dashboardUI(TaiKhoan user) {
         this.currentUser = user;
@@ -59,7 +78,17 @@ public class dashboardUI extends JFrame {
                         c.setBounds(0, 0, getWidth(), getHeight());
                     } else if (c == assistant) {
                         Dimension d = c.getPreferredSize();
-                        c.setBounds(getWidth() - d.width - 60, getHeight() - d.height - 30, d.width, d.height);
+                        if (assistant.isDragged()) {
+                            // Giữ vị trí hiện tại, chỉ ép lại vào trong khung hình nếu cửa sổ bị thu nhỏ
+                            int newX = Math.min(assistant.getX(), getWidth() - d.width);
+                            int newY = Math.min(assistant.getY(), getHeight() - d.height);
+                            newX = Math.max(0, newX);
+                            newY = Math.max(0, newY);
+                            c.setBounds(newX, newY, d.width, d.height);
+                        } else {
+                            // Vị trí mặc định: Góc dưới bên phải
+                            c.setBounds(getWidth() - d.width - 60, getHeight() - d.height - 30, d.width, d.height);
+                        }
                     }
                 }
             }
@@ -642,7 +671,10 @@ public class dashboardUI extends JFrame {
         nodeBanVe.add(new DefaultMutableTreeNode("Đồ Ăn"));
         root.add(nodeBanVe);
 
-        // CHỈ THÊM MENU QUẢN LÝ NẾU LÀ ADMIN
+        DefaultMutableTreeNode nodeHoaDon = new DefaultMutableTreeNode("Hóa Đơn");
+        root.add(nodeHoaDon);
+
+        // CHỈ THÊM CÁC MENU QUẢN LÝ NẾU LÀ ADMIN
         if (currentUser.isAdmin()) {
             DefaultMutableTreeNode nodeNhanVien = new DefaultMutableTreeNode("Quản Lý Nhân Viên");
             root.add(nodeNhanVien);
@@ -659,6 +691,7 @@ public class dashboardUI extends JFrame {
         java.util.Map<String, String> iconFileMap = new java.util.HashMap<>();
         iconFileMap.put("Trang Chủ", "/resources/icons/house.png");
         iconFileMap.put("Bán Vé", "/resources/icons/film.png");
+        iconFileMap.put("Hóa Đơn", "/resources/icons/bill.png");
         iconFileMap.put("Vé Phim", "/resources/icons/clapboard.png");
         iconFileMap.put("Đồ Ăn", "/resources/icons/burger.png");
 
@@ -680,6 +713,12 @@ public class dashboardUI extends JFrame {
         tree.setFont(CustomUI.plain(13));
         tree.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
         tree.setRowHeight(46);
+        
+        if (tree.getUI() instanceof javax.swing.plaf.basic.BasicTreeUI) {
+            javax.swing.plaf.basic.BasicTreeUI ui = (javax.swing.plaf.basic.BasicTreeUI) tree.getUI();
+            ui.setLeftChildIndent(0);
+            ui.setRightChildIndent(0);
+        }
 
         for (int i = 0; i < tree.getRowCount(); i++)
             tree.expandRow(i);
@@ -719,8 +758,9 @@ public class dashboardUI extends JFrame {
                     }
                 };
                 item.setOpaque(false);
-                int leftPad = isChild ? (24 + (depth - 1) * 14) : 10;
+                int leftPad = isChild ? (44 + (depth - 1) * 14) : 10;
                 item.setBorder(BorderFactory.createEmptyBorder(0, leftPad, 0, 8));
+                item.setPreferredSize(new Dimension(300, 46));
 
                 JLabel lblIcon;
                 ImageIcon ico = iconCache.get(label);
@@ -758,6 +798,8 @@ public class dashboardUI extends JFrame {
         });
 
         tree.addTreeSelectionListener(e -> {
+            if (isProgrammaticSelection) return;
+
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
             if (node == null)
                 return;
@@ -771,6 +813,8 @@ public class dashboardUI extends JFrame {
                 switchContent(new BanVeUI());
             } else if (val.equals("Đồ Ăn")) {
                 switchContent(new DoAnUI());
+            } else if (val.equals("Hóa Đơn")) {
+                switchContent(new HoaDonUI());
             } else if (val.equals("Quản Lý Nhân Viên")) {
                 if (currentUser.isAdmin())
                     switchContent(new QuanLyNhanVienUI());
@@ -796,6 +840,79 @@ public class dashboardUI extends JFrame {
         return sp;
     }
 
+    
+
+    private JPanel createMenuOverlay() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(CustomUI.SIDEBAR_BG);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 8, 10, 8));
+
+        java.util.ArrayList<String> items = new java.util.ArrayList<>();
+        items.add("Trang Chủ");
+        items.add("Bán Vé");
+        items.add("Hóa Đơn");
+
+        if (currentUser.isAdmin()) {
+            items.add("Quản Lý Nhân Viên");
+            items.add("Quản Lý Phim");
+            items.add("Thống Kê");
+        }
+        items.add("Đăng xuất");
+
+        for (String name : items) {
+            JPanel item = CustomUI.createNavItem("", name, false);
+            item.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    handleNavigationFromMenu(name);
+                }
+            });
+
+            panel.add(item);
+            panel.add(Box.createVerticalStrut(6));
+        }
+
+        panel.add(Box.createVerticalGlue());
+        return panel;
+    }
+
+    private void handleNavigationFromMenu(String itemName) {
+        switch (itemName) {
+            case "Trang Chủ":
+                if (currentUser.isAdmin())
+                    switchContent(buildHomeContent());
+                break;
+            case "Bán Vé":
+                switchContent(new BanVeUI());
+                break;
+            case "Hóa Đơn":
+                switchContent(new HoaDonUI());
+                break;
+            case "Quản Lý Nhân Viên":
+                if (currentUser.isAdmin())
+                    switchContent(new QuanLyNhanVienUI());
+                break;
+            case "Quản Lý Phim":
+                if (currentUser.isAdmin())
+                    switchContent(new QuanLyPhimUI("List"));
+                break;
+            case "Thống Kê":
+                if (currentUser.isAdmin())
+                    switchContent(new ThongKeUI());
+                break;
+            case "Đăng xuất":
+                int confirm = JOptionPane.showConfirmDialog(dashboardUI.this,
+                        "Bạn có chắc muốn đăng xuất?", "Xác nhận",
+                        JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    dispose();
+                    new dangNhapUI().setVisible(true);
+                }
+                break;
+        }
+    }
+    
     private void switchContent(JPanel newContent) {
         if (contentArea != null)
             root.remove(contentArea);

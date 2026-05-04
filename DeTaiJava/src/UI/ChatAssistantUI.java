@@ -27,6 +27,12 @@ public class ChatAssistantUI extends JPanel {
 
     private JPanel botIconPanel;
     private JPanel expandedPanel;
+    
+    private boolean isUserDragged = false;
+
+    public boolean isDragged() {
+        return isUserDragged;
+    }
 
     public ChatAssistantUI() {
         this.geminiService = new GeminiService();
@@ -65,12 +71,48 @@ public class ChatAssistantUI extends JPanel {
             botIconPanel.add(lblFallback, BorderLayout.CENTER);
         }
 
-        botIconPanel.addMouseListener(new MouseAdapter() {
+        MouseAdapter dragAdapter = new MouseAdapter() {
+            private Point initialClick;
+            private boolean isDragging = false;
+
             @Override
-            public void mouseClicked(MouseEvent e) {
-                toggleExpand();
+            public void mousePressed(MouseEvent e) {
+                initialClick = e.getPoint();
+                isDragging = false;
             }
-        });
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                isDragging = true;
+                int thisX = getLocation().x;
+                int thisY = getLocation().y;
+
+                int xMoved = e.getX() - initialClick.x;
+                int yMoved = e.getY() - initialClick.y;
+
+                int newX = thisX + xMoved;
+                int newY = thisY + yMoved;
+                
+                if (getParent() != null) {
+                    newX = Math.max(0, Math.min(newX, getParent().getWidth() - getWidth()));
+                    newY = Math.max(0, Math.min(newY, getParent().getHeight() - getHeight()));
+                }
+
+                setLocation(newX, newY);
+                isUserDragged = true;
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (!isDragging && e.getComponent() == botIconPanel) {
+                    toggleExpand();
+                }
+                isDragging = false;
+            }
+        };
+
+        botIconPanel.addMouseListener(dragAdapter);
+        botIconPanel.addMouseMotionListener(dragAdapter);
 
         // --- 2. Expanded Chat Panel ---
         expandedPanel = new JPanel(new BorderLayout()) {
@@ -107,6 +149,9 @@ public class ChatAssistantUI extends JPanel {
         btnClose.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnClose.addActionListener(e -> toggleExpand());
         header.add(btnClose, BorderLayout.EAST);
+        
+        header.addMouseListener(dragAdapter);
+        header.addMouseMotionListener(dragAdapter);
 
         expandedPanel.add(header, BorderLayout.NORTH);
 
@@ -172,6 +217,18 @@ public class ChatAssistantUI extends JPanel {
         } else {
             setPreferredSize(new Dimension(ICON_SIZE, ICON_SIZE));
             add(botIconPanel, BorderLayout.CENTER);
+        }
+        
+        if (getParent() != null) {
+            int w = isExpanded ? WIDTH_EXPANDED : ICON_SIZE;
+            int h = isExpanded ? HEIGHT_EXPANDED : ICON_SIZE;
+            int newX = Math.min(getX(), getParent().getWidth() - w);
+            int newY = Math.min(getY(), getParent().getHeight() - h);
+            newX = Math.max(0, newX);
+            newY = Math.max(0, newY);
+            if (newX != getX() || newY != getY()) {
+                setLocation(newX, newY);
+            }
         }
 
         revalidate();

@@ -25,6 +25,7 @@ public class ThemPhimPanel extends JPanel {
 
         JPanel form = new JPanel(new GridBagLayout());
         form.setOpaque(false);
+        form.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 30));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(0, 0, 15, 0);
@@ -132,8 +133,8 @@ public class ThemPhimPanel extends JPanel {
         posterPanel.setOpaque(false);
         posterPanel.add(txtPoster, BorderLayout.CENTER);
         
-        JButton btnBrowse = BanVeHelper.ghostBtn("Chọn ảnh...");
-        btnBrowse.setPreferredSize(new Dimension(120, 30));
+        JButton btnBrowse = BanVeHelper.primaryBtn("Chọn ảnh");
+        btnBrowse.setPreferredSize(new Dimension(120, 46));
         btnBrowse.addActionListener(e -> handleBrowsePoster());
         posterPanel.add(btnBrowse, BorderLayout.EAST);
         
