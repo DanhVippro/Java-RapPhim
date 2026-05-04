@@ -14,7 +14,6 @@ import model.CinemaData;
  *   [LEFT]  Grid 4x2 snack items (có stepper +/−)
  *   [RIGHT] Chi tiết đơn hàng (scroll):
  *             - Phim / giờ / phòng / ghế / loại
- *             - Combo chọn (nếu chưa chọn → hiển thị row combo có thể chọn ngay)
  *             - Thông tin người nhận (tên / phone / email – gửi về Gmail)
  *             - Footer: tạm tính + nút Xác nhận
  *   [BOTTOM] Nút: "← Quay lại"  |  "Làm mới"
@@ -25,12 +24,11 @@ public class SnackPanel extends JPanel {
     private final Runnable     onBack;
 
     // Snack stepper refs
-    private int[]   qty;
+    private int[]    qty;
     private JLabel[] qtyLabels;
 
     // Summary refs
-    private JLabel  lblSnackTotal, lblGrandTotal;
-    private JPanel  snackDetailPanel; // panel hiển thị combo đã chọn hoặc combo picker
+    private JLabel lblSnackTotal, lblGrandTotal;
 
     public SnackPanel(BookingState state, Runnable onBack) {
         this.state  = state;
@@ -42,8 +40,8 @@ public class SnackPanel extends JPanel {
         setOpaque(false);
         setLayout(new BorderLayout(0, 14));
 
-        add(buildTopBar(),  BorderLayout.NORTH);
-        add(buildBody(),    BorderLayout.CENTER);
+        add(buildTopBar(),    BorderLayout.NORTH);
+        add(buildBody(),      BorderLayout.CENTER);
         add(buildBottomBar(), BorderLayout.SOUTH);
     }
 
@@ -133,10 +131,18 @@ public class SnackPanel extends JPanel {
 
         int fi = idx;
         minus.addActionListener(e -> {
-            if (qty[fi] > 0) { qty[fi]--; state.snackQty[fi] = qty[fi]; qtyLabels[fi].setText(String.valueOf(qty[fi])); refreshTotals(); }
+            if (qty[fi] > 0) {
+                qty[fi]--;
+                state.snackQty[fi] = qty[fi];
+                qtyLabels[fi].setText(String.valueOf(qty[fi]));
+                refreshTotals();
+            }
         });
         plus.addActionListener(e -> {
-            qty[fi]++; state.snackQty[fi] = qty[fi]; qtyLabels[fi].setText(String.valueOf(qty[fi])); refreshTotals();
+            qty[fi]++;
+            state.snackQty[fi] = qty[fi];
+            qtyLabels[fi].setText(String.valueOf(qty[fi]));
+            refreshTotals();
         });
 
         stepper.add(minus); stepper.add(qtyLabels[idx]); stepper.add(plus);
@@ -149,7 +155,6 @@ public class SnackPanel extends JPanel {
     private JPanel buildOrderDetail() {
         JPanel outer = BanVeHelper.darkCard();
         outer.setLayout(new BorderLayout(0, 0));
-        outer.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         // Scrollable content
         JPanel content = new JPanel();
@@ -160,29 +165,17 @@ public class SnackPanel extends JPanel {
         content.add(sectionLbl("📋  CHI TIẾT ĐẶT VÉ"));
         content.add(vgap(10));
 
-        // Thông tin vé cố định
-        content.add(sumRow("🎬  Phim",        CinemaData.PHIM_LIST[state.phimIdx]));
+        content.add(sumRow("🎬  Phim",       CinemaData.PHIM_LIST[state.phimIdx]));
         content.add(vgap(5));
-        content.add(sumRow("⏰  Suất chiếu",  state.gioBatDau() + " – " + state.gioKetThuc()));
+        content.add(sumRow("⏰  Suất chiếu", state.gioBatDau() + " – " + state.gioKetThuc()));
         content.add(vgap(5));
-        content.add(sumRow("📅  Ngày",        state.thuDisplay() + ", " + state.ngayChieu()));
+        content.add(sumRow("📅  Ngày",       state.thuDisplay() + ", " + state.ngayChieu()));
         content.add(vgap(5));
-        content.add(sumRow("🏛️  Phòng",       CinemaData.PHONG_BY_PHIM[state.phimIdx][state.phongIdx]));
+        content.add(sumRow("🏛️  Phòng",      CinemaData.PHONG_BY_PHIM[state.phimIdx][state.phongIdx]));
         content.add(vgap(5));
-        content.add(sumRow("🪑  Ghế",          state.gheDisplay() + "  (" + state.loaiGheDisplay() + ")"));
+        content.add(sumRow("🪑  Ghế",         state.gheDisplay() + "  (" + state.loaiGheDisplay() + ")"));
         content.add(vgap(5));
-        content.add(sumRow("💰  Tiền vé",     BanVeHelper.formatVND(state.tienVe())));
-        content.add(vgap(10));
-        content.add(divider());
-        content.add(vgap(10));
-
-        // ── Combo bắp nước (nếu chưa chọn → cho chọn ngay ở đây) ──────────
-        content.add(sectionLbl("🍿  BẮP & NƯỚC"));
-        content.add(vgap(8));
-
-        // Row picker nhỏ gọn (luôn hiển thị, cập nhật khi stepper thay đổi)
-        snackDetailPanel = buildInlineSnackPicker();
-        content.add(snackDetailPanel);
+        content.add(sumRow("💰  Tiền vé",    BanVeHelper.formatVND(state.tienVe())));
         content.add(vgap(10));
         content.add(divider());
         content.add(vgap(10));
@@ -190,11 +183,11 @@ public class SnackPanel extends JPanel {
         // ── Thông tin người nhận ─────────────────────────────────────────────
         content.add(sectionLbl("📨  THÔNG TIN NGƯỜI NHẬN"));
         content.add(vgap(6));
-        content.add(sumRow("👤  Họ tên",     emptyOrDash(state.tenKhachHang)));
+        content.add(sumRow("👤  Họ tên",    emptyOrDash(state.tenKhachHang)));
         content.add(vgap(4));
-        content.add(sumRow("📱  Điện thoại",  emptyOrDash(state.soDienThoai)));
+        content.add(sumRow("📱  Điện thoại", emptyOrDash(state.soDienThoai)));
         content.add(vgap(4));
-        content.add(sumRow("📧  Email",       emptyOrDash(state.email)));
+        content.add(sumRow("📧  Email",      emptyOrDash(state.email)));
         content.add(vgap(4));
 
         JLabel gmailNote = new JLabel("✉️  Vé sẽ được gửi qua email sau khi xác nhận");
@@ -207,7 +200,7 @@ public class SnackPanel extends JPanel {
         content.add(divider());
         content.add(vgap(10));
 
-        // ── Tổng snack ───────────────────────────────────────────────────────
+        // ── Tổng snack & vé ──────────────────────────────────────────────────
         lblSnackTotal = new JLabel("0 đ");
         lblSnackTotal.setFont(CustomUI.bold(12));
         lblSnackTotal.setForeground(new Color(0xF59E0B));
@@ -233,7 +226,7 @@ public class SnackPanel extends JPanel {
         JPanel footer = new JPanel(new BorderLayout(0, 8));
         footer.setOpaque(false);
         footer.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1,0,0,0, new Color(0x2D3F4F)),
+            BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(0x2D3F4F)),
             BorderFactory.createEmptyBorder(10, 16, 12, 16)));
 
         JPanel grandRow = new JPanel(new BorderLayout());
@@ -244,7 +237,7 @@ public class SnackPanel extends JPanel {
         lblGrandTotal = new JLabel(BanVeHelper.formatVND(state.tienVe()));
         lblGrandTotal.setFont(CustomUI.bold(20));
         lblGrandTotal.setForeground(new Color(0x00B8D4));
-        grandRow.add(gl, BorderLayout.WEST);
+        grandRow.add(gl,            BorderLayout.WEST);
         grandRow.add(lblGrandTotal, BorderLayout.EAST);
         footer.add(grandRow, BorderLayout.NORTH);
 
@@ -259,75 +252,6 @@ public class SnackPanel extends JPanel {
 
         outer.add(footer, BorderLayout.SOUTH);
         return outer;
-    }
-
-    /**
-     * Inline snack picker nhỏ gọn ngay trong chi tiết đơn hàng.
-     * Luôn hiển thị; stepper ở đây ĐỒNG BỘ với stepper bên grid lớn.
-     */
-    private JPanel buildInlineSnackPicker() {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setOpaque(false);
-        p.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
-        p.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        for (int i = 0; i < CinemaData.SNACK_DATA.length; i++) {
-            final int fi = i;
-            String name  = (String) CinemaData.SNACK_DATA[i][1];
-            String price = (String) CinemaData.SNACK_DATA[i][3];
-            Color  color = new Color((int) CinemaData.SNACK_DATA[i][5]);
-
-            JPanel row = new JPanel(new BorderLayout(6, 0));
-            row.setOpaque(false);
-            row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 26));
-            row.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-            JLabel nameLbl = new JLabel((String) CinemaData.SNACK_DATA[i][0] + " " + name);
-            nameLbl.setFont(CustomUI.plain(11));
-            nameLbl.setForeground(CustomUI.TEXT_LIGHT);
-
-            JLabel priceLbl = new JLabel(price);
-            priceLbl.setFont(CustomUI.plain(10));
-            priceLbl.setForeground(color);
-
-            // Mini stepper cho inline picker – đồng bộ với grid lớn
-            JPanel stepper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
-            stepper.setOpaque(false);
-            JButton m2 = miniBtn("−");
-            JLabel  q2 = new JLabel("0", JLabel.CENTER);
-            q2.setFont(CustomUI.bold(11));
-            q2.setForeground(CustomUI.TEXT_WHITE);
-            q2.setPreferredSize(new Dimension(18, 18));
-            JButton p2 = miniBtn("+");
-
-            m2.addActionListener(e -> {
-                if (qty[fi] > 0) {
-                    qty[fi]--; state.snackQty[fi] = qty[fi];
-                    q2.setText(String.valueOf(qty[fi]));
-                    qtyLabels[fi].setText(String.valueOf(qty[fi]));
-                    refreshTotals();
-                }
-            });
-            p2.addActionListener(e -> {
-                qty[fi]++; state.snackQty[fi] = qty[fi];
-                q2.setText(String.valueOf(qty[fi]));
-                qtyLabels[fi].setText(String.valueOf(qty[fi]));
-                refreshTotals();
-            });
-            stepper.add(m2); stepper.add(q2); stepper.add(p2);
-
-            JPanel left = new JPanel(new BorderLayout(6, 0));
-            left.setOpaque(false);
-            left.add(nameLbl, BorderLayout.WEST);
-            left.add(priceLbl, BorderLayout.CENTER);
-
-            row.add(left, BorderLayout.CENTER);
-            row.add(stepper, BorderLayout.EAST);
-            p.add(row);
-            p.add(Box.createVerticalStrut(3));
-        }
-        return p;
     }
 
     // ── Bottom bar: Làm mới ───────────────────────────────────────────────────
@@ -354,33 +278,13 @@ public class SnackPanel extends JPanel {
         for (int i = 0; i < qtyLabels.length; i++)
             if (qtyLabels[i] != null) qtyLabels[i].setText("0");
         refreshTotals();
-        // Rebuild inline picker để đồng bộ
-        refreshInlinePicker();
     }
 
     private void refreshTotals() {
         long snack = state.tienSnack();
         long grand = state.tongCong();
-        if (lblSnackTotal  != null) lblSnackTotal.setText(BanVeHelper.formatVND(snack));
-        if (lblGrandTotal  != null) lblGrandTotal.setText(BanVeHelper.formatVND(grand));
-    }
-
-    /** Sau reset, rebuild inline picker (reset qty labels nhỏ) */
-    private void refreshInlinePicker() {
-        if (snackDetailPanel != null) {
-            for (Component c : snackDetailPanel.getComponents()) {
-                if (c instanceof JPanel) {
-                    for (Component sub : ((JPanel)c).getComponents()) {
-                        if (sub instanceof JLabel) {
-                            JLabel l = (JLabel) sub;
-                            // Label số lượng inline
-                            try { if (Integer.parseInt(l.getText()) >= 0) l.setText("0"); }
-                            catch (NumberFormatException ignored) {}
-                        }
-                    }
-                }
-            }
-        }
+        if (lblSnackTotal != null) lblSnackTotal.setText(BanVeHelper.formatVND(snack));
+        if (lblGrandTotal != null) lblGrandTotal.setText(BanVeHelper.formatVND(grand));
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -388,19 +292,6 @@ public class SnackPanel extends JPanel {
         JButton b = new JButton(t);
         b.setPreferredSize(new Dimension(26, 26));
         b.setFont(CustomUI.bold(13));
-        b.setForeground(CustomUI.TEXT_WHITE);
-        b.setBackground(new Color(0x243447));
-        b.setOpaque(true);
-        b.setBorder(BorderFactory.createLineBorder(new Color(0x3A5070)));
-        b.setFocusPainted(false);
-        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        return b;
-    }
-
-    private JButton miniBtn(String t) {
-        JButton b = new JButton(t);
-        b.setPreferredSize(new Dimension(20, 20));
-        b.setFont(new Font("SansSerif", Font.BOLD, 11));
         b.setForeground(CustomUI.TEXT_WHITE);
         b.setBackground(new Color(0x243447));
         b.setOpaque(true);
@@ -444,7 +335,7 @@ public class SnackPanel extends JPanel {
         JLabel l = new JLabel(label);
         l.setFont(CustomUI.plain(11));
         l.setForeground(CustomUI.TEXT_LIGHT);
-        row.add(l, BorderLayout.WEST);
+        row.add(l,      BorderLayout.WEST);
         row.add(valLbl, BorderLayout.EAST);
         return row;
     }
@@ -460,5 +351,8 @@ public class SnackPanel extends JPanel {
     }
 
     private Component vgap(int h) { return Box.createVerticalStrut(h); }
-    private String emptyOrDash(String s) { return (s == null || s.isBlank()) ? "-" : s; }
+
+    private String emptyOrDash(String s) {
+        return (s == null || s.isBlank()) ? "-" : s;
+    }
 }
