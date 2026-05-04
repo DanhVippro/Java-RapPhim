@@ -24,6 +24,7 @@ public class dashboardUI extends JFrame {
     private JScrollPane treeScroll;
     private JPanel accountPanel;
     private boolean isProgrammaticSelection = false;
+    private long lastAccountPopupCloseTime = 0;
 
     public void setSelectedSidebarNode(String nodeName) {
         if (treeScroll != null && treeScroll.getViewport().getView() instanceof JTree) {
@@ -475,6 +476,10 @@ public class dashboardUI extends JFrame {
     }
 
     private void showAccountPopup(Component invoker) {
+        if (System.currentTimeMillis() - lastAccountPopupCloseTime < 150) {
+            return;
+        }
+
         JPopupMenu popup = new JPopupMenu();
         popup.setBackground(new Color(0x1E2A3A));
         popup.setBorder(BorderFactory.createLineBorder(new Color(0x2D4055)));
@@ -490,6 +495,20 @@ public class dashboardUI extends JFrame {
         popup.add(infoItem);
         popup.addSeparator();
         popup.add(logoutItem);
+
+        popup.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {}
+
+            @Override
+            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent e) {
+                lastAccountPopupCloseTime = System.currentTimeMillis();
+            }
+
+            @Override
+            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent e) {}
+        });
+
         popup.pack();
         popup.show(invoker, 0, -popup.getPreferredSize().height);
     }
