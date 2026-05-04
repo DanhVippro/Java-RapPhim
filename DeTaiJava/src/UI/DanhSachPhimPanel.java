@@ -38,31 +38,54 @@ public class DanhSachPhimPanel extends JPanel {
         actions.setOpaque(false);
 
         txtSearch = BanVeHelper.placeholderField("Tìm tên phim...");
-        txtSearch.setPreferredSize(new Dimension(180, 42));
+        txtSearch.setPreferredSize(new Dimension(180, 38));
         txtSearch.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             public void insertUpdate(javax.swing.event.DocumentEvent e) { filter(); }
             public void removeUpdate(javax.swing.event.DocumentEvent e) { filter(); }
             public void changedUpdate(javax.swing.event.DocumentEvent e) { filter(); }
         });
 
-        comboFilter = new JComboBox<>(new String[]{"Tất cả trạng thái", "Đang chiếu", "Sắp chiếu", "Ngừng chiếu"});
-        comboFilter.setPreferredSize(new Dimension(150, 42));
-        comboFilter.setBackground(BanVeHelper.BG_FIELD);
+        comboFilter = BanVeHelper.styledCombo(new String[]{"Tất cả trạng thái", "Đang chiếu", "Sắp chiếu", "Ngừng chiếu"});
+        comboFilter.setPreferredSize(new Dimension(180, 38));
         comboFilter.setForeground(Color.WHITE);
+        comboFilter.setFont(customUI.CustomUI.plain(13));
+        comboFilter.setBorder(BorderFactory.createLineBorder(new Color(0x3A4C5E), 1, true));
+        comboFilter.setUI(new javax.swing.plaf.basic.BasicComboBoxUI() {
+            @Override
+            protected JButton createArrowButton() {
+                JButton btn = new JButton("▼");
+                btn.setForeground(Color.WHITE);
+                btn.setBackground(new Color(0x16212A));
+                btn.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+                btn.setFocusPainted(false);
+                btn.setContentAreaFilled(false);
+                return btn;
+            }
+        });
         comboFilter.addActionListener(e -> filter());
 
-        JButton btnReload = BanVeHelper.ghostBtn("Làm mới");
-        btnReload.setPreferredSize(new Dimension(100, 42));
+        JButton btnReload = customUI.CustomUI.createPrimaryButton("Làm mới");
+        btnReload.setPreferredSize(new Dimension(100, 38));
         btnReload.addActionListener(e -> {
             txtSearch.setText("Tìm tên phim...");
             comboFilter.setSelectedIndex(0);
             loadData();
         });
 
-        actions.add(new JLabel("Tìm: "));
+        JLabel lblSearch = new JLabel("Tìm:");
+        lblSearch.setForeground(new Color(0x90CAF9));
+        lblSearch.setFont(customUI.CustomUI.bold(13));
+        
+        JLabel lblStatus = new JLabel("Trạng thái:");
+        lblStatus.setForeground(new Color(0x90CAF9));
+        lblStatus.setFont(customUI.CustomUI.bold(13));
+        
+        actions.add(lblSearch);
         actions.add(txtSearch);
-        actions.add(new JLabel("Trạng thái: "));
+        actions.add(Box.createHorizontalStrut(10));
+        actions.add(lblStatus);
         actions.add(comboFilter);
+        actions.add(Box.createHorizontalStrut(10));
         actions.add(btnReload);
 
         header.add(actions, BorderLayout.CENTER);
