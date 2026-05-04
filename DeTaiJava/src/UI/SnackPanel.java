@@ -73,15 +73,14 @@ public class SnackPanel extends JPanel {
     }
 
     private JPanel buildSnackItem(int idx) {
-        String icon  = (String)  CinemaData.SNACK_DATA[idx][0];
-        String name  = (String)  CinemaData.SNACK_DATA[idx][1];
-        String desc  = (String)  CinemaData.SNACK_DATA[idx][2];
-        String price = (String)  CinemaData.SNACK_DATA[idx][3];
-        Color  color = new Color((int) CinemaData.SNACK_DATA[idx][5]);
+        String icon    = (String) CinemaData.SNACK_DATA[idx][0];
+        String name    = (String) CinemaData.SNACK_DATA[idx][1];
+        String desc    = (String) CinemaData.SNACK_DATA[idx][2];
+        String price   = (String) CinemaData.SNACK_DATA[idx][3];
+        Color  color   = new Color((int) CinemaData.SNACK_DATA[idx][5]);
         Object imgPath = CinemaData.SNACK_DATA[idx][6];
         boolean isCombo = name.startsWith("Combo");
 
-        // --- Card container ---
         JPanel card = new JPanel(new BorderLayout(8, 0)) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -100,7 +99,7 @@ public class SnackPanel extends JPanel {
         card.setOpaque(false);
         card.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // --- Ảnh đồ ăn ---
+        // --- Ảnh ---
         JLabel imgLbl;
         if (imgPath != null) {
             java.net.URL url = getClass().getResource((String) imgPath);
@@ -112,8 +111,7 @@ public class SnackPanel extends JPanel {
                     protected void paintComponent(Graphics g) {
                         Graphics2D g2 = (Graphics2D) g.create();
                         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                        // Bo tròn ảnh
-                        g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, 52, 52));
+                        g2.setClip(new Ellipse2D.Float(0, 0, 52, 52));
                         g2.drawImage(((ImageIcon) getIcon()).getImage(), 0, 0, null);
                         g2.dispose();
                     }
@@ -123,7 +121,6 @@ public class SnackPanel extends JPanel {
                 imgLbl.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 26));
             }
         } else {
-            // Combo: vẽ badge đặc biệt
             imgLbl = new JLabel(icon, JLabel.CENTER) {
                 @Override
                 protected void paintComponent(Graphics g) {
@@ -201,7 +198,6 @@ public class SnackPanel extends JPanel {
         JPanel outer = BanVeHelper.darkCard();
         outer.setLayout(new BorderLayout(0, 0));
 
-        // Scrollable content
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setOpaque(false);
@@ -209,30 +205,28 @@ public class SnackPanel extends JPanel {
 
         content.add(sectionLbl("📋  CHI TIẾT ĐẶT VÉ"));
         content.add(vgap(10));
-
-        content.add(sumRow("🎬  Phim", CinemaData.PHIM_LIST[state.phimIdx]));
+        content.add(sumRow("🎬  Phim",        CinemaData.PHIM_LIST[state.phimIdx]));
         content.add(vgap(5));
-        content.add(sumRow("⏰  Suất chiếu", state.gioBatDau() + " – " + state.gioKetThuc()));
+        content.add(sumRow("⏰  Suất chiếu",  state.gioBatDau() + " – " + state.gioKetThuc()));
         content.add(vgap(5));
-        content.add(sumRow("📅  Ngày", state.thuDisplay() + ", " + state.ngayChieu()));
+        content.add(sumRow("📅  Ngày",         state.thuDisplay() + ", " + state.ngayChieu()));
         content.add(vgap(5));
-        content.add(sumRow("🏛️  Phòng", CinemaData.PHONG_BY_PHIM[state.phimIdx][state.phongIdx]));
+        content.add(sumRow("🏛️  Phòng",       CinemaData.PHONG_BY_PHIM[state.phimIdx][state.phongIdx]));
         content.add(vgap(5));
-        content.add(sumRow("🪑  Ghế", state.gheDisplay() + "  (" + state.loaiGheDisplay() + ")"));
+        content.add(sumRow("🪑  Ghế",          state.gheDisplay() + "  (" + state.loaiGheDisplay() + ")"));
         content.add(vgap(5));
-        content.add(sumRow("💰  Tiền vé", BanVeHelper.formatVND(state.tienVe())));
+        content.add(sumRow("💰  Tiền vé",      BanVeHelper.formatVND(state.tienVe())));
         content.add(vgap(10));
         content.add(divider());
         content.add(vgap(10));
 
-        // ── Thông tin người nhận ─────────────────────────────────────────────
         content.add(sectionLbl("📨  THÔNG TIN NGƯỜI NHẬN"));
         content.add(vgap(6));
-        content.add(sumRow("👤  Họ tên", emptyOrDash(state.tenKhachHang)));
+        content.add(sumRow("👤  Họ tên",       emptyOrDash(state.tenKhachHang)));
         content.add(vgap(4));
-        content.add(sumRow("📱  Điện thoại", emptyOrDash(state.soDienThoai)));
+        content.add(sumRow("📱  Điện thoại",   emptyOrDash(state.soDienThoai)));
         content.add(vgap(4));
-        content.add(sumRow("📧  Email", emptyOrDash(state.email)));
+        content.add(sumRow("📧  Email",         emptyOrDash(state.email)));
         content.add(vgap(4));
 
         JLabel gmailNote = new JLabel("✉️  Vé sẽ được gửi qua email sau khi xác nhận");
@@ -245,7 +239,6 @@ public class SnackPanel extends JPanel {
         content.add(divider());
         content.add(vgap(10));
 
-        // ── Tổng snack & vé ──────────────────────────────────────────────────
         lblSnackTotal = new JLabel("0 đ");
         lblSnackTotal.setFont(CustomUI.bold(12));
         lblSnackTotal.setForeground(new Color(0xF59E0B));
@@ -267,7 +260,7 @@ public class SnackPanel extends JPanel {
         scroll.getVerticalScrollBar().setUnitIncrement(12);
         outer.add(scroll, BorderLayout.CENTER);
 
-        // ── Footer tạm tính + Xác nhận ───────────────────────────────────────
+        // ── Footer ───────────────────────────────────────────────────────────
         JPanel footer = new JPanel(new BorderLayout(0, 8));
         footer.setOpaque(false);
         footer.setBorder(BorderFactory.createCompoundBorder(
@@ -288,18 +281,30 @@ public class SnackPanel extends JPanel {
 
         JButton btnPay = CustomUI.createPrimaryButton("Xác nhận thanh toán →");
         btnPay.setPreferredSize(new Dimension(0, 42));
+
+        // ★ PHẦN SỬA: tìm SeatMapPanel rồi truyền callback vào ConfirmDialog
         btnPay.addActionListener(e -> {
             Window win = SwingUtilities.getWindowAncestor(this);
-            ConfirmDialog dlg = new ConfirmDialog(win, state);
+
+            // Tìm SeatMapPanel trong cây component để reload sau khi lưu
+            SeatMapPanel seatMap = findSeatMapPanel(win);
+
+            ConfirmDialog dlg = new ConfirmDialog(win, state, () -> {
+                // Sau khi lưu DB thành công: reset ghế + reload sơ đồ
+                state.resetSeats();
+                if (seatMap != null) {
+                    seatMap.reloadSeatMap();
+                }
+            });
             dlg.setVisible(true);
         });
-        footer.add(btnPay, BorderLayout.SOUTH);
 
+        footer.add(btnPay, BorderLayout.SOUTH);
         outer.add(footer, BorderLayout.SOUTH);
         return outer;
     }
 
-    // ── Bottom bar: Làm mới ───────────────────────────────────────────────────
+    // ── Bottom bar ───────────────────────────────────────────────────────────
     private JPanel buildBottomBar() {
         JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         bar.setOpaque(false);
@@ -335,11 +340,24 @@ public class SnackPanel extends JPanel {
             lblGrandTotal.setText(BanVeHelper.formatVND(grand));
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
+    // ★ Helper: tìm SeatMapPanel trong cây component
+    private SeatMapPanel findSeatMapPanel(Container root) {
+        if (root == null) return null;
+        for (Component c : root.getComponents()) {
+            if (c instanceof SeatMapPanel) return (SeatMapPanel) c;
+            if (c instanceof Container) {
+                SeatMapPanel found = findSeatMapPanel((Container) c);
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
+
+    // ── Helpers UI ───────────────────────────────────────────────────────────
     private JButton stepperBtn(String t) {
         JButton b = new JButton(t);
         b.setPreferredSize(new Dimension(28, 28));
-        b.setFont(new Font("Arial", Font.BOLD, 16));  // Arial chắc chắn có + và -
+        b.setFont(new Font("Arial", Font.BOLD, 16));
         b.setForeground(CustomUI.TEXT_WHITE);
         b.setBackground(new Color(0x243447));
         b.setOpaque(true);
