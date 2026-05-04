@@ -21,16 +21,16 @@ public class BookingInfoPanel extends JPanel {
         void onRoomChanged(int roomKey);
     }
 
-    private final BookingState       state;
-    private final Runnable           onConfirm;
+    private final BookingState state;
+    private final Runnable onConfirm;
     private final RoomChangeListener onRoomChange;
 
     // Dynamic labels
     private JTextArea lblGhe;
-    private JLabel    lblLoai, lblTong;
+    private JLabel lblLoai, lblTong;
 
     // Poster + combos
-    private JLabel            posterLabel;
+    private JLabel posterLabel;
     private JComboBox<String> comboRap, comboPhim, comboSuat, comboPhong;
 
     // Form fields
@@ -38,9 +38,9 @@ public class BookingInfoPanel extends JPanel {
 
     // ── Constructor ───────────────────────────────────────────────────────────
     public BookingInfoPanel(BookingState state, Runnable onConfirm,
-                            RoomChangeListener onRoomChange) {
-        this.state        = state;
-        this.onConfirm    = onConfirm;
+            RoomChangeListener onRoomChange) {
+        this.state = state;
+        this.onConfirm = onConfirm;
         this.onRoomChange = onRoomChange;
         setOpaque(false);
         setLayout(new BorderLayout());
@@ -100,15 +100,15 @@ public class BookingInfoPanel extends JPanel {
         content.add(sectionLabel("👤  THÔNG TIN KHÁCH HÀNG"));
         content.add(vgap(10));
 
-        fieldTen   = styledField("Nhập họ và tên...");
+        fieldTen = styledField("Nhập họ và tên...");
         fieldPhone = styledField("Nhập số điện thoại...");
         fieldEmail = styledField("Nhập email nhận vé...");
 
-        content.add(labeledField("Họ và tên",     fieldTen));
+        content.add(labeledField("Họ và tên", fieldTen));
         content.add(vgap(8));
         content.add(labeledField("Số điện thoại", fieldPhone));
         content.add(vgap(8));
-        content.add(labeledField("Email",          fieldEmail));
+        content.add(labeledField("Email", fieldEmail));
         content.add(vgap(16));
         content.add(divider());
         content.add(vgap(12));
@@ -123,7 +123,7 @@ public class BookingInfoPanel extends JPanel {
         lblTong = new JLabel("0 đ");
         lblTong.setFont(CustomUI.bold(20));
         lblTong.setForeground(new Color(0x00B8D4));
-        totalRow.add(tlbl,    BorderLayout.WEST);
+        totalRow.add(tlbl, BorderLayout.WEST);
         totalRow.add(lblTong, BorderLayout.EAST);
         content.add(totalRow);
         content.add(vgap(16));
@@ -160,11 +160,11 @@ public class BookingInfoPanel extends JPanel {
         // Phim → cập nhật suất + phòng + poster
         comboPhim = styledCombo(CinemaData.PHIM_LIST);
         comboPhim.addActionListener(e -> {
-            state.phimIdx  = comboPhim.getSelectedIndex();
-            state.suatIdx  = 0;
+            state.phimIdx = comboPhim.getSelectedIndex();
+            state.suatIdx = 0;
             state.phongIdx = 0;
             comboSuat.setModel(new DefaultComboBoxModel<>(
-                CinemaData.SUAT_BY_PHIM[state.phimIdx]));
+                    CinemaData.SUAT_BY_PHIM[state.phimIdx]));
             rebuildPhongCombo(state.phimIdx);
             posterLabel.setIcon(buildPosterIcon(state.phimIdx, 80, 115));
         });
@@ -172,8 +172,7 @@ public class BookingInfoPanel extends JPanel {
 
         // Suất chiếu
         comboSuat = styledCombo(CinemaData.SUAT_BY_PHIM[0]);
-        comboSuat.addActionListener(e ->
-            state.suatIdx = Math.max(0, comboSuat.getSelectedIndex()));
+        comboSuat.addActionListener(e -> state.suatIdx = Math.max(0, comboSuat.getSelectedIndex()));
         combos.add(wrapCombo("Suất chiếu", comboSuat));
 
         // Phòng chiếu
@@ -204,15 +203,17 @@ public class BookingInfoPanel extends JPanel {
     private void rebuildPhongCombo(int phimIdx) {
         // Xoá listener tạm thời tránh trigger khi đang set model
         var listeners = comboPhong.getActionListeners();
-        for (var l : listeners) comboPhong.removeActionListener(l);
+        for (var l : listeners)
+            comboPhong.removeActionListener(l);
 
         comboPhong.setModel(new DefaultComboBoxModel<>(
-            CinemaData.PHONG_BY_PHIM[phimIdx]));
+                CinemaData.PHONG_BY_PHIM[phimIdx]));
         comboPhong.setSelectedIndex(0);
         state.phongIdx = 0;
 
         // Gắn lại listener
-        for (var l : listeners) comboPhong.addActionListener(l);
+        for (var l : listeners)
+            comboPhong.addActionListener(l);
 
         // Trigger thủ công
         state.seats.clear();
@@ -225,9 +226,14 @@ public class BookingInfoPanel extends JPanel {
 
     /** Tính roomKey từ phimIdx + phongIdx */
     private int getRoomKey(int phimIdx, int phongIdx) {
-        if (phimIdx  >= CinemaData.PHONG_ROOM_KEY.length) return 0;
+        if (phimIdx >= CinemaData.PHONG_ROOM_KEY.length)
+            return 0;
+
         int[] keys = CinemaData.PHONG_ROOM_KEY[phimIdx];
-        if (phongIdx >= keys.length) return 0;
+
+        if (phongIdx >= keys.length)
+            return 0;
+
         return keys[phongIdx];
     }
 
@@ -240,13 +246,13 @@ public class BookingInfoPanel extends JPanel {
     private void handleConfirm() {
         if (state.seats.isEmpty()) {
             JOptionPane.showMessageDialog(this,
-                "Vui lòng chọn ít nhất một ghế trước khi tiếp tục.",
-                "Chưa chọn ghế", JOptionPane.WARNING_MESSAGE);
+                    "Vui lòng chọn ít nhất một ghế trước khi tiếp tục.",
+                    "Chưa chọn ghế", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        state.tenKhachHang = realText(fieldTen,   "Nhập họ và tên...");
-        state.soDienThoai  = realText(fieldPhone,  "Nhập số điện thoại...");
-        state.email        = realText(fieldEmail,  "Nhập email nhận vé...");
+        state.tenKhachHang = realText(fieldTen, "Nhập họ và tên...");
+        state.soDienThoai = realText(fieldPhone, "Nhập số điện thoại...");
+        state.email = realText(fieldEmail, "Nhập email nhận vé...");
         onConfirm.run();
     }
 
@@ -259,8 +265,10 @@ public class BookingInfoPanel extends JPanel {
     public void refreshSeatInfo() {
         if (state.seats.isEmpty()) {
             lblGhe.setText("-");
-            if (lblLoai != null) lblLoai.setText("-");
-            if (lblTong != null) lblTong.setText("0 đ");
+            if (lblLoai != null)
+                lblLoai.setText("-");
+            if (lblTong != null)
+                lblTong.setText("0 đ");
         } else {
             lblGhe.setText(state.gheDisplay());
             lblLoai.setText(state.loaiGheDisplay());
@@ -274,7 +282,7 @@ public class BookingInfoPanel extends JPanel {
     private ImageIcon buildPosterIcon(int idx, int w, int h) {
         try {
             ImageIcon icon = new ImageIcon(
-                getClass().getResource("/" + CinemaData.POSTER_PATH[idx]));
+                    getClass().getResource("/" + CinemaData.POSTER_PATH[idx]));
             Image img = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
             return new ImageIcon(img);
         } catch (Exception e) {
@@ -283,7 +291,7 @@ public class BookingInfoPanel extends JPanel {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  UI HELPERS
+    // UI HELPERS
     // ══════════════════════════════════════════════════════════════════════════
     private JLabel sectionLabel(String text) {
         JLabel l = new JLabel(text);
@@ -307,7 +315,7 @@ public class BookingInfoPanel extends JPanel {
         JLabel l = new JLabel(label);
         l.setFont(CustomUI.plain(12));
         l.setForeground(CustomUI.TEXT_LIGHT);
-        row.add(l,   BorderLayout.WEST);
+        row.add(l, BorderLayout.WEST);
         row.add(val, BorderLayout.EAST);
         return row;
     }
@@ -317,7 +325,8 @@ public class BookingInfoPanel extends JPanel {
         row.setOpaque(false);
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
         GridBagConstraints cL = new GridBagConstraints();
-        cL.gridx = 0; cL.gridy = 0;
+        cL.gridx = 0;
+        cL.gridy = 0;
         cL.anchor = GridBagConstraints.NORTHWEST;
         cL.insets = new Insets(2, 0, 0, 8);
         JLabel l = new JLabel(labelText);
@@ -325,10 +334,11 @@ public class BookingInfoPanel extends JPanel {
         l.setForeground(CustomUI.TEXT_LIGHT);
         row.add(l, cL);
         GridBagConstraints cR = new GridBagConstraints();
-        cR.gridx   = 1; cR.gridy = 0;
+        cR.gridx = 1;
+        cR.gridy = 0;
         cR.weightx = 1.0;
-        cR.fill    = GridBagConstraints.HORIZONTAL;
-        cR.anchor  = GridBagConstraints.NORTHEAST;
+        cR.fill = GridBagConstraints.HORIZONTAL;
+        cR.anchor = GridBagConstraints.NORTHEAST;
         row.add(area, cR);
         return row;
     }
@@ -340,7 +350,7 @@ public class BookingInfoPanel extends JPanel {
         JLabel l = new JLabel(labelText);
         l.setFont(CustomUI.plain(11));
         l.setForeground(CustomUI.TEXT_LIGHT);
-        wrap.add(l,     BorderLayout.NORTH);
+        wrap.add(l, BorderLayout.NORTH);
         wrap.add(field, BorderLayout.CENTER);
         return wrap;
     }
@@ -353,18 +363,21 @@ public class BookingInfoPanel extends JPanel {
         f.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent e) {
                 if (f.getText().equals(placeholder)) {
-                    f.setText(""); f.setForeground(CustomUI.TEXT_WHITE);
+                    f.setText("");
+                    f.setForeground(CustomUI.TEXT_WHITE);
                 }
             }
+
             public void focusLost(java.awt.event.FocusEvent e) {
                 if (f.getText().isEmpty()) {
-                    f.setText(placeholder); f.setForeground(new Color(0x607D8B));
+                    f.setText(placeholder);
+                    f.setForeground(new Color(0x607D8B));
                 }
             }
         });
         f.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(0x3A4C5E)),
-            BorderFactory.createEmptyBorder(7, 10, 7, 10)));
+                BorderFactory.createLineBorder(new Color(0x3A4C5E)),
+                BorderFactory.createEmptyBorder(7, 10, 7, 10)));
         f.setBackground(new Color(0x1A2A39));
         f.setFont(CustomUI.plain(12));
         f.setCaretColor(CustomUI.TEXT_WHITE);
@@ -381,7 +394,9 @@ public class BookingInfoPanel extends JPanel {
         return d;
     }
 
-    private Component vgap(int h) { return Box.createVerticalStrut(h); }
+    private Component vgap(int h) {
+        return Box.createVerticalStrut(h);
+    }
 
     private <T> JComboBox<T> styledCombo(T[] items) {
         JComboBox<T> c = new JComboBox<>(items);
@@ -398,7 +413,7 @@ public class BookingInfoPanel extends JPanel {
         JLabel l = new JLabel(label);
         l.setFont(CustomUI.bold(10));
         l.setForeground(CustomUI.TEXT_LIGHT);
-        p.add(l,     BorderLayout.NORTH);
+        p.add(l, BorderLayout.NORTH);
         p.add(combo, BorderLayout.CENTER);
         return p;
     }

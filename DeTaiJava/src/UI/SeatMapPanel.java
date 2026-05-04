@@ -12,10 +12,10 @@ import model.CinemaData;
 public class SeatMapPanel extends JPanel {
 
     // ── Màu ghế ─────────────────────────────────────────────
-    public static final Color SEAT_EMPTY    = new Color(0x3E5065);
-    public static final Color SEAT_SOLD     = new Color(0x2A3F52);
-    public static final Color SEAT_SELECTED = new Color(0x00E5FF); // 🔥 đổi màu chọn (không trắng)
-    public static final Color SEAT_VIP      = new Color(0x5B4DB8);
+    public static final Color SEAT_EMPTY = new Color(0x3E5065);
+    public static final Color SEAT_SOLD = new Color(0x2A3F52);
+    public static final Color SEAT_SELECTED = new Color(0xFFFFFF); // 🔥 đổi màu chọn (không trắng)
+    public static final Color SEAT_VIP = new Color(0x5B4DB8);
 
     private final BookingState state;
     private Runnable onSeatChange;
@@ -56,8 +56,7 @@ public class SeatMapPanel extends JPanel {
 
         // ── Grid ghế ────────────────────────────────────────
         JPanel grid = new JPanel(
-            new GridLayout(CinemaData.SEAT_ROWS.length, CinemaData.SEAT_COLS, 6, 6)
-        );
+                new GridLayout(CinemaData.SEAT_ROWS.length, CinemaData.SEAT_COLS, 6, 6));
         grid.setOpaque(false);
 
         for (int r = 0; r < CinemaData.SEAT_ROWS.length; r++) {
@@ -66,7 +65,7 @@ public class SeatMapPanel extends JPanel {
                 String label = CinemaData.SEAT_ROWS[r] + (c + 1);
 
                 boolean isSold = CinemaData.SOLD[r][c];
-                boolean isVip  = CinemaData.VIP_SEATS[r][c];
+                boolean isVip = CinemaData.VIP_SEATS[r][c];
 
                 grid.add(createSeatBtn(label, isSold, isVip));
             }
@@ -155,5 +154,10 @@ public class SeatMapPanel extends JPanel {
         }
 
         return btn;
+    }
+
+    public void rebuild(int roomKey) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'rebuild'");
     }
 }
