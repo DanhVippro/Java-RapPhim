@@ -1,0 +1,8 @@
+{
+    "java.debug.settings.onBuildFailureProceed": true,
+    "liveServer.settings.multiRootWorkspaceName": "Java-RapPhim",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "DeTaiJava/lib/mssql-jdbc-13.4.0.jre11.jar"
+    ]
+}
