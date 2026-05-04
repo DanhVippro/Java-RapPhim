@@ -1,5 +1,6 @@
 package model;
 
+import java.awt.BorderLayout;
 /**
  * CinemaData – Toàn bộ dữ liệu tĩnh.
  */
@@ -12,6 +13,7 @@ public final class CinemaData {
         "Galaxy Cinema Nguyễn Du",
         "BHD Star Bitexco"
     };
+
     public static final String[] RAP_DIA_CHI = {
         "72 Lê Thánh Tôn, Q.1, TP.HCM",
         "101 Tôn Dật Tiên, Q.7, TP.HCM",
@@ -91,13 +93,23 @@ public final class CinemaData {
         { "🎬","Combo 1",  "Bắp Vừa + Nước Vừa",            "70.000 đ", 70_000,  0x8B5CF6 },
         { "🎬","Combo 2",  "Bắp Lớn + 2 Nước Vừa",          "110.000 đ",110_000, 0x8B5CF6 },
     };
-public static final String[] POSTER_PATH = {
-    "resources/avengers.jpg",
-    "resources/conan.jpg",
-    "resources/doraemon.jpg",
-    "resources/xmen.jpg",
-    "resources/spiderman.jpg",
-    "resources/bogia.jpg"
-};
+    public static final String[] POSTER_PATH = {
+        "resources/avengers.jpg",
+        "resources/conan.jpg",
+        "resources/doraemon.jpg",
+        "resources/xmen.jpg",
+        "resources/spiderman.jpg",
+        "resources/bogia.jpg"
+    };
+
+    public static final int[][] PHONG_ROOM_KEY = {
+        { 1, 5 },
+        { 2, 4 },
+        { 3, 6 },
+        { 7, 8 },
+        { 2, 9 },
+        { 1, 3 }
+    };
+
     private CinemaData() {}
 }

@@ -34,6 +34,10 @@ public class SeatMapPanel extends JPanel {
     }
 
     // ── Reload khi đổi phòng ────────────────────────────────
+    public void loadRoom(int roomKey) {
+        reloadSeatMap();
+    }
+
     public void reloadSeatMap() {
         removeAll();
         add(buildCard(), BorderLayout.CENTER);

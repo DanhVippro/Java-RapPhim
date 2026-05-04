@@ -1,19 +1,35 @@
 package UI;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import java.awt.*;
+import javax.swing.*;
+import customUI.CustomUI;
 
 public class QuanLyPhimUI extends JPanel {
     public QuanLyPhimUI(String mode) {
-        setLayout(new BorderLayout()); // thêm dòng này cho chắc layout
+        setOpaque(false);
+        setLayout(new BorderLayout());
+        
+        // Header Area
+        JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
+        header.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        
+        JLabel title = new JLabel("Hệ Thống Quản Lý Phim");
+        title.setFont(CustomUI.bold(26));
+        title.setForeground(CustomUI.TEXT_LIGHT);
+        header.add(title, BorderLayout.WEST);
+        
+        add(header, BorderLayout.NORTH);
 
+        // Custom Styled JTabbedPane
         JTabbedPane tab = new JTabbedPane();
-        tab.add("Danh sách", new DanhSachPhimPanel());
-        tab.add("Thêm phim", new ThemPhimPanel());
+        tab.setFont(CustomUI.bold(14));
+        tab.setBackground(BanVeHelper.BG_CARD);
+        tab.setForeground(Color.WHITE);
+        
+        tab.addTab("📋  Danh Sách Phim", new DanhSachPhimPanel());
+        tab.addTab("➕  Thêm Phim Mới", new ThemPhimPanel());
 
-        // dùng đúng tham số truyền vào
         if ("add".equals(mode)) {
             tab.setSelectedIndex(1);
         } else {
