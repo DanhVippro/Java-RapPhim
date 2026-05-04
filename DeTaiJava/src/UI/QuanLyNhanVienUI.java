@@ -90,6 +90,7 @@ public class QuanLyNhanVienUI extends JPanel {
 
         JTextField txtTim = new JTextField(15);
         JButton btnTim = new JButton("Tìm");
+        JButton btnReset = new JButton("Reset");
 
         buttonPanel.add(btnThem);
         buttonPanel.add(btnSua);
@@ -97,6 +98,7 @@ public class QuanLyNhanVienUI extends JPanel {
         buttonPanel.add(Box.createHorizontalStrut(20));
         buttonPanel.add(txtTim);
         buttonPanel.add(btnTim);
+        buttonPanel.add(btnReset);
 
         String[] cols = {
                 "Mã NV", "Tên nhân viên", "SĐT", "Chức vụ", "Trạng thái"
@@ -156,6 +158,22 @@ public class QuanLyNhanVienUI extends JPanel {
                 cbTrangThai.setSelectedItem(model.getValueAt(row, 4));
             }
         });
+        btnReset.addActionListener(e -> {
+            model.setRowCount(0);
+            NhanVienDAO dao = new NhanVienDAO();
+            model.setRowCount(0);
+            for (NhanVien nv : dao.getAll()) {
+                model.addRow(new Object[] {
+                        nv.getMaNV(),
+                        nv.getHoTen(),
+                        nv.getSoDT(),
+                        nv.getChucVu(),
+                        nv.getTrangThai()
+                });
+            }
+
+            table.setModel(model);
+        });
 
         btnSua.addActionListener(e -> {
             if (!validateData(txtTen, txtSDT))
@@ -211,17 +229,25 @@ public class QuanLyNhanVienUI extends JPanel {
         });
 
         btnTim.addActionListener(e -> {
-            String keyword = txtTim.getText().toLowerCase();
+            String keyword = txtTim.getText().toLowerCase().trim();
+
+            DefaultTableModel newModel = new DefaultTableModel(cols, 0);
 
             for (int i = 0; i < model.getRowCount(); i++) {
-                String ma = model.getValueAt(i, 0).toString().toLowerCase();
                 String ten = model.getValueAt(i, 1).toString().toLowerCase();
 
-                if (ma.contains(keyword) || ten.contains(keyword)) {
-                    table.setRowSelectionInterval(i, i);
-                    return;
+                if (ten.contains(keyword)) {
+                    newModel.addRow(new Object[] {
+                            model.getValueAt(i, 0),
+                            model.getValueAt(i, 1),
+                            model.getValueAt(i, 2),
+                            model.getValueAt(i, 3),
+                            model.getValueAt(i, 4)
+                    });
                 }
             }
+
+            table.setModel(newModel);
         });
 
         NhanVienDAO dao = new NhanVienDAO();
