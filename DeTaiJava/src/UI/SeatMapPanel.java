@@ -18,10 +18,10 @@ import model.CinemaData;
 public class SeatMapPanel extends JPanel {
 
     // ── Màu ghế ─────────────────────────────────────────────
-    public static final Color SEAT_EMPTY = new Color(0x3E5065);
-    public static final Color SEAT_SOLD = new Color(0x2A3F52);
-    public static final Color SEAT_SELECTED = new Color(0xFFFFFF);
-    public static final Color SEAT_VIP = new Color(0x5B4DB8);
+    public static final Color SEAT_EMPTY = BanVeHelper.SEAT_EMPTY;
+    public static final Color SEAT_SOLD = BanVeHelper.SEAT_SOLD;
+    public static final Color SEAT_SELECTED = BanVeHelper.SEAT_SELECTED;
+    public static final Color SEAT_VIP = BanVeHelper.SEAT_VIP;
 
     private final BookingState state;
     private Runnable onSeatChange;
@@ -123,9 +123,15 @@ public class SeatMapPanel extends JPanel {
     // ── Tạo ghế ─────────────────────────────────────────────
     private JToggleButton createSeatBtn(String label, boolean isSold, boolean isVip) {
         JToggleButton btn = new JToggleButton(label);
+
         btn.setFont(new Font("Monospaced", Font.BOLD, 12));
         btn.setForeground(new Color(0xCCDDEE));
-        btn.setOpaque(true);
+
+        // 🔥 QUAN TRỌNG
+        btn.setContentAreaFilled(false); // 🔥 thêm
+        btn.setOpaque(true); // 🔥 thêm
+        btn.setUI(new javax.swing.plaf.basic.BasicToggleButtonUI());
+
         btn.setFocusPainted(false);
         btn.setBorder(BorderFactory.createLineBorder(new Color(0x374B5C)));
         btn.setPreferredSize(new Dimension(40, 38));
@@ -146,16 +152,20 @@ public class SeatMapPanel extends JPanel {
                 } else {
                     btn.setBackground(isVip ? SEAT_VIP : SEAT_EMPTY);
                     btn.setForeground(new Color(0xCCDDEE));
+
                     int i = state.seats.indexOf(label);
                     if (i >= 0) {
                         state.seats.remove(i);
                         state.seatsVip.remove(i);
                     }
                 }
+
+                btn.repaint(); // 🔥 giữ lại
                 if (onSeatChange != null)
                     onSeatChange.run();
             });
         }
+
         return btn;
     }
 }

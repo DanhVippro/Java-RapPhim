@@ -12,9 +12,9 @@ import customUI.CustomUI;
 public final class BanVeHelper {
 
     // ── Màu ghế ──────────────────
-    public static final Color SEAT_EMPTY    = new Color(0x3E5065);
-    public static final Color SEAT_SOLD     = new Color(0x2A3F52);
-    public static final Color SEAT_SELECTED = new Color(0x0098C0);
+    public static final Color SEAT_EMPTY = new Color(0x3E5065);
+    public static final Color SEAT_SOLD = new Color( 0xFF3300);
+    public static final Color SEAT_SELECTED = new Color(0x006400); // đỏ
     public static final Color SEAT_VIP = new Color(0x5B4DB8);
 
     // ── Màu accent ────────────────────────────────────────────────────────────
@@ -27,7 +27,8 @@ public final class BanVeHelper {
     private BanVeHelper() {
     }
 
-    // ── Card bo góc cực mềm (30px) ───────────────────────────────────────────────────────
+    // ── Card bo góc cực mềm (30px)
+    // ───────────────────────────────────────────────────────
     public static JPanel darkCard() {
         JPanel card = new JPanel() {
             @Override
@@ -39,7 +40,7 @@ public final class BanVeHelper {
                 // Subtle border
                 g2.setColor(new Color(255, 255, 255, 12));
                 g2.setStroke(new BasicStroke(1.2f));
-                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 30, 30);
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 30, 30);
                 g2.dispose();
             }
         };
@@ -48,7 +49,8 @@ public final class BanVeHelper {
         return card;
     }
 
-    // ── Step card bo góc nhạt hơn (24px) ─────────────────────────────────────────────
+    // ── Step card bo góc nhạt hơn (24px)
+    // ─────────────────────────────────────────────
     public static JPanel stepCard(Color accent) {
         JPanel card = new JPanel() {
             @Override
@@ -59,7 +61,7 @@ public final class BanVeHelper {
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 24, 24);
                 g2.setColor(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 60));
                 g2.setStroke(new BasicStroke(1.5f));
-                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 24, 24);
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 24, 24);
                 g2.dispose();
             }
         };
@@ -68,7 +70,8 @@ public final class BanVeHelper {
         return card;
     }
 
-    // ── Nút primary bo tròn dạng pill ───────────────────────────────────────────────────
+    // ── Nút primary bo tròn dạng pill
+    // ───────────────────────────────────────────────────
     public static JButton primaryBtn(String text) {
         return CustomUI.createPrimaryButton(text);
     }
@@ -76,14 +79,15 @@ public final class BanVeHelper {
     // ── Nút ghost bo tròn ───────────────────────────────────────────────────
     public static JButton ghostBtn(String text) {
         JButton b = new JButton(text) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(getBackground());
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
                 g2.setColor(new Color(0x3A4C5E));
                 g2.setStroke(new BasicStroke(1.2f));
-                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 20, 20);
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
                 super.paintComponent(g);
                 g2.dispose();
             }
@@ -99,17 +103,19 @@ public final class BanVeHelper {
         return b;
     }
 
-    // ── TextField bo tròn 24px có placeholder ──────────────────────────────────────────────
+    // ── TextField bo tròn 24px có placeholder
+    // ──────────────────────────────────────────────
     public static JTextField placeholderField(String placeholder) {
         JTextField f = new JTextField() {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(BG_FIELD);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 24, 24);
                 g2.setColor(new Color(0x3A4C5E));
                 g2.setStroke(new BasicStroke(1.2f));
-                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 24, 24);
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 24, 24);
                 super.paintComponent(g);
                 g2.dispose();
             }
@@ -198,19 +204,19 @@ public final class BanVeHelper {
         return Box.createVerticalStrut(h);
     }
 
-
-
-    // ── Nút stepper +/− bo tròn dạng tròn ──────────────────────────────────────────────────────
+    // ── Nút stepper +/− bo tròn dạng tròn
+    // ──────────────────────────────────────────────────────
     public static JButton stepperBtn(String t, int size) {
         JButton b = new JButton(t) {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(getBackground());
                 g2.fillOval(0, 0, getWidth(), getHeight());
                 g2.setColor(new Color(0x3A5070));
                 g2.setStroke(new BasicStroke(1.5f));
-                g2.drawOval(0, 0, getWidth()-1, getHeight()-1);
+                g2.drawOval(0, 0, getWidth() - 1, getHeight() - 1);
                 super.paintComponent(g);
                 g2.dispose();
             }
