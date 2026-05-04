@@ -9,45 +9,75 @@ import java.util.List;
 import config.DatabaseConnection;
 
 public class ThongKeDAO {
-    private Connection getConnection() {
-        return DatabaseConnection.getConnection();
+
+    // ─────────────────────────────────────────────────────────────
+    // 1. Thống kê vé hôm nay
+    // ─────────────────────────────────────────────────────────────
+    public int getTongVeHomNay() {
+        String sql = "SELECT COUNT(*) FROM Ve WHERE CAST(ngayBan AS DATE) = CAST(GETDATE() AS DATE) AND trangThai = N'Đã bán'";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
-    /**
-     * Doanh thu 7 ngày gần nhất (mỗi phần tử = 1 ngày)
-     * Trả về đủ 7 phần tử, ngày nào không có doanh thu thì = 0.0
-     */
+    // ─────────────────────────────────────────────────────────────
+    // 2. Thống kê vé hôm qua
+    // ─────────────────────────────────────────────────────────────
+    public int getTongVeHomQua() {
+        String sql = "SELECT COUNT(*) FROM Ve WHERE CAST(ngayBan AS DATE) = CAST(DATEADD(day, -1, GETDATE()) AS DATE) AND trangThai = N'Đã bán'";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 3. Doanh thu tháng này
+    // ─────────────────────────────────────────────────────────────
+    public double getDoanhThuThangNay() {
+        String sql = "SELECT SUM(giaVe) FROM Ve WHERE MONTH(ngayBan) = MONTH(GETDATE()) AND YEAR(ngayBan) = YEAR(GETDATE()) AND trangThai = N'Đã bán'";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 4. Doanh thu 7 ngày gần nhất
+    // ─────────────────────────────────────────────────────────────
     public List<Double> getDoanhThu7Ngay() {
         List<Double> result = new ArrayList<>();
-        // Khởi tạo 7 ngày = 0
-        for (int i = 0; i < 7; i++)
-            result.add(0.0);
-
-        String sql = "SELECT CAST(ngayLap AS DATE) as ngay, COALESCE(SUM(tongTien), 0) as doanhThu " +
-                "FROM HoaDon " +
-                "WHERE ngayLap >= DATEADD(day, -6, CAST(GETDATE() AS DATE)) " +
-                "GROUP BY CAST(ngayLap AS DATE) " +
-                "ORDER BY CAST(ngayLap AS DATE)";
-        try (Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
-            // Map dữ liệu vào đúng vị trí (0 = 6 ngày trước, 6 = hôm nay)
-            Calendar today = Calendar.getInstance();
-            today.set(Calendar.HOUR_OF_DAY, 0);
-            today.set(Calendar.MINUTE, 0);
-            today.set(Calendar.SECOND, 0);
-            today.set(Calendar.MILLISECOND, 0);
-
+        String sql = "SELECT " +
+                "ISNULL(SUM(v.giaVe), 0) as doanhThu " +
+                "FROM (SELECT DATEADD(day, -n, CAST(GETDATE() AS DATE)) as ngay " +
+                "      FROM (VALUES (0),(1),(2),(3),(4),(5),(6)) as nums(n)) dates " +
+                "LEFT JOIN Ve v ON CAST(v.ngayBan AS DATE) = dates.ngay AND v.trangThai = N'Đã bán' " +
+                "GROUP BY dates.ngay " +
+                "ORDER BY dates.ngay ASC";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                java.sql.Date ngay = rs.getDate("ngay");
-                double dt = rs.getDouble("doanhThu");
-                Calendar c = Calendar.getInstance();
-                c.setTime(ngay);
-                // Tính khoảng cách ngày so với hôm nay
-                long diff = (today.getTimeInMillis() - c.getTimeInMillis()) / (1000 * 60 * 60 * 24);
-                int idx = (int) (6 - diff);
-                if (idx >= 0 && idx < 7)
-                    result.set(idx, dt);
+                result.add(rs.getDouble("doanhThu"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -55,132 +85,154 @@ public class ThongKeDAO {
         return result;
     }
 
-    /**
-     * Tên 7 ngày trong tuần (ví dụ: T2, T3, ... CN) tương ứng với 7 ngày gần nhất
-     */
+    // ─────────────────────────────────────────────────────────────
+    // 5. Tên các ngày trong tuần (7 ngày gần nhất)
+    // ─────────────────────────────────────────────────────────────
     public List<String> getNgayTrongTuan() {
         List<String> result = new ArrayList<>();
-        String[] tenNgay = { "CN", "T2", "T3", "T4", "T5", "T6", "T7" };
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM");
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, -6);
-        for (int i = 0; i < 7; i++) {
-            int dow = cal.get(Calendar.DAY_OF_WEEK) - 1; // 0=CN, 1=T2,...
-            result.add(tenNgay[dow] + "\n" + sdf.format(cal.getTime()));
-            cal.add(Calendar.DAY_OF_YEAR, 1);
+        for (int i = 6; i >= 0; i--) {
+            Calendar day = Calendar.getInstance();
+            day.add(Calendar.DAY_OF_MONTH, -i);
+            result.add(sdf.format(day.getTime()));
         }
         return result;
     }
 
-    /**
-     * Tổng doanh thu tháng này
-     */
-    public double getDoanhThuThangNay() {
-        String sql = "SELECT COALESCE(SUM(tongTien), 0) FROM HoaDon " +
-                "WHERE MONTH(ngayLap) = MONTH(GETDATE()) AND YEAR(ngayLap) = YEAR(GETDATE())";
-        try (Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
-            if (rs.next())
-                return rs.getDouble(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0.0;
-    }
-
-    /**
-     * Tổng vé bán hôm nay
-     */
-    public int getTongVeHomNay() {
-        String sql = "SELECT COUNT(*) FROM Ve v " +
-                "JOIN SuatChieu sc ON v.maSC = sc.maSC " +
-                "WHERE CAST(sc.ngayChieu AS DATE) = CAST(GETDATE() AS DATE)";
-        try (Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
-            if (rs.next())
-                return rs.getInt(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    /**
-     * Tổng vé hôm qua (để so sánh %)
-     */
-    public int getTongVeHomQua() {
-        String sql = "SELECT COUNT(*) FROM Ve v " +
-                "JOIN SuatChieu sc ON v.maSC = sc.maSC " +
-                "WHERE CAST(sc.ngayChieu AS DATE) = CAST(DATEADD(day,-1,GETDATE()) AS DATE)";
-        try (Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
-            if (rs.next())
-                return rs.getInt(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    /**
-     * Hoạt động gần đây: [tenKhach, tenPhim, tongTien, ngayLap]
-     */
-    public List<Object[]> getHoatDongGanDay(int limit) {
-        List<Object[]> result = new ArrayList<>();
-        String sql = "SELECT TOP " + limit + " " +
-                "hd.tenKhach, p.tenPhim, hd.tongTien, hd.ngayLap " +
-                "FROM HoaDon hd " +
-                "JOIN ChiTietHoaDon ct ON hd.maHD = ct.maHD " +
-                "JOIN Ve v ON ct.maVe = v.maVe " +
-                "JOIN SuatChieu sc ON v.maSC = sc.maSC " +
-                "JOIN Phim p ON sc.maPhim = p.maPhim " +
-                "ORDER BY hd.ngayLap DESC";
-        try (Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                result.add(new Object[] {
-                        rs.getString("tenKhach"),
-                        rs.getString("tenPhim"),
-                        rs.getDouble("tongTien"),
-                        rs.getTimestamp("ngayLap")
-                });
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
-    /**
-     * Thống kê doanh thu theo thể loại phim
-     * Trả về: [theLoai, tongDoanhThu]
-     */
+    // ─────────────────────────────────────────────────────────────
+    // 6. Doanh thu theo thể loại phim (tháng này)
+    // ─────────────────────────────────────────────────────────────
     public List<Object[]> getDoanhThuTheoTheLoai() {
         List<Object[]> result = new ArrayList<>();
-        String sql = "SELECT p.theLoai, COALESCE(SUM(hd.tongTien), 0) as tongDT " +
+        String sql = "SELECT " +
+                "p.theLoai, " +
+                "ISNULL(SUM(v.giaVe), 0) as doanhThu " +
                 "FROM Phim p " +
-                "JOIN SuatChieu sc ON p.maPhim = sc.maPhim " +
-                "JOIN Ve v ON sc.maSC = v.maSC " +
-                "JOIN ChiTietHoaDon ct ON v.maVe = ct.maVe " +
-                "JOIN HoaDon hd ON ct.maHD = hd.maHD " +
-                "WHERE MONTH(hd.ngayLap) = MONTH(GETDATE()) " +
-                "GROUP BY p.theLoai ORDER BY tongDT DESC";
-        try (Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+                "LEFT JOIN SuatChieu sc ON p.maPhim = sc.maPhim " +
+                "LEFT JOIN Ve v ON sc.maSuat = v.maSuat " +
+                "   AND v.trangThai = N'Đã bán' " +
+                "   AND MONTH(v.ngayBan) = MONTH(GETDATE()) " +
+                "   AND YEAR(v.ngayBan) = YEAR(GETDATE()) " +
+                "WHERE p.trangThai = N'Đang chiếu' " +
+                "GROUP BY p.theLoai " +
+                "HAVING ISNULL(SUM(v.giaVe), 0) > 0 " +
+                "ORDER BY doanhThu DESC";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                result.add(new Object[] {
-                        rs.getString("theLoai"),
-                        rs.getDouble("tongDT")
-                });
+                Object[] row = new Object[2];
+                row[0] = rs.getString("theLoai");
+                row[1] = rs.getDouble("doanhThu");
+                result.add(row);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return result;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 7. Hoạt động bán vé gần đây
+    // ─────────────────────────────────────────────────────────────
+    public List<Object[]> getHoatDongGanDay(int limit) {
+        List<Object[]> result = new ArrayList<>();
+        String sql = "SELECT TOP (?) " +
+                "   'KH_' + CAST(v.maVe AS VARCHAR) as khachHang, " +
+                "   p.tenPhim, " +
+                "   v.giaVe, " +
+                "   v.ngayBan " +
+                "FROM Ve v " +
+                "JOIN SuatChieu sc ON v.maSuat = sc.maSuat " +
+                "JOIN Phim p ON sc.maPhim = p.maPhim " +
+                "WHERE v.trangThai = N'Đã bán' " +
+                "ORDER BY v.ngayBan DESC";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, limit);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Object[] row = new Object[4];
+                row[0] = rs.getString("khachHang");
+                row[1] = rs.getString("tenPhim");
+                row[2] = rs.getDouble("giaVe");
+                row[3] = rs.getTimestamp("ngayBan");
+                result.add(row);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 8. Doanh thu theo ngày (cho biểu đồ chi tiết)
+    // ─────────────────────────────────────────────────────────────
+    public double getDoanhThuTheoNgay(int nam, int thang, int ngay) {
+        String sql = "SELECT ISNULL(SUM(giaVe), 0) FROM Ve " +
+                "WHERE YEAR(ngayBan) = ? AND MONTH(ngayBan) = ? AND DAY(ngayBan) = ? " +
+                "AND trangThai = N'Đã bán'";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, nam);
+            stmt.setInt(2, thang);
+            stmt.setInt(3, ngay);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 9. Doanh thu theo tháng trong năm
+    // ─────────────────────────────────────────────────────────────
+    public List<Double> getDoanhThuTheoThang(int nam) {
+        List<Double> result = new ArrayList<>();
+        String sql = "SELECT MONTH(ngayBan) as thang, ISNULL(SUM(giaVe), 0) as doanhThu " +
+                "FROM Ve " +
+                "WHERE YEAR(ngayBan) = ? AND trangThai = N'Đã bán' " +
+                "GROUP BY MONTH(ngayBan) " +
+                "ORDER BY thang";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, nam);
+            ResultSet rs = stmt.executeQuery();
+            double[] monthly = new double[12];
+            while (rs.next()) {
+                int thang = rs.getInt("thang");
+                monthly[thang - 1] = rs.getDouble("doanhThu");
+            }
+            for (double d : monthly) {
+                result.add(d);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 10. Tổng số vé theo phim (cho thống kê top phim)
+    // ─────────────────────────────────────────────────────────────
+    public int getTongVeTheoPhim(int maPhim) {
+        String sql = "SELECT COUNT(*) FROM Ve v " +
+                "JOIN SuatChieu sc ON v.maSuat = sc.maSuat " +
+                "WHERE sc.maPhim = ? AND v.trangThai = N'Đã bán'";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, maPhim);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

@@ -31,7 +31,7 @@ public class BookingInfoPanel extends JPanel {
         this.state = state;
         this.onConfirm = onConfirm;
         this.onRoomChange = onRoomChange;
-        
+
         setOpaque(false);
         setLayout(new BorderLayout());
 
@@ -58,7 +58,7 @@ public class BookingInfoPanel extends JPanel {
         content.add(buildSelectionSection());
         content.add(vgap(16));
         content.add(divider());
-        
+
         // Section: Thông tin ghế
         content.add(vgap(12));
         content.add(sectionLabel("🪑  THÔNG TIN GHẾ"));
@@ -70,7 +70,7 @@ public class BookingInfoPanel extends JPanel {
         lblLoai = boldVal("-");
         content.add(seatRow("Ghế đã chọn", lblGhe));
         content.add(infoRow("Loại ghế", lblLoai));
-        
+
         // Section: Tổng tiền & Xác nhận
         content.add(vgap(16));
         content.add(divider());
@@ -252,9 +252,6 @@ public class BookingInfoPanel extends JPanel {
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // UI HELPERS
-    // ══════════════════════════════════════════════════════════════════════════
     private JLabel sectionLabel(String text) {
         JLabel l = new JLabel(text);
         l.setFont(CustomUI.bold(15));

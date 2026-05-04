@@ -7,10 +7,6 @@ import customUI.CustomUI;
 import model.BookingState;
 import model.CinemaData;
 
-/**
- * ConfirmDialog – Modal xác nhận đặt vé thành công.
- * Hiển thị: tên rạp, phim, giờ bắt đầu/kết thúc, ngày, phòng, ghế, tổng tiền.
- */
 public class ConfirmDialog extends JDialog {
     private JComboBox<String> paymentMethod;
     private JLabel qrLabel;
@@ -255,20 +251,19 @@ public class ConfirmDialog extends JDialog {
         return row;
     }
 
-private void showQR() {
-    try {
-        ImageIcon icon = new ImageIcon(
-            getClass().getResource("/resources/qr.png")
-        );
+    private void showQR() {
+        try {
+            ImageIcon icon = new ImageIcon(
+                    getClass().getResource("/resources/qr.png"));
 
-        Image img = icon.getImage().getScaledInstance(220, 220, Image.SCALE_SMOOTH);
-        qrLabel.setIcon(new ImageIcon(img));
+            Image img = icon.getImage().getScaledInstance(220, 220, Image.SCALE_SMOOTH);
+            qrLabel.setIcon(new ImageIcon(img));
 
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Không tìm thấy QR!");
-        e.printStackTrace();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Không tìm thấy QR!");
+            e.printStackTrace();
+        }
     }
-}
 
     private JPanel divider() {
         JPanel d = new JPanel();

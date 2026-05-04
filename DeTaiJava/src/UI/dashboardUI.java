@@ -5,12 +5,11 @@ import customUI.CustomUI;
 import entity.TaiKhoan;
 
 import javax.swing.*;
-import javax.swing.table.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
+import java.awt.geom.RoundRectangle2D;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -39,28 +38,27 @@ public class dashboardUI extends JFrame {
 
         root.add(buildSidebar(), BorderLayout.WEST);
 
+        // KHỞI TẠO NỘI DUNG THEO QUYỀN
         if (user.isAdmin()) {
             activeNav = "Trang Chủ";
             contentArea = buildHomeContent();
         } else {
+            // NHÂN VIÊN: MẶC ĐỊNH LÀ BÁN VÉ
             activeNav = "Bán Vé";
             contentArea = new BanVeUI();
         }
         root.add(contentArea, BorderLayout.CENTER);
 
-        // --- AI Assistant ---
+        // AI Assistant
         assistant = new ChatAssistantUI();
-        
-        // Dùng JLayeredPane để làm hiệu ứng nổi
+
         JLayeredPane layers = new JLayeredPane() {
             @Override
             public void doLayout() {
-                // Layout cho root (chiếm toàn bộ)
                 for (Component c : getComponents()) {
                     if (c == root) {
                         c.setBounds(0, 0, getWidth(), getHeight());
                     } else if (c == assistant) {
-                        // Vị trí: Góc dưới bên phải, cách lề phải 60px để không đè lên scrollbar
                         Dimension d = c.getPreferredSize();
                         c.setBounds(getWidth() - d.width - 60, getHeight() - d.height - 30, d.width, d.height);
                     }
@@ -211,7 +209,6 @@ public class dashboardUI extends JFrame {
         info.add(lblTheLoai);
         info.add(Box.createVerticalStrut(8));
 
-        // Thời lượng
         JLabel lblThoiLuong = new JLabel("Thời lượng: " + thoiLuong + " phút");
         lblThoiLuong.setFont(CustomUI.plain(12));
         lblThoiLuong.setForeground(new Color(0x6B8099));
@@ -245,7 +242,6 @@ public class dashboardUI extends JFrame {
             info.add(Box.createVerticalStrut(10));
         }
 
-        // Nút Đặt vé
         JButton btnDatVe = new JButton("Đặt Vé") {
             boolean hov = false;
             {
@@ -310,15 +306,15 @@ public class dashboardUI extends JFrame {
                 }
             }
 
-            // Thử theo thứ tự ưu tiên
             String[] candidates = {
-                posterPath,                            // đường dẫn đầy đủ từ DB (nếu có)
-                "/resources/list_film/" + posterPath,  // thư mục mới
-                "/resources/" + posterPath             // thư mục cũ
+                    posterPath,
+                    "/resources/list_film/" + posterPath,
+                    "/resources/" + posterPath
             };
             for (String candidate : candidates) {
                 URL url = getClass().getResource(candidate);
-                if (url != null) return new ImageIcon(url);
+                if (url != null)
+                    return new ImageIcon(url);
             }
             System.out.println("[poster] Không tìm thấy: " + posterPath);
             return null;
@@ -328,113 +324,6 @@ public class dashboardUI extends JFrame {
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    // TOP BAR
-    // ══════════════════════════════════════════════════════════════════
-    private JPanel buildTopBar() {
-        JPanel bar = new JPanel(new BorderLayout(0, 0)) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                g.setColor(CustomUI.SIDEBAR_BG);
-                g.fillRect(0, 0, getWidth(), getHeight());
-            }
-        };
-        bar.setOpaque(false);
-        bar.setPreferredSize(new Dimension(0, 60));
-        bar.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
-
-        JPanel logoArea = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        logoArea.setOpaque(false);
-        // Load logo.png từ resources/
-        java.net.URL logoUrl = getClass().getResource("/resources/logo.png");
-        if (logoUrl != null) {
-            ImageIcon logoRaw = new ImageIcon(logoUrl);
-            Image logoScaled = logoRaw.getImage().getScaledInstance(-1, 40, Image.SCALE_SMOOTH);
-            JLabel logoImg = new JLabel(new ImageIcon(logoScaled));
-            logoArea.add(logoImg);
-        } else {
-            // Fallback nếu chưa có file
-            JLabel nm = new JLabel("MEGADE Cinema");
-            nm.setFont(CustomUI.bold(15));
-            nm.setForeground(CustomUI.PRIMARY);
-            logoArea.add(nm);
-        }
-        bar.add(logoArea, BorderLayout.WEST);
-
-        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 11));
-        right.setOpaque(false);
-
-        // [Search field removed]
-        
-        // Language Selector (Popup Menu)
-        JPanel langArea = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        langArea.setOpaque(false);
-        
-        JButton btnLang = new JButton("Tiếng Việt ▼");
-        btnLang.setFont(CustomUI.plain(13));
-        btnLang.setForeground(Color.WHITE);
-        btnLang.setBackground(new Color(0x1F1E42));
-        btnLang.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
-        btnLang.setFocusPainted(false);
-        btnLang.setContentAreaFilled(false);
-        btnLang.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        JPopupMenu langMenu = new JPopupMenu();
-        langMenu.setBackground(new Color(0x2D2A5E));
-        langMenu.setBorder(BorderFactory.createLineBorder(new Color(0x3D3C6B)));
-
-        JMenuItem viItem = new JMenuItem("Tiếng Việt");
-        viItem.setForeground(Color.WHITE);
-        viItem.setBackground(new Color(0x2D2A5E));
-        viItem.addActionListener(e -> btnLang.setText("Tiếng Việt ▼"));
-
-        JMenuItem enItem = new JMenuItem("English");
-        enItem.setForeground(Color.WHITE);
-        enItem.setBackground(new Color(0x2D2A5E));
-        enItem.addActionListener(e -> btnLang.setText("English ▼"));
-
-        langMenu.add(viItem);
-        langMenu.add(enItem);
-
-        btnLang.addActionListener(e -> langMenu.show(btnLang, 0, btnLang.getHeight()));
-        
-        langArea.add(btnLang);
-        right.add(langArea);
-
-        JPanel user = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        user.setOpaque(false);
-        JPanel av = new JPanel() {
-            {
-                setPreferredSize(new Dimension(34, 34));
-                setOpaque(false);
-            }
-
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(CustomUI.PRIMARY);
-                g2.fillOval(0, 0, 34, 34);
-                g2.setFont(CustomUI.bold(13));
-                g2.setColor(Color.WHITE);
-                g2.drawString(currentUser.isAdmin() ? "AD" : "NV", 8, 23);
-                g2.dispose();
-            }
-        };
-        JLabel uname = new JLabel(currentUser.isAdmin() ? "Quản Trị Viên" : currentUser.getHoTen());
-        uname.setFont(CustomUI.plain(13));
-        uname.setForeground(CustomUI.TEXT_LIGHT);
-        user.add(av);
-        user.add(uname);
-        right.add(user);
-        bar.add(right, BorderLayout.EAST);
-        return bar;
-    }
-
-    // ══════════════════════════════════════════════════════════════════
-    // SIDEBAR
-    // ══════════════════════════════════════════════════════════════════
     private JPanel buildSidebar() {
         final int W = 260;
         JPanel side = new JPanel(new BorderLayout()) {
@@ -468,13 +357,13 @@ public class dashboardUI extends JFrame {
         layeredSidebar.setOpaque(false);
         layeredSidebar.setBackground(CustomUI.SIDEBAR_BG);
 
-        // ── LOGO ──
+        // LOGO
         JPanel logoArea = new JPanel(new BorderLayout());
         logoArea.setOpaque(false);
         logoArea.setName("logo");
         logoArea.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
 
-        java.net.URL logoUrl = getClass().getResource("/resources/logo.png");
+        URL logoUrl = getClass().getResource("/resources/logo.png");
         if (logoUrl != null) {
             ImageIcon logoRaw = new ImageIcon(logoUrl);
             Image logoScaled = logoRaw.getImage().getScaledInstance(100, -1, Image.SCALE_SMOOTH);
@@ -491,7 +380,7 @@ public class dashboardUI extends JFrame {
         layeredSidebar.add(logoArea, Integer.valueOf(1));
         logoArea.setName("logo");
 
-        // ── NÚT MENU ──
+        // NÚT MENU (HIỂN THỊ CHO CẢ ADMIN VÀ NHÂN VIÊN)
         JPanel menuBtnPanel = new JPanel(new BorderLayout());
         menuBtnPanel.setOpaque(false);
         menuBtnPanel.setName("menuBtn");
@@ -526,15 +415,14 @@ public class dashboardUI extends JFrame {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(hover ? CustomUI.PRIMARY : new Color(43, 200, 163, 20));
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
-                
-                // Vẽ 3 gạch ngang (Hamburger Menu) bằng code để tránh lỗi font (hiện hình chữ nhật)
+
                 g2.setColor(Color.WHITE);
-                int startX = (getWidth() - 60) / 2; // Canh giữa tổng thể text + icon
+                int startX = (getWidth() - 60) / 2;
                 int startY = getHeight() / 2 - 5;
                 g2.fillRect(startX, startY, 14, 2);
                 g2.fillRect(startX, startY + 5, 14, 2);
                 g2.fillRect(startX, startY + 10, 14, 2);
-                
+
                 g2.setFont(CustomUI.bold(13));
                 FontMetrics fm = g2.getFontMetrics();
                 g2.drawString("MENU", startX + 22, (getHeight() + fm.getAscent() - fm.getDescent()) / 2 - 1);
@@ -546,22 +434,20 @@ public class dashboardUI extends JFrame {
         layeredSidebar.add(menuBtnPanel, Integer.valueOf(1));
         menuBtnPanel.setName("menuBtn");
 
+        // TREE NAVIGATION (HIỂN THỊ CHO CẢ HAI, NHƯNG NỘI DUNG KHÁC NHAU)
         treeScroll = buildNavTree();
         treeScroll.setName("tree");
-        if (!currentUser.isAdmin()) {
-            treeScroll.setVisible(false);
-        }
         layeredSidebar.add(treeScroll, Integer.valueOf(0));
         treeScroll.setName("tree");
 
-        // ── Menu Overlay (đã sửa lỗi đè chữ) ──
+        // MENU OVERLAY (HIỂN THỊ CHO CẢ HAI, NHƯNG NỘI DUNG KHÁC NHAU)
         menuOverlay = createMenuOverlay();
         menuOverlay.setName("menuOverlay");
         menuOverlay.setVisible(false);
         layeredSidebar.add(menuOverlay, Integer.valueOf(1));
         menuOverlay.setName("menuOverlay");
 
-        // Sự kiện bật/tắt menu
+        // SỰ KIỆN BẬT/TẮT MENU (CHO CẢ HAI)
         menuToggleBtn.addActionListener(e -> {
             boolean showMenu = !menuOverlay.isVisible();
             menuOverlay.setVisible(showMenu);
@@ -571,7 +457,7 @@ public class dashboardUI extends JFrame {
             layeredSidebar.repaint();
         });
 
-        // ── ACCOUNT ──
+        // ACCOUNT
         JPanel accountArea = new JPanel();
         accountArea.setLayout(new BoxLayout(accountArea, BoxLayout.Y_AXIS));
         accountArea.setOpaque(false);
@@ -644,15 +530,17 @@ public class dashboardUI extends JFrame {
     private JScrollPane buildNavTree() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
 
+        // THÊM NODE TRANG CHỦ CHO CẢ HAI
         DefaultMutableTreeNode nodeTrangChu = new DefaultMutableTreeNode("Trang Chủ");
         root.add(nodeTrangChu);
 
+        // THÊM NODE BÁN VÉ CHO CẢ HAI
         DefaultMutableTreeNode nodeBanVe = new DefaultMutableTreeNode("Bán Vé");
         nodeBanVe.add(new DefaultMutableTreeNode("Vé Phim"));
         nodeBanVe.add(new DefaultMutableTreeNode("Đồ Ăn"));
         root.add(nodeBanVe);
 
-        // CHỈ THÊM CÁC MENU QUẢN LÝ NẾU LÀ ADMIN
+        // CHỈ THÊM MENU QUẢN LÝ NẾU LÀ ADMIN
         if (currentUser.isAdmin()) {
             DefaultMutableTreeNode nodeNhanVien = new DefaultMutableTreeNode("Quản Lý Nhân Viên");
             root.add(nodeNhanVien);
@@ -666,19 +554,22 @@ public class dashboardUI extends JFrame {
             root.add(nodeThongKe);
         }
 
-        // Map icon PNG cho từng mục menu
         java.util.Map<String, String> iconFileMap = new java.util.HashMap<>();
-        iconFileMap.put("Trang Chủ",         "/resources/icons/house.png");
-        iconFileMap.put("Bán Vé",            "/resources/icons/film.png");
-        iconFileMap.put("Vé Phim",           "/resources/icons/clapboard.png");
-        iconFileMap.put("Đồ Ăn",             "/resources/icons/burger.png");
-        iconFileMap.put("Quản Lý Nhân Viên", "/resources/icons/staff.png");
-        iconFileMap.put("Quản Lý Phim",      "/resources/icons/movies.png");
-        iconFileMap.put("Danh Sách Phim",    "/resources/icons/list_film.png");
-        iconFileMap.put("Thêm Phim",         "/resources/icons/add-movie.png");
-        iconFileMap.put("Thống Kê",          "/resources/icons/report.png");
+        iconFileMap.put("Trang Chủ", "/resources/icons/house.png");
+        iconFileMap.put("Bán Vé", "/resources/icons/film.png");
+        iconFileMap.put("Vé Phim", "/resources/icons/clapboard.png");
+        iconFileMap.put("Đồ Ăn", "/resources/icons/burger.png");
 
-        javax.swing.tree.DefaultTreeModel model = new javax.swing.tree.DefaultTreeModel(root);
+        // CHỈ THÊM ICON CHO MENU QUẢN LÝ NẾU LÀ ADMIN
+        if (currentUser.isAdmin()) {
+            iconFileMap.put("Quản Lý Nhân Viên", "/resources/icons/staff.png");
+            iconFileMap.put("Quản Lý Phim", "/resources/icons/movies.png");
+            iconFileMap.put("Danh Sách Phim", "/resources/icons/list_film.png");
+            iconFileMap.put("Thêm Phim", "/resources/icons/add-movie.png");
+            iconFileMap.put("Thống Kê", "/resources/icons/report.png");
+        }
+
+        DefaultTreeModel model = new DefaultTreeModel(root);
         JTree tree = new JTree(model);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(false);
@@ -691,10 +582,9 @@ public class dashboardUI extends JFrame {
         for (int i = 0; i < tree.getRowCount(); i++)
             tree.expandRow(i);
 
-        // Pre-load icons (scale 20x20)
         java.util.Map<String, ImageIcon> iconCache = new java.util.HashMap<>();
         for (java.util.Map.Entry<String, String> e : iconFileMap.entrySet()) {
-            java.net.URL url = getClass().getResource(e.getValue());
+            URL url = getClass().getResource(e.getValue());
             if (url != null) {
                 ImageIcon raw = new ImageIcon(url);
                 Image scaled = raw.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
@@ -702,7 +592,6 @@ public class dashboardUI extends JFrame {
             }
         }
 
-        // Custom renderer: dùng PNG icon thực tế
         tree.setCellRenderer(new javax.swing.tree.TreeCellRenderer() {
             @Override
             public Component getTreeCellRendererComponent(JTree t, Object val,
@@ -710,10 +599,10 @@ public class dashboardUI extends JFrame {
 
                 String label = val.toString();
                 int depth = t.getPathForRow(row) != null
-                        ? t.getPathForRow(row).getPathCount() - 2 : 0;
+                        ? t.getPathForRow(row).getPathCount() - 2
+                        : 0;
                 boolean isChild = depth > 0;
 
-                // --- Container row ---
                 JPanel item = new JPanel(new BorderLayout()) {
                     @Override
                     protected void paintComponent(Graphics g) {
@@ -731,13 +620,11 @@ public class dashboardUI extends JFrame {
                 int leftPad = isChild ? (24 + (depth - 1) * 14) : 10;
                 item.setBorder(BorderFactory.createEmptyBorder(0, leftPad, 0, 8));
 
-                // --- Icon ---
                 JLabel lblIcon;
                 ImageIcon ico = iconCache.get(label);
                 if (ico != null) {
                     lblIcon = new JLabel(ico);
                 } else {
-                    // Fallback: vẽ dot nếu không có icon
                     lblIcon = new JLabel() {
                         @Override
                         protected void paintComponent(Graphics g) {
@@ -752,7 +639,6 @@ public class dashboardUI extends JFrame {
                 lblIcon.setPreferredSize(new Dimension(26, 26));
                 lblIcon.setHorizontalAlignment(JLabel.CENTER);
 
-                // --- Text ---
                 JLabel lblText = new JLabel(label);
                 lblText.setFont(isChild ? CustomUI.plain(12) : CustomUI.bold(13));
                 lblText.setForeground(sel ? Color.WHITE
@@ -775,10 +661,14 @@ public class dashboardUI extends JFrame {
                 return;
 
             String val = node.toString().trim();
-            // So sánh trực tiếp vì tên node là text thuần (không còn emoji prefix)
+
+            // XỬ LÝ ĐIỀU HƯỚNG
             if (val.equals("Trang Chủ")) {
+                // NHÂN VIÊN CŨNG CÓ THỂ XEM TRANG CHỦ
                 if (currentUser.isAdmin())
                     switchContent(buildHomeContent());
+                else
+                    switchContent(buildHomeContent()); // NHÂN VIÊN VẪN XEM ĐƯỢC TRANG CHỦ
             } else if (val.equals("Vé Phim") || val.equals("Bán Vé")) {
                 switchContent(new BanVeUI());
             } else if (val.equals("Đồ Ăn")) {
@@ -845,8 +735,7 @@ public class dashboardUI extends JFrame {
     private void handleNavigationFromMenu(String itemName) {
         switch (itemName) {
             case "Trang Chủ":
-                if (currentUser.isAdmin())
-                    switchContent(buildHomeContent());
+                switchContent(buildHomeContent()); // CẢ ADMIN VÀ NHÂN VIÊN ĐỀU XEM ĐƯỢC
                 break;
             case "Bán Vé":
                 switchContent(new BanVeUI());

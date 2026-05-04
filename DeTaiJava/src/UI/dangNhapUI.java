@@ -167,11 +167,53 @@ public class dangNhapUI extends JPanel {
         hint.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Trường tên đăng nhập
-        JLabel lblUser = fieldLabel("Tên đăng nhập");
-        txtUser = BanVeHelper.placeholderField("Nhập tên đăng nhập...");
-        txtUser.setPreferredSize(new Dimension(Integer.MAX_VALUE, 50));
+        String placeholder = "Nhập tên đăng nhập...";
+
+        txtUser = new JTextField() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // nền
+                g2.setColor(CustomUI.BG_WHITE);
+                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 24, 24));
+
+                // border
+                g2.setColor(hasFocus() ? CustomUI.PRIMARY : CustomUI.BORDER2);
+                g2.setStroke(new BasicStroke(hasFocus() ? 1.5f : 1f));
+                g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, getWidth() - 1, getHeight() - 1, 24, 24));
+
+                super.paintComponent(g2);
+
+                // placeholder
+                if (getText().isEmpty() && !hasFocus()) {
+                    g2.setFont(CustomUI.plain(14));
+                    g2.setColor(CustomUI.TEXT_LIGHT);
+                    g2.drawString(placeholder, 14, getHeight() / 2 + 5);
+                }
+
+                g2.dispose();
+            }
+        };
+
+        txtUser.setFont(CustomUI.plain(16));
+        txtUser.setForeground(CustomUI.TEXT_DARK);
+        txtUser.setOpaque(false);
+        txtUser.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
         txtUser.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         txtUser.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // repaint khi focus
+        txtUser.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent e) {
+                txtUser.repaint();
+            }
+
+            public void focusLost(FocusEvent e) {
+                txtUser.repaint();
+            }
+        });
 
         // Trường mật khẩu
         JLabel lblPass = fieldLabel("Mật khẩu");
@@ -206,6 +248,7 @@ public class dangNhapUI extends JPanel {
         };
         txtUser.addKeyListener(enterKey);
         txtPass.addKeyListener(enterKey);
+        JLabel lblUser = fieldLabel("Tên đăng nhập");
 
         card.add(heading);
         card.add(Box.createVerticalStrut(6));
@@ -260,12 +303,17 @@ public class dangNhapUI extends JPanel {
         pf.setPreferredSize(new Dimension(Integer.MAX_VALUE, 50));
         pf.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         pf.setEchoChar('●');
-        
+
         pf.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusGained(FocusEvent e) { pf.repaint(); }
+            public void focusGained(FocusEvent e) {
+                pf.repaint();
+            }
+
             @Override
-            public void focusLost(FocusEvent e) { pf.repaint(); }
+            public void focusLost(FocusEvent e) {
+                pf.repaint();
+            }
         });
 
         return pf;

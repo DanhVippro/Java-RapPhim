@@ -16,18 +16,37 @@ public class ThongKeUI extends JPanel {
     private final ThongKeDAO thongKeDAO = new ThongKeDAO();
     private final PhimDAO phimDAO = new PhimDAO();
     private final DecimalFormat dfMoney = new DecimalFormat("#,###");
+    private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+    // Components cần refresh
+    private JPanel statCardsPanel;
+    private JPanel doanhThuChartPanel;
+    private JPanel theLoaiChartPanel;
+    private JTable topPhimTable;
+    private JTable hoatDongTable;
+    private DefaultTableModel topPhimModel;
+    private DefaultTableModel hoatDongModel;
 
     public ThongKeUI() {
         setLayout(new BorderLayout(0, 0));
         setBackground(CustomUI.BG_MAIN);
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // ── Tiêu đề trang ──
+        // ── Tiêu đề trang với nút Refresh ──
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0));
+
         JLabel title = new JLabel("📊 Thống Kê & Báo Cáo");
         title.setFont(CustomUI.bold(24));
         title.setForeground(CustomUI.TEXT_DARK);
-        title.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0));
-        add(title, BorderLayout.NORTH);
+        headerPanel.add(title, BorderLayout.WEST);
+
+        // Nút Refresh
+        JButton refreshBtn = createRefreshButton();
+        headerPanel.add(refreshBtn, BorderLayout.EAST);
+
+        add(headerPanel, BorderLayout.NORTH);
 
         // ── Nội dung chính (scroll) ──
         JPanel main = new JPanel();
@@ -35,14 +54,16 @@ public class ThongKeUI extends JPanel {
         main.setOpaque(false);
 
         // Hàng 1: 3 stat cards
-        main.add(buildStatCards());
+        statCardsPanel = buildStatCards();
+        main.add(statCardsPanel);
         main.add(Box.createVerticalStrut(16));
 
         // Hàng 2: Biểu đồ doanh thu 7 ngày + Bảng top phim
         JPanel row2 = new JPanel(new GridLayout(1, 2, 16, 0));
         row2.setOpaque(false);
-        row2.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
-        row2.add(buildDoanhThuChart());
+        row2.setMaximumSize(new Dimension(Integer.MAX_VALUE, 320));
+        doanhThuChartPanel = buildDoanhThuChart();
+        row2.add(doanhThuChartPanel);
         row2.add(buildTopPhimTable());
         main.add(row2);
         main.add(Box.createVerticalStrut(16));
@@ -50,8 +71,9 @@ public class ThongKeUI extends JPanel {
         // Hàng 3: Biểu đồ doanh thu theo thể loại + Bảng hoạt động gần đây
         JPanel row3 = new JPanel(new GridLayout(1, 2, 16, 0));
         row3.setOpaque(false);
-        row3.setMaximumSize(new Dimension(Integer.MAX_VALUE, 280));
-        row3.add(buildTheLoaiChart());
+        row3.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
+        theLoaiChartPanel = buildTheLoaiChart();
+        row3.add(theLoaiChartPanel);
         row3.add(buildHoatDongTable());
         main.add(row3);
         main.add(Box.createVerticalStrut(16));
@@ -61,7 +83,119 @@ public class ThongKeUI extends JPanel {
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
         scroll.getVerticalScrollBar().setUnitIncrement(12);
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         add(scroll, BorderLayout.CENTER);
+    }
+
+    private JButton createRefreshButton() {
+        JButton btn = new JButton("Làm mới");
+        btn.setFont(CustomUI.plain(12));
+        btn.setForeground(CustomUI.PRIMARY);
+        btn.setBackground(Color.WHITE);
+        btn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(0xE8EDF2), 1),
+                BorderFactory.createEmptyBorder(6, 12, 6, 12)));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setFocusPainted(false);
+        btn.addActionListener(e -> refreshAllData());
+        return btn;
+    }
+
+    private void refreshAllData() {
+        // Refresh stat cards
+        refreshStatCards();
+
+        // Refresh biểu đồ
+        refreshDoanhThuChart();
+        refreshTheLoaiChart();
+
+        // Refresh bảng
+        refreshTopPhimTable();
+        refreshHoatDongTable();
+    }
+
+    private void refreshStatCards() {
+        Container parent = statCardsPanel.getParent();
+        int index = -1;
+        if (parent != null) {
+            for (int i = 0; i < parent.getComponentCount(); i++) {
+                if (parent.getComponent(i) == statCardsPanel) {
+                    index = i;
+                    break;
+                }
+            }
+        }
+
+        statCardsPanel = buildStatCards();
+        if (parent != null && index != -1) {
+            parent.remove(index);
+            parent.add(statCardsPanel, index);
+            parent.revalidate();
+            parent.repaint();
+        }
+    }
+
+    private void refreshDoanhThuChart() {
+        Container parent = doanhThuChartPanel.getParent();
+        if (parent != null) {
+            int index = -1;
+            for (int i = 0; i < parent.getComponentCount(); i++) {
+                if (parent.getComponent(i) == doanhThuChartPanel) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index != -1) {
+                parent.remove(index);
+                doanhThuChartPanel = buildDoanhThuChart();
+                parent.add(doanhThuChartPanel, index);
+                parent.revalidate();
+                parent.repaint();
+            }
+        }
+    }
+
+    private void refreshTheLoaiChart() {
+        Container parent = theLoaiChartPanel.getParent();
+        if (parent != null) {
+            int index = -1;
+            for (int i = 0; i < parent.getComponentCount(); i++) {
+                if (parent.getComponent(i) == theLoaiChartPanel) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index != -1) {
+                parent.remove(index);
+                theLoaiChartPanel = buildTheLoaiChart();
+                parent.add(theLoaiChartPanel, index);
+                parent.revalidate();
+                parent.repaint();
+            }
+        }
+    }
+
+    private void refreshTopPhimTable() {
+        if (topPhimModel != null) {
+            topPhimModel.setRowCount(0);
+            List<Object[]> rows = phimDAO.getTopPhimBanChay(5);
+            for (Object[] row : rows) {
+                topPhimModel.addRow(new Object[] { row[0], row[1] });
+            }
+        }
+    }
+
+    private void refreshHoatDongTable() {
+        if (hoatDongModel != null) {
+            hoatDongModel.setRowCount(0);
+            List<Object[]> rows = thongKeDAO.getHoatDongGanDay(8);
+            for (Object[] row : rows) {
+                String thoiGian = row[3] != null ? sdf.format(row[3]) : "";
+                hoatDongModel.addRow(new Object[] {
+                        row[0], row[1], dfMoney.format((Double) row[2]), thoiGian
+                });
+            }
+        }
     }
 
     // ──────────────────────────────────────────
@@ -73,20 +207,26 @@ public class ThongKeUI extends JPanel {
         double dtThang = thongKeDAO.getDoanhThuThangNay();
         int soPhim = phimDAO.getSoPhimDangChieu();
 
-        String pctVe = veHomQua == 0 ? "—"
-                : String.format("%+.0f%%", (veHomNay - veHomQua) * 100.0 / veHomQua) + " so với hôm qua";
+        String pctVe;
+        if (veHomQua == 0) {
+            pctVe = "—";
+        } else {
+            double pct = (veHomNay - veHomQua) * 100.0 / veHomQua;
+            String arrow = pct >= 0 ? "▲" : "▼";
+            pctVe = String.format("%s %.1f%% so với hôm qua", arrow, Math.abs(pct));
+        }
 
         JPanel cards = new JPanel(new GridLayout(1, 3, 16, 0));
         cards.setOpaque(false);
-        cards.setMaximumSize(new Dimension(Integer.MAX_VALUE, 110));
+        cards.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
         cards.add(CustomUI.createStatCard("TỔNG VÉ HÔM NAY",
-                String.valueOf(veHomNay), pctVe, CustomUI.CARD_1));
+                String.format("%,d", veHomNay), pctVe, CustomUI.CARD_1));
         cards.add(CustomUI.createStatCard("DOANH THU THÁNG NÀY",
                 dfMoney.format(dtThang / 1_000_000) + "M",
-                "Cập nhật liên tục", CustomUI.CARD_2));
+                "≈ " + dfMoney.format(dtThang) + " VNĐ", CustomUI.CARD_2));
         cards.add(CustomUI.createStatCard("PHIM ĐANG CHIẾU",
                 String.valueOf(soPhim),
-                "Cập nhật mới nhất", CustomUI.CARD_3));
+                "Đang hoạt động", CustomUI.CARD_3));
         return cards;
     }
 
@@ -107,9 +247,17 @@ public class ThongKeUI extends JPanel {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
                 int w = getWidth(), h = getHeight();
-                int padL = 60, padR = 16, padT = 16, padB = 50;
+                int padL = 55, padR = 16, padT = 20, padB = 45;
                 int chartW = w - padL - padR;
                 int chartH = h - padT - padB;
+
+                if (doanhThu == null || doanhThu.isEmpty() || doanhThu.stream().allMatch(d -> d == 0)) {
+                    g2.setColor(new Color(0xA0B0C0));
+                    g2.setFont(CustomUI.plain(13));
+                    g2.drawString("Chưa có dữ liệu", w / 2 - 50, h / 2);
+                    g2.dispose();
+                    return;
+                }
 
                 double max = doanhThu.stream().mapToDouble(Double::doubleValue).max().orElse(1);
                 if (max == 0)
@@ -126,9 +274,15 @@ public class ThongKeUI extends JPanel {
                     int y = padT + chartH - (int) (chartH * i / 4.0);
                     g2.drawLine(padL, y, w - padR, y);
                     g2.setColor(new Color(0xA0B0C0));
-                    g2.setFont(CustomUI.plain(10));
-                    long val = (long) (max * i / 4 / 1000);
-                    g2.drawString(val + "K", 2, y + 4);
+                    g2.setFont(CustomUI.plain(9));
+                    long val = (long) (max * i / 4);
+                    if (val >= 1_000_000) {
+                        g2.drawString((val / 1_000_000) + "tr", 2, y + 4);
+                    } else if (val >= 1_000) {
+                        g2.drawString((val / 1_000) + "k", 2, y + 4);
+                    } else {
+                        g2.drawString(String.valueOf(val), 2, y + 4);
+                    }
                     g2.setColor(new Color(0xE8EDF2));
                 }
                 g2.setStroke(new BasicStroke(1));
@@ -137,8 +291,10 @@ public class ThongKeUI extends JPanel {
                 for (int i = 0; i < n; i++) {
                     double v = doanhThu.get(i);
                     int barH = (int) (chartH * v / max);
-                    int x = padL + i * barW + barW / 4;
-                    int bw = barW / 2;
+                    if (barH < 2 && v > 0)
+                        barH = 2;
+                    int x = padL + i * barW + barW / 5;
+                    int bw = barW * 3 / 5;
                     int y = padT + chartH - barH;
 
                     // Gradient fill
@@ -149,17 +305,35 @@ public class ThongKeUI extends JPanel {
 
                     // Nhãn ngày
                     g2.setColor(new Color(0x6B8099));
-                    g2.setFont(CustomUI.plain(10));
-                    String label = (i < ngay.size()) ? ngay.get(i).replace("\n", " ") : "";
+                    g2.setFont(CustomUI.plain(9));
+                    String label = (i < ngay.size()) ? ngay.get(i) : "";
+                    if (label.length() > 5)
+                        label = label.substring(0, 5);
                     FontMetrics fm = g2.getFontMetrics();
                     g2.drawString(label, x + bw / 2 - fm.stringWidth(label) / 2,
-                            padT + chartH + 18);
+                            padT + chartH + 16);
+
+                    // Giá trị trên cột
+                    if (barH > 15) {
+                        g2.setColor(CustomUI.PRIMARY);
+                        g2.setFont(CustomUI.bold(9));
+                        String valStr;
+                        if (v >= 1_000_000) {
+                            valStr = (v / 1_000_000) + "tr";
+                        } else if (v >= 1_000) {
+                            valStr = (v / 1_000) + "k";
+                        } else {
+                            valStr = String.valueOf((long) v);
+                        }
+                        fm = g2.getFontMetrics();
+                        g2.drawString(valStr, x + bw / 2 - fm.stringWidth(valStr) / 2, y - 3);
+                    }
                 }
                 g2.dispose();
             }
         };
         chart.setOpaque(false);
-        chart.setPreferredSize(new Dimension(0, 200));
+        chart.setPreferredSize(new Dimension(0, 220));
         card.add(chart, BorderLayout.CENTER);
         return card;
     }
@@ -172,7 +346,8 @@ public class ThongKeUI extends JPanel {
 
         Color[] palette = {
                 new Color(0x2BC8A3), new Color(0x3B82F6), new Color(0xF59E0B),
-                new Color(0xEF4444), new Color(0x8B5CF6), new Color(0xEC4899)
+                new Color(0xEF4444), new Color(0x8B5CF6), new Color(0xEC4899),
+                new Color(0x10B981), new Color(0x6366F1)
         };
 
         JPanel card = createCard("Doanh Thu Theo Thể Loại (Tháng Này)");
@@ -185,7 +360,7 @@ public class ThongKeUI extends JPanel {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
                 int w = getWidth(), h = getHeight();
-                if (data.isEmpty()) {
+                if (data == null || data.isEmpty()) {
                     g2.setColor(new Color(0xA0B0C0));
                     g2.setFont(CustomUI.plain(13));
                     g2.drawString("Chưa có dữ liệu", w / 2 - 50, h / 2);
@@ -194,33 +369,45 @@ public class ThongKeUI extends JPanel {
                 }
 
                 double total = data.stream().mapToDouble(r -> (Double) r[1]).sum();
-                int size = Math.min(h - 40, w / 2 - 20);
-                int cx = size / 2 + 20, cy = h / 2;
+                if (total == 0) {
+                    g2.setColor(new Color(0xA0B0C0));
+                    g2.setFont(CustomUI.plain(13));
+                    g2.drawString("Chưa có dữ liệu", w / 2 - 50, h / 2);
+                    g2.dispose();
+                    return;
+                }
+
+                int size = Math.min(h - 60, w / 2 - 30);
+                int cx = size / 2 + 25, cy = h / 2;
                 double startAngle = 90;
 
                 for (int i = 0; i < data.size(); i++) {
                     double val = (Double) data.get(i)[1];
                     double angle = (val / total) * 360.0;
-                    g2.setColor(palette[i % palette.length]);
-                    g2.fill(new Arc2D.Double(cx - size / 2, cy - size / 2, size, size,
-                            startAngle, -angle, Arc2D.PIE));
+                    if (angle > 0) {
+                        g2.setColor(palette[i % palette.length]);
+                        g2.fill(new Arc2D.Double(cx - size / 2, cy - size / 2, size, size,
+                                startAngle, -angle, Arc2D.PIE));
+                    }
                     startAngle -= angle;
                 }
 
                 // Vòng trắng giữa (donut)
-                g2.setColor(getBackground());
+                g2.setColor(Color.WHITE);
                 int inner = size / 3;
                 g2.fillOval(cx - inner, cy - inner, inner * 2, inner * 2);
 
                 // Legend
-                int legX = cx + size / 2 + 16;
-                int legY = cy - (data.size() * 20) / 2;
+                int legX = cx + size / 2 + 12;
+                int legY = cy - (Math.min(data.size(), 6) * 22) / 2;
                 g2.setFont(CustomUI.plain(11));
-                for (int i = 0; i < data.size(); i++) {
+                for (int i = 0; i < Math.min(data.size(), 6); i++) {
                     g2.setColor(palette[i % palette.length]);
                     g2.fillRoundRect(legX, legY + i * 22, 12, 12, 4, 4);
                     g2.setColor(new Color(0x3D5166));
                     String lbl = (String) data.get(i)[0];
+                    if (lbl.length() > 15)
+                        lbl = lbl.substring(0, 12) + "...";
                     double pct = (Double) data.get(i)[1] / total * 100;
                     g2.drawString(String.format("%s %.1f%%", lbl, pct), legX + 18, legY + i * 22 + 11);
                 }
@@ -228,7 +415,7 @@ public class ThongKeUI extends JPanel {
             }
         };
         chart.setOpaque(false);
-        chart.setPreferredSize(new Dimension(0, 200));
+        chart.setPreferredSize(new Dimension(0, 220));
         card.add(chart, BorderLayout.CENTER);
         return card;
     }
@@ -247,7 +434,21 @@ public class ThongKeUI extends JPanel {
             data[i][1] = rows.get(i)[1];
         }
 
-        JTable table = buildStyledTable(data, cols);
+        topPhimModel = new DefaultTableModel(data, cols) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        JTable table = new JTable(topPhimModel);
+        styleTable(table);
+
+        // Set column widths
+        TableColumnModel colModel = table.getColumnModel();
+        colModel.getColumn(0).setPreferredWidth(200);
+        colModel.getColumn(1).setPreferredWidth(80);
+
         JScrollPane sp = new JScrollPane(table);
         sp.setBorder(null);
         sp.getViewport().setBackground(Color.WHITE);
@@ -262,7 +463,6 @@ public class ThongKeUI extends JPanel {
         List<Object[]> rows = thongKeDAO.getHoatDongGanDay(8);
         JPanel card = createCard("🕐 Hoạt Động Gần Đây");
 
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd/MM");
         String[] cols = { "Khách Hàng", "Phim", "Tiền", "Thời Gian" };
         Object[][] data = new Object[rows.size()][4];
         for (int i = 0; i < rows.size(); i++) {
@@ -272,7 +472,23 @@ public class ThongKeUI extends JPanel {
             data[i][3] = rows.get(i)[3] != null ? sdf.format(rows.get(i)[3]) : "";
         }
 
-        JTable table = buildStyledTable(data, cols);
+        hoatDongModel = new DefaultTableModel(data, cols) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        JTable table = new JTable(hoatDongModel);
+        styleTable(table);
+
+        // Set column widths
+        TableColumnModel colModel = table.getColumnModel();
+        colModel.getColumn(0).setPreferredWidth(100);
+        colModel.getColumn(1).setPreferredWidth(120);
+        colModel.getColumn(2).setPreferredWidth(80);
+        colModel.getColumn(3).setPreferredWidth(100);
+
         JScrollPane sp = new JScrollPane(table);
         sp.setBorder(null);
         sp.getViewport().setBackground(Color.WHITE);
@@ -306,16 +522,9 @@ public class ThongKeUI extends JPanel {
         return card;
     }
 
-    private JTable buildStyledTable(Object[][] data, String[] cols) {
-        DefaultTableModel model = new DefaultTableModel(data, cols) {
-            @Override
-            public boolean isCellEditable(int r, int c) {
-                return false;
-            }
-        };
-        JTable table = new JTable(model);
+    private void styleTable(JTable table) {
         table.setFont(CustomUI.plain(12));
-        table.setRowHeight(30);
+        table.setRowHeight(32);
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
         table.setBackground(Color.WHITE);
@@ -330,6 +539,17 @@ public class ThongKeUI extends JPanel {
         header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(0xE8EDF2)));
         header.setReorderingAllowed(false);
 
+        // Center align số vé và tiền
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            String colName = table.getColumnName(i);
+            if (colName.equals("Số Vé") || colName.equals("Tiền")) {
+                table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+            }
+        }
+
         // Zebra rows
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
@@ -338,10 +558,9 @@ public class ThongKeUI extends JPanel {
                 super.getTableCellRendererComponent(t, v, sel, foc, row, col);
                 setBackground(sel ? new Color(43, 200, 163, 40)
                         : (row % 2 == 0 ? Color.WHITE : new Color(0xF9FAFB)));
-                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
                 return this;
             }
         });
-        return table;
     }
 }

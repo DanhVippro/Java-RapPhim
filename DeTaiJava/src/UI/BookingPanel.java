@@ -22,7 +22,7 @@ public class BookingPanel extends JPanel {
 
         header.add(title, BorderLayout.WEST);
 
-        JButton btnAI = new JButton("💡 Gợi ý phim bằng AI") {
+        JButton btnAI = new JButton("💡Gợi ý phim bằng AI") {
             {
                 setFont(CustomUI.bold(12));
                 setForeground(new Color(0x00B8D4));
@@ -33,12 +33,12 @@ public class BookingPanel extends JPanel {
             }
         };
         btnAI.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, 
-                "Hãy sử dụng khung chat ✨ Trợ Lý AI ở góc dưới bên phải màn hình\n" +
-                "để nhận được gợi ý phim và suất chiếu phù hợp nhất từ Gemini!",
-                "Trợ lý ảo thông minh", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Hãy sử dụng khung chat ✨ Trợ Lý AI ở góc dưới bên phải màn hình\n" +
+                            "để nhận được gợi ý phim và suất chiếu phù hợp nhất từ Gemini!",
+                    "Trợ lý ảo thông minh", JOptionPane.INFORMATION_MESSAGE);
         });
-        
+
         JPanel rightHeader = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         rightHeader.setOpaque(false);
         rightHeader.add(btnAI);

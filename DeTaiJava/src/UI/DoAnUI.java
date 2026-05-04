@@ -10,25 +10,20 @@ import DAO.DoAnDAO;
 import entity.DoAn;
 import model.BookingState;
 
-/**
- * DoAnUI – Màn hình Đồ Ăn & Nước.
- *
- * Có 2 chế độ:
- *  - Độc lập (state = null): mở từ sidebar, chỉ xem/tính tiền
- *  - Tích hợp (state != null): mở từ SnackPanel, ghi vào BookingState.snackQty
- */
 public class DoAnUI extends JPanel {
 
     private static final int COLS = 4;
 
-    private final BookingState state;    // null nếu mở độc lập
-    private List<DoAn>         items;
-    private int[]              qty;
-    private JLabel[]           qtyLabels;
-    private JLabel             lblTotal;
+    private final BookingState state; // null nếu mở độc lập
+    private List<DoAn> items;
+    private int[] qty;
+    private JLabel[] qtyLabels;
+    private JLabel lblTotal;
 
     /** Constructor độc lập (từ sidebar) */
-    public DoAnUI() { this(null); }
+    public DoAnUI() {
+        this(null);
+    }
 
     /** Constructor tích hợp (từ SnackPanel/BanVeUI) */
     public DoAnUI(BookingState state) {
@@ -37,8 +32,8 @@ public class DoAnUI extends JPanel {
         // Load từ DB (hoặc fallback)
         DoAnDAO dao = new DoAnDAO();
         dao.createTableIfNotExists();
-        this.items     = dao.getAllDoAn();
-        this.qty       = new int[items.size()];
+        this.items = dao.getAllDoAn();
+        this.qty = new int[items.size()];
         this.qtyLabels = new JLabel[items.size()];
 
         // Nếu có state, khôi phục số lượng đã chọn trước đó
@@ -51,9 +46,9 @@ public class DoAnUI extends JPanel {
         setLayout(new BorderLayout(0, 16));
         setBorder(BorderFactory.createEmptyBorder(20, 24, 20, 24));
 
-        add(buildHeader(),  BorderLayout.NORTH);
-        add(buildGrid(),    BorderLayout.CENTER);
-        add(buildFooter(),  BorderLayout.SOUTH);
+        add(buildHeader(), BorderLayout.NORTH);
+        add(buildGrid(), BorderLayout.CENTER);
+        add(buildFooter(), BorderLayout.SOUTH);
 
         refreshTotal();
     }
@@ -90,14 +85,17 @@ public class DoAnUI extends JPanel {
 
     // ── Grid đồ ăn ─────────────────────────────────────────────────────────
     private JScrollPane buildGrid() {
-        int n    = items.size();
+        int n = items.size();
         int rows = (int) Math.ceil((double) n / COLS);
 
         JPanel grid = new JPanel(new GridLayout(rows, COLS, 14, 14));
         grid.setOpaque(false);
-        for (int i = 0; i < n; i++) grid.add(buildCard(i));
+        for (int i = 0; i < n; i++)
+            grid.add(buildCard(i));
         for (int i = n; i < rows * COLS; i++) {
-            JPanel ph = new JPanel(); ph.setOpaque(false); grid.add(ph);
+            JPanel ph = new JPanel();
+            ph.setOpaque(false);
+            grid.add(ph);
         }
 
         JScrollPane sp = new JScrollPane(grid);
@@ -111,8 +109,8 @@ public class DoAnUI extends JPanel {
     }
 
     private JPanel buildCard(int idx) {
-        DoAn   item    = items.get(idx);
-        Color  accent  = accentColor(item);
+        DoAn item = items.get(idx);
+        Color accent = accentColor(item);
         boolean isCombo = item.isCombo();
 
         JPanel card = new JPanel(new BorderLayout(0, 8)) {
@@ -123,10 +121,10 @@ public class DoAnUI extends JPanel {
                 // Shadow
                 g2.setColor(new Color(0, 0, 0, 10));
                 g2.fillRoundRect(2, 4, getWidth() - 4, getHeight() - 4, 24, 24);
-                
+
                 g2.setColor(CustomUI.BG_WHITE);
                 g2.fillRoundRect(0, 0, getWidth() - 2, getHeight() - 3, 24, 24);
-                
+
                 g2.setColor(isCombo ? accent : CustomUI.BORDER);
                 g2.setStroke(new BasicStroke(isCombo ? 2f : 1f));
                 g2.drawRoundRect(0, 0, getWidth() - 3, getHeight() - 4, 24, 24);
@@ -134,10 +132,10 @@ public class DoAnUI extends JPanel {
                 if (isCombo) {
                     // Badge "COMBO"
                     g2.setColor(accent);
-                    g2.fillRoundRect(getWidth()-58, 0, 56, 22, 10, 10);
+                    g2.fillRoundRect(getWidth() - 58, 0, 56, 22, 10, 10);
                     g2.setColor(Color.WHITE);
                     g2.setFont(CustomUI.bold(10));
-                    g2.drawString("COMBO", getWidth()-52, 15);
+                    g2.drawString("COMBO", getWidth() - 52, 15);
                 }
                 g2.dispose();
             }
@@ -168,7 +166,9 @@ public class DoAnUI extends JPanel {
         pl.setFont(CustomUI.bold(12));
         pl.setForeground(accent);
 
-        texts.add(nl); texts.add(dl); texts.add(pl);
+        texts.add(nl);
+        texts.add(dl);
+        texts.add(pl);
         card.add(texts, BorderLayout.CENTER);
 
         // Stepper — dùng ASCII + / - để tránh lỗi font
@@ -214,8 +214,8 @@ public class DoAnUI extends JPanel {
             java.net.URL url = getClass().getResource(path);
             if (url != null) {
                 try {
-                    ImageIcon raw    = new ImageIcon(url);
-                    Image     scaled = raw.getImage().getScaledInstance(72, 72, Image.SCALE_SMOOTH);
+                    ImageIcon raw = new ImageIcon(url);
+                    Image scaled = raw.getImage().getScaledInstance(72, 72, Image.SCALE_SMOOTH);
                     JLabel lbl = new JLabel(new ImageIcon(scaled)) {
                         @Override
                         protected void paintComponent(Graphics g) {
@@ -229,7 +229,8 @@ public class DoAnUI extends JPanel {
                     lbl.setPreferredSize(new Dimension(72, 72));
                     lbl.setOpaque(false);
                     return lbl;
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
 
@@ -283,7 +284,7 @@ public class DoAnUI extends JPanel {
         lblTotal.setFont(CustomUI.bold(22));
         lblTotal.setForeground(CustomUI.PRIMARY);
 
-        row.add(lbl,      BorderLayout.WEST);
+        row.add(lbl, BorderLayout.WEST);
         row.add(lblTotal, BorderLayout.EAST);
         footer.add(row, BorderLayout.CENTER);
 
@@ -309,7 +310,8 @@ public class DoAnUI extends JPanel {
         for (int i = 0; i < qty.length; i++) {
             qty[i] = 0;
             syncState(i);
-            if (qtyLabels[i] != null) qtyLabels[i].setText("0");
+            if (qtyLabels[i] != null)
+                qtyLabels[i].setText("0");
         }
         refreshTotal();
     }
@@ -324,11 +326,11 @@ public class DoAnUI extends JPanel {
 
     private Color accentColor(DoAn item) {
         return switch (item.getLoai()) {
-            case "BAP"    -> new Color(0xF59E0B);
-            case "NUOC"   -> new Color(0x06B6D4);
-            case "COMBO"  -> new Color(0x8B5CF6);
-            case "KHAI_VI"-> new Color(0xEF4444);
-            default       -> new Color(0x64748B);
+            case "BAP" -> new Color(0xF59E0B);
+            case "NUOC" -> new Color(0x06B6D4);
+            case "COMBO" -> new Color(0x8B5CF6);
+            case "KHAI_VI" -> new Color(0xEF4444);
+            default -> new Color(0x64748B);
         };
     }
 
@@ -356,7 +358,7 @@ public class DoAnUI extends JPanel {
                 g2.fillOval(0, 0, getWidth(), getHeight());
                 g2.setColor(accent);
                 g2.setStroke(new BasicStroke(1.2f));
-                g2.drawOval(1, 1, getWidth()-2, getHeight()-2);
+                g2.drawOval(1, 1, getWidth() - 2, getHeight() - 2);
                 super.paintComponent(g);
                 g2.dispose();
             }
