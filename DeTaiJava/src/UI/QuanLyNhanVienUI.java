@@ -91,6 +91,11 @@ public class QuanLyNhanVienUI extends JPanel {
         JTextField txtTim = new JTextField(15);
         JButton btnTim = new JButton("Tìm");
         JButton btnReset = new JButton("Reset");
+        styleButton(btnThem, new Color(46, 204, 113));
+        styleButton(btnSua, new Color(52, 152, 219));
+        styleButton(btnXoa, new Color(231, 76, 60));
+        styleButton(btnTim, new Color(155, 89, 182));
+        styleButton(btnReset, new Color(241, 196, 15));
 
         buttonPanel.add(btnThem);
         buttonPanel.add(btnSua);
@@ -106,10 +111,11 @@ public class QuanLyNhanVienUI extends JPanel {
 
         DefaultTableModel model = new DefaultTableModel(cols, 0);
         JTable table = new JTable(model);
-        table.setRowHeight(30);
+
+        table.setRowHeight(35);
         table.setFont(new Font("Arial", Font.PLAIN, 14));
         table.setBackground(CustomUI.SIDEBAR_BG);
-        ;
+        
         table.setForeground(Color.WHITE);
 
         table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
@@ -314,4 +320,27 @@ public class QuanLyNhanVienUI extends JPanel {
 
         return sb.toString().trim();
     }
+
+
+
+    private void styleButton(JButton btn, Color bg) {
+        btn.setFocusPainted(false);
+        btn.setFont(new Font("Arial", Font.BOLD, 13));
+        btn.setBackground(bg);
+        btn.setForeground(Color.WHITE);
+        btn.setPreferredSize(new Dimension(100, 35));
+        btn.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btn.setBackground(bg.brighter());
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btn.setBackground(bg);
+            }
+        });
+    }
+    
+
 }
