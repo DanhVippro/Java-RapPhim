@@ -30,8 +30,8 @@ public class BanVeUI extends JPanel {
 
     public BanVeUI() {
         setLayout(new BorderLayout(0, 0));
-        setBackground(CustomUI.SIDEBAR_BG);
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setOpaque(false);
+        setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         cardHost.setOpaque(false);
         cardHost.add(new BookingPanel(state, this::goToSnack), "booking");

@@ -1,6 +1,7 @@
 package UI;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import javax.swing.*;
 import javax.swing.border.*;
 import customUI.CustomUI;
@@ -88,34 +89,93 @@ public class SnackPanel extends JPanel {
     }
 
     private JPanel buildSnackItem(int idx) {
-        String icon  = (String) CinemaData.SNACK_DATA[idx][0];
-        String name  = (String) CinemaData.SNACK_DATA[idx][1];
-        String desc  = (String) CinemaData.SNACK_DATA[idx][2];
-        String price = (String) CinemaData.SNACK_DATA[idx][3];
+        String icon  = (String)  CinemaData.SNACK_DATA[idx][0];
+        String name  = (String)  CinemaData.SNACK_DATA[idx][1];
+        String desc  = (String)  CinemaData.SNACK_DATA[idx][2];
+        String price = (String)  CinemaData.SNACK_DATA[idx][3];
         Color  color = new Color((int) CinemaData.SNACK_DATA[idx][5]);
+        Object imgPath = CinemaData.SNACK_DATA[idx][6];
+        boolean isCombo = name.startsWith("Combo");
 
-        JPanel card = BanVeHelper.darkCard();
-        card.setLayout(new BorderLayout(8, 0));
+        // --- Card container ---
+        JPanel card = new JPanel(new BorderLayout(8, 0)) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(new Color(0x1A2A3A));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                if (isCombo) {
+                    g2.setStroke(new BasicStroke(2f));
+                    g2.setColor(color);
+                    g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
+                }
+                g2.dispose();
+            }
+        };
+        card.setOpaque(false);
         card.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Icon
-        JLabel iconLbl = new JLabel(icon, JLabel.CENTER);
-        iconLbl.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
-        iconLbl.setPreferredSize(new Dimension(46, 46));
-        iconLbl.setOpaque(true);
-        iconLbl.setBackground(color.darker().darker());
-        iconLbl.setBorder(BorderFactory.createLineBorder(color, 2));
-        card.add(iconLbl, BorderLayout.WEST);
+        // --- Ảnh đồ ăn ---
+        JLabel imgLbl;
+        if (imgPath != null) {
+            java.net.URL url = getClass().getResource((String) imgPath);
+            if (url != null) {
+                ImageIcon raw = new ImageIcon(url);
+                Image scaled  = raw.getImage().getScaledInstance(52, 52, Image.SCALE_SMOOTH);
+                imgLbl = new JLabel(new ImageIcon(scaled)) {
+                    @Override
+                    protected void paintComponent(Graphics g) {
+                        Graphics2D g2 = (Graphics2D) g.create();
+                        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                        // Bo tròn ảnh
+                        g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, 52, 52));
+                        g2.drawImage(((ImageIcon) getIcon()).getImage(), 0, 0, null);
+                        g2.dispose();
+                    }
+                };
+            } else {
+                imgLbl = new JLabel(icon, JLabel.CENTER);
+                imgLbl.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 26));
+            }
+        } else {
+            // Combo: vẽ badge đặc biệt
+            imgLbl = new JLabel(icon, JLabel.CENTER) {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    g2.setColor(color.darker().darker());
+                    g2.fillOval(0, 0, 52, 52);
+                    g2.setColor(color);
+                    g2.setStroke(new BasicStroke(2f));
+                    g2.drawOval(1, 1, 50, 50);
+                    g2.dispose();
+                    super.paintComponent(g);
+                }
+            };
+            imgLbl.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 22));
+            imgLbl.setHorizontalAlignment(JLabel.CENTER);
+        }
+        imgLbl.setPreferredSize(new Dimension(52, 52));
+        imgLbl.setOpaque(false);
+        card.add(imgLbl, BorderLayout.WEST);
 
-        // Info
+        // --- Info ---
         JPanel info = new JPanel(new BorderLayout(0, 3));
         info.setOpaque(false);
 
         JPanel texts = new JPanel(new GridLayout(3, 1, 0, 1));
         texts.setOpaque(false);
-        JLabel nl = new JLabel(name);  nl.setFont(CustomUI.bold(11));  nl.setForeground(CustomUI.TEXT_WHITE);
-        JLabel dl = new JLabel(desc);  dl.setFont(CustomUI.plain(9));  dl.setForeground(CustomUI.TEXT_LIGHT);
-        JLabel pl = new JLabel(price); pl.setFont(CustomUI.bold(10));  pl.setForeground(color);
+        JLabel nl = new JLabel(name);
+        nl.setFont(CustomUI.bold(11));
+        nl.setForeground(isCombo ? color : CustomUI.TEXT_WHITE);
+        JLabel dl = new JLabel(desc);
+        dl.setFont(CustomUI.plain(9));
+        dl.setForeground(CustomUI.TEXT_LIGHT);
+        JLabel pl = new JLabel(price);
+        pl.setFont(CustomUI.bold(10));
+        pl.setForeground(color);
         texts.add(nl); texts.add(dl); texts.add(pl);
         info.add(texts, BorderLayout.CENTER);
 
@@ -290,8 +350,8 @@ public class SnackPanel extends JPanel {
     // ── Helpers ──────────────────────────────────────────────────────────────
     private JButton stepperBtn(String t) {
         JButton b = new JButton(t);
-        b.setPreferredSize(new Dimension(26, 26));
-        b.setFont(CustomUI.bold(13));
+        b.setPreferredSize(new Dimension(28, 28));
+        b.setFont(new Font("Arial", Font.BOLD, 16));  // Arial chắc chắn có + và -
         b.setForeground(CustomUI.TEXT_WHITE);
         b.setBackground(new Color(0x243447));
         b.setOpaque(true);

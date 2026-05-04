@@ -47,34 +47,25 @@ public class CustomUI {
     public static final Color DANGER = new Color(0xFFB3BA); // hồng đỏ nhẹ
     public static final Color INFO = new Color(0x8AADF5); // xanh pastel
 
-    // ─── Font ─────────────────────────────────────────────────
+    // ─── Font scale toàn cục (tăng/giảm cỡ chữ toàn app tại đây) ──
+    private static final int FONT_SCALE = 2;
+
     public static Font bold(int s) {
-        return new Font("Segoe UI", Font.BOLD, s);
+        return new Font("Segoe UI", Font.BOLD, s + FONT_SCALE);
     }
 
     public static Font plain(int s) {
-        return new Font("Segoe UI", Font.PLAIN, s);
+        return new Font("Segoe UI", Font.PLAIN, s + FONT_SCALE);
     }
 
     public static Font mono(int s) {
-        return new Font("Monospaced", Font.PLAIN, s);
+        return new Font("Monospaced", Font.PLAIN, s + FONT_SCALE);
     }
 
-    public static Font fontTitle(float s) {
-        return bold((int) s);
-    }
-
-    public static Font fontBody(float s) {
-        return plain((int) s);
-    }
-
-    public static Font fontMono(float s) {
-        return mono((int) s);
-    }
-
-    public static Font fontMedium(float s) {
-        return plain((int) s);
-    }
+    public static Font fontTitle(float s)  { return bold((int) s); }
+    public static Font fontBody(float s)   { return plain((int) s); }
+    public static Font fontMono(float s)   { return mono((int) s); }
+    public static Font fontMedium(float s) { return plain((int) s); }
 
     // ─── applyTheme ───────────────────────────────────────────
     public static void applyTheme() {
@@ -102,25 +93,28 @@ public class CustomUI {
         UIManager.put("OptionPane.background", BG_WHITE);
     }
 
-    // ─── Card trắng bo góc + shadow nhẹ ──────────────────────────
+    // ─── Card trắng bo góc cực mềm ──────────────────────────
     public static JPanel createCard() {
         JPanel p = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(0, 0, 0, 10));
-                g2.fill(new RoundRectangle2D.Float(1, 3, getWidth() - 2, getHeight() - 2, 16, 16));
+                // Shadow
+                g2.setColor(new Color(0, 0, 0, 12));
+                g2.fillRoundRect(2, 4, getWidth() - 4, getHeight() - 4, 32, 32);
+                // Background
                 g2.setColor(BG_WHITE);
-                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth() - 2, getHeight() - 3, 16, 16));
+                g2.fillRoundRect(0, 0, getWidth() - 2, getHeight() - 3, 32, 32);
+                // Border
                 g2.setColor(BORDER);
-                g2.setStroke(new BasicStroke(0.8f));
-                g2.draw(new RoundRectangle2D.Float(0.4f, 0.4f, getWidth() - 3, getHeight() - 4, 16, 16));
+                g2.setStroke(new BasicStroke(1.2f));
+                g2.drawRoundRect(0, 0, getWidth() - 3, getHeight() - 4, 32, 32);
                 g2.dispose();
             }
         };
         p.setOpaque(false);
-        p.setBorder(BorderFactory.createEmptyBorder(18, 18, 18, 18));
+        p.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         return p;
     }
 
@@ -132,10 +126,10 @@ public class CustomUI {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(new Color(0, 0, 30, 20));
-                g2.fill(new RoundRectangle2D.Float(2, 5, getWidth() - 2, getHeight() - 3, 16, 16));
+                g2.fillRoundRect(2, 5, getWidth() - 2, getHeight() - 3, 24, 24);
                 GradientPaint gp = new GradientPaint(0, 0, bg.brighter(), getWidth(), getHeight(), bg.darker());
                 g2.setPaint(gp);
-                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth() - 2, getHeight() - 3, 16, 16));
+                g2.fillRoundRect(0, 0, getWidth() - 2, getHeight() - 3, 24, 24);
                 // vòng trang trí pastel
                 g2.setColor(new Color(255, 255, 255, 30));
                 g2.fillOval(getWidth() - 55, -15, 75, 75);
@@ -171,21 +165,14 @@ public class CustomUI {
         return card;
     }
 
-    // ─── Nút primary (xanh logo) ───────────────────────────────────
+    // ─── Nút primary dạng viên thuốc (Pill shape) ───────────────────────────────────
     public static JButton createPrimaryButton(String text) {
         JButton btn = new JButton(text) {
             boolean hov = false;
             {
                 addMouseListener(new MouseAdapter() {
-                    public void mouseEntered(MouseEvent e) {
-                        hov = true;
-                        repaint();
-                    }
-
-                    public void mouseExited(MouseEvent e) {
-                        hov = false;
-                        repaint();
-                    }
+                    public void mouseEntered(MouseEvent e) { hov = true; repaint(); }
+                    public void mouseExited(MouseEvent e) { hov = false; repaint(); }
                 });
             }
 
@@ -194,12 +181,12 @@ public class CustomUI {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(hov ? PRIMARY_DARK : PRIMARY);
-                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 12, 12));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), getHeight(), getHeight()); 
                 g2.setFont(getFont());
                 g2.setColor(Color.WHITE);
                 FontMetrics fm = g2.getFontMetrics();
-                g2.drawString(getText(),
-                        (getWidth() - fm.stringWidth(getText())) / 2,
+                String txt = getText();
+                g2.drawString(txt, (getWidth() - fm.stringWidth(txt)) / 2,
                         (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
                 g2.dispose();
             }
@@ -209,25 +196,18 @@ public class CustomUI {
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.setPreferredSize(new Dimension(150, 36));
+        btn.setPreferredSize(new Dimension(150, 52));
         return btn;
     }
 
-    // ─── Nút outline (màu tím) ────────────────────────────────
+    // ─── Nút outline bo tròn ────────────────────────────────
     public static JButton createSecondaryButton(String text) {
         JButton btn = new JButton(text) {
             boolean hov = false;
             {
                 addMouseListener(new MouseAdapter() {
-                    public void mouseEntered(MouseEvent e) {
-                        hov = true;
-                        repaint();
-                    }
-
-                    public void mouseExited(MouseEvent e) {
-                        hov = false;
-                        repaint();
-                    }
+                    public void mouseEntered(MouseEvent e) { hov = true; repaint(); }
+                    public void mouseExited(MouseEvent e) { hov = false; repaint(); }
                 });
             }
 
@@ -235,16 +215,15 @@ public class CustomUI {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(hov ? new Color(0x6C63FF, 40, getHorizontalAlignment()) : BG_WHITE);
-                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 12, 12));
+                g2.setColor(hov ? new Color(108, 99, 255, 40) : BG_WHITE);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 24, 24);
                 g2.setColor(SIDEBAR_ACT);
-                g2.setStroke(new BasicStroke(1.2f));
-                g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, getWidth() - 1, getHeight() - 1, 12, 12));
+                g2.setStroke(new BasicStroke(1.5f));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 24, 24);
                 g2.setFont(getFont());
                 g2.setColor(SIDEBAR_ACT);
                 FontMetrics fm = g2.getFontMetrics();
-                g2.drawString(getText(),
-                        (getWidth() - fm.stringWidth(getText())) / 2,
+                g2.drawString(getText(), (getWidth() - fm.stringWidth(getText())) / 2,
                         (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
                 g2.dispose();
             }
@@ -254,11 +233,11 @@ public class CustomUI {
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.setPreferredSize(new Dimension(100, 36));
+        btn.setPreferredSize(new Dimension(100, 45));
         return btn;
     }
 
-    // ─── TextField search ─────────────────────────────────────
+    // ─── TextField bo tròn 24px ─────────────────────────────────────
     public static JTextField createTextField(String ph) {
         JTextField tf = new JTextField() {
             @Override
@@ -266,25 +245,39 @@ public class CustomUI {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(BG_WHITE);
-                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 12, 12));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 24, 24);
                 g2.setColor(isFocusOwner() ? PRIMARY : BORDER2);
-                g2.setStroke(new BasicStroke(isFocusOwner() ? 1.5f : 1f));
-                g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, getWidth() - 1, getHeight() - 1, 12, 12));
+                g2.setStroke(new BasicStroke(1.5f));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 24, 24);
                 super.paintComponent(g);
-                if (getText().isEmpty() && !isFocusOwner()) {
+                if (getText().isEmpty() && !hasFocus()) {
                     g2.setFont(plain(13));
                     g2.setColor(TEXT_LIGHT);
-                    g2.drawString(ph, 12, getHeight() / 2 + 5);
+                    FontMetrics fm = g2.getFontMetrics();
+                    g2.drawString(ph, 28, (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
                 }
                 g2.dispose();
             }
         };
-        tf.setFont(plain(13));
+        tf.setFont(plain(14));
         tf.setForeground(TEXT_DARK);
         tf.setBackground(new Color(0, 0, 0, 0));
         tf.setOpaque(false);
-        tf.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
-        tf.setPreferredSize(new Dimension(220, 36));
+        tf.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
+        tf.setPreferredSize(new Dimension(220, 48));
+
+        tf.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                tf.repaint();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                tf.repaint();
+            }
+        });
+
         return tf;
     }
 
@@ -294,166 +287,52 @@ public class CustomUI {
             boolean hov = false;
             {
                 addMouseListener(new MouseAdapter() {
-                    public void mouseEntered(MouseEvent e) {
-                        hov = true;
-                        repaint();
-                    }
-
-                    public void mouseExited(MouseEvent e) {
-                        hov = false;
-                        repaint();
-                    }
+                    public void mouseEntered(MouseEvent e) { hov = true; repaint(); }
+                    public void mouseExited(MouseEvent e) { hov = false; repaint(); }
                 });
             }
 
             @Override
             protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                if (active) {
-                    g2.setColor(new Color(108, 99, 255, 30));
-                    g2.fill(new RoundRectangle2D.Float(6, 2, getWidth() - 12, getHeight() - 4, 12, 12));
-                    g2.setColor(SIDEBAR_ACT);
-                    g2.setStroke(new BasicStroke(3.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                    g2.drawLine(4, 9, 4, getHeight() - 9);
-                } else if (hov) {
-                    g2.setColor(new Color(108, 99, 255, 15));
-                    g2.fill(new RoundRectangle2D.Float(6, 2, getWidth() - 12, getHeight() - 4, 12, 12));
+                if (active || hov) {
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    g2.setColor(active ? SIDEBAR_ACT : new Color(255, 255, 255, 20));
+                    g2.fillRoundRect(8, 2, getWidth() - 16, getHeight() - 4, 18, 18);
+                    g2.dispose();
                 }
-                g2.dispose();
-                super.paintComponent(g);
             }
         };
+        p.setLayout(new BorderLayout(15, 0));
         p.setOpaque(false);
-        p.setLayout(new FlowLayout(FlowLayout.LEFT, 16, 10));
+        p.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 20));
         p.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        p.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
 
-        JLabel ic = new JLabel(icon);
-        ic.setFont(plain(15));
-        ic.setForeground(active ? SIDEBAR_ACT : new Color(0xA8A8C5));
+        JLabel lblIcon = new JLabel(icon);
+        lblIcon.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        lblIcon.setForeground(Color.WHITE);
 
-        JLabel lb = new JLabel(label);
-        lb.setFont(active ? bold(13) : plain(13));
-        lb.setForeground(active ? Color.WHITE : new Color(0xC5C5E0));
+        JLabel lblText = new JLabel(label);
+        lblText.setFont(active ? bold(14) : plain(14));
+        lblText.setForeground(Color.WHITE);
 
-        p.add(ic);
-        p.add(lb);
+        p.add(lblIcon, BorderLayout.WEST);
+        p.add(lblText, BorderLayout.CENTER);
+
+        if (active) {
+            JPanel indicator = new JPanel();
+            indicator.setPreferredSize(new Dimension(4, 20));
+            indicator.setBackground(ACCENT);
+            p.add(indicator, BorderLayout.EAST);
+        }
+
         return p;
     }
 
-    // ─── Mini bar chart màu pastel ────────────────────────────
-    public static JPanel createMiniBarChart(int[] values, String[] labels, Color barColor) {
-        return new JPanel() {
-            {
-                setOpaque(false);
-                setPreferredSize(new Dimension(300, 140));
-            }
-
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                int n = values.length, pad = 6, gap = 5;
-                int barW = (getWidth() - pad * 2 - gap * (n - 1)) / n;
-                int maxV = 0;
-                for (int v : values)
-                    maxV = Math.max(maxV, v);
-                int chartH = getHeight() - 24;
-
-                g2.setStroke(new BasicStroke(0.5f));
-                for (int i = 1; i <= 4; i++) {
-                    int y = chartH - chartH * i / 4;
-                    g2.setColor(BORDER);
-                    g2.drawLine(pad, y, getWidth() - pad, y);
-                }
-
-                for (int i = 0; i < n; i++) {
-                    int bh = (int) ((double) values[i] / maxV * chartH);
-                    int bx = pad + i * (barW + gap), by = chartH - bh;
-                    GradientPaint gp = new GradientPaint(bx, by, barColor,
-                            bx, chartH, new Color(barColor.getRed(), barColor.getGreen(), barColor.getBlue(), 70));
-                    g2.setPaint(gp);
-                    g2.fill(new RoundRectangle2D.Float(bx, by, barW, bh, 6, 6));
-                    g2.setFont(plain(9));
-                    g2.setColor(TEXT_MID);
-                    FontMetrics fm = g2.getFontMetrics();
-                    g2.drawString(labels[i], bx + (barW - fm.stringWidth(labels[i])) / 2, getHeight() - 5);
-                }
-                g2.dispose();
-            }
-        };
-    }
-
-    // ─── Section title ────────────────────────────────────────
-    public static JLabel createSectionTitle(String text) {
-        JLabel l = new JLabel(text);
-        l.setFont(bold(16));
-        l.setForeground(TEXT_DARK);
-        l.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
-        return l;
-    }
-
-    // ─── Logo (theo ảnh MeGeDe Cinema) ─────────────────────────
-    public static JPanel createLogo() {
-        JPanel p = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setOpaque(false);
-
-        JLabel logoMain = new JLabel("MeGeDe");
-        logoMain.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        logoMain.setForeground(PRIMARY);
-        logoMain.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel cinemaSub = new JLabel("CINEMA");
-        cinemaSub.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        cinemaSub.setForeground(ACCENT);
-        cinemaSub.setAlignmentX(Component.CENTER_ALIGNMENT);
-        cinemaSub.setBorder(BorderFactory.createEmptyBorder(-5, 0, 5, 0));
-
-        JLabel slogan = new JLabel("XEM PHIM · CƯỜI CHẬT · TRẢI NGHIỆM CỰC ĐÃ");
-        slogan.setFont(plain(9));
-        slogan.setForeground(TEXT_LIGHT);
-        slogan.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        p.add(logoMain);
-        p.add(cinemaSub);
-        p.add(slogan);
-        return p;
-    }
-
-    // ─── Divider ──────────────────────────────────────────────
     public static JSeparator createDivider() {
-        JSeparator s = new JSeparator();
-        s.setForeground(BORDER);
-        s.setBackground(BORDER);
-        s.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-        return s;
-    }
-
-    // ─── Helpers ──────────────────────────────────────────────
-    public static JPanel row(Component... cs) {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        p.setOpaque(false);
-        for (Component c : cs)
-            p.add(c);
-        return p;
-    }
-
-    public static JPanel col(Component... cs) {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setOpaque(false);
-        for (Component c : cs)
-            p.add(c);
-        return p;
+        JSeparator sep = new JSeparator();
+        sep.setForeground(BORDER);
+        sep.setBackground(new Color(0, 0, 0, 0));
+        return sep;
     }
 }

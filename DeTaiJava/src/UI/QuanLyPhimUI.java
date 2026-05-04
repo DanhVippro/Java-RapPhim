@@ -27,8 +27,8 @@ public class QuanLyPhimUI extends JPanel {
         tab.setBackground(BanVeHelper.BG_CARD);
         tab.setForeground(Color.WHITE);
         
-        tab.addTab("📋  Danh Sách Phim", new DanhSachPhimPanel());
-        tab.addTab("➕  Thêm Phim Mới", new ThemPhimPanel());
+        tab.addTab("Danh Sách Phim", new DanhSachPhimPanel());
+        tab.addTab("Thêm Phim Mới", new ThemPhimPanel());
 
         if ("add".equals(mode)) {
             tab.setSelectedIndex(1);

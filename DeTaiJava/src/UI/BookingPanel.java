@@ -21,6 +21,29 @@ public class BookingPanel extends JPanel {
         title.setForeground(CustomUI.TEXT_LIGHT);
 
         header.add(title, BorderLayout.WEST);
+
+        JButton btnAI = new JButton("💡 Gợi ý phim bằng AI") {
+            {
+                setFont(CustomUI.bold(12));
+                setForeground(new Color(0x00B8D4));
+                setOpaque(false);
+                setContentAreaFilled(false);
+                setBorder(BorderFactory.createLineBorder(new Color(0x00B8D4), 1, true));
+                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+        };
+        btnAI.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, 
+                "Hãy sử dụng khung chat ✨ Trợ Lý AI ở góc dưới bên phải màn hình\n" +
+                "để nhận được gợi ý phim và suất chiếu phù hợp nhất từ Gemini!",
+                "Trợ lý ảo thông minh", JOptionPane.INFORMATION_MESSAGE);
+        });
+        
+        JPanel rightHeader = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        rightHeader.setOpaque(false);
+        rightHeader.add(btnAI);
+        header.add(rightHeader, BorderLayout.EAST);
+
         add(header, BorderLayout.NORTH);
 
         // ⚠️ TẠO SEAT PANEL TRƯỚC

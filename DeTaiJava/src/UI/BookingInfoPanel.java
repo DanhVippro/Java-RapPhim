@@ -98,10 +98,10 @@ public class BookingInfoPanel extends JPanel {
         totalRow.setOpaque(false);
         totalRow.setAlignmentX(Component.LEFT_ALIGNMENT);
         JLabel tlbl = new JLabel("Tổng cộng");
-        tlbl.setFont(CustomUI.bold(14));
+        tlbl.setFont(CustomUI.bold(18));
         tlbl.setForeground(CustomUI.TEXT_LIGHT);
         lblTong = new JLabel("0 đ");
-        lblTong.setFont(CustomUI.bold(20));
+        lblTong.setFont(CustomUI.bold(26));
         lblTong.setForeground(new Color(0x00B8D4));
         totalRow.add(tlbl, BorderLayout.WEST);
         totalRow.add(lblTong, BorderLayout.EAST);
@@ -244,7 +244,7 @@ public class BookingInfoPanel extends JPanel {
     private ImageIcon buildPosterIcon(int idx, int w, int h) {
         try {
             ImageIcon icon = new ImageIcon(
-                    getClass().getResource("/" + CinemaData.POSTER_PATH[idx]));
+                    getClass().getResource(CinemaData.POSTER_PATH[idx]));
             Image img = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
             return new ImageIcon(img);
         } catch (Exception e) {
@@ -257,7 +257,7 @@ public class BookingInfoPanel extends JPanel {
     // ══════════════════════════════════════════════════════════════════════════
     private JLabel sectionLabel(String text) {
         JLabel l = new JLabel(text);
-        l.setFont(CustomUI.bold(12));
+        l.setFont(CustomUI.bold(15));
         l.setForeground(new Color(0x90CAF9));
         l.setAlignmentX(Component.LEFT_ALIGNMENT);
         return l;
@@ -265,7 +265,7 @@ public class BookingInfoPanel extends JPanel {
 
     private JLabel boldVal(String text) {
         JLabel l = new JLabel(text);
-        l.setFont(CustomUI.bold(12));
+        l.setFont(CustomUI.bold(14));
         l.setForeground(CustomUI.TEXT_WHITE);
         return l;
     }
@@ -275,7 +275,7 @@ public class BookingInfoPanel extends JPanel {
         row.setOpaque(false);
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
         JLabel l = new JLabel(label);
-        l.setFont(CustomUI.plain(12));
+        l.setFont(CustomUI.plain(14));
         l.setForeground(CustomUI.TEXT_LIGHT);
         row.add(l, BorderLayout.WEST);
         row.add(val, BorderLayout.EAST);
@@ -292,7 +292,7 @@ public class BookingInfoPanel extends JPanel {
         cL.anchor = GridBagConstraints.NORTHWEST;
         cL.insets = new Insets(2, 0, 0, 8);
         JLabel l = new JLabel(labelText);
-        l.setFont(CustomUI.plain(12));
+        l.setFont(CustomUI.plain(14));
         l.setForeground(CustomUI.TEXT_LIGHT);
         row.add(l, cL);
         GridBagConstraints cR = new GridBagConstraints();
@@ -310,7 +310,7 @@ public class BookingInfoPanel extends JPanel {
         wrap.setOpaque(false);
         wrap.setAlignmentX(Component.LEFT_ALIGNMENT);
         JLabel l = new JLabel(labelText);
-        l.setFont(CustomUI.plain(11));
+        l.setFont(CustomUI.plain(13));
         l.setForeground(CustomUI.TEXT_LIGHT);
         wrap.add(l, BorderLayout.NORTH);
         wrap.add(field, BorderLayout.CENTER);
@@ -341,7 +341,7 @@ public class BookingInfoPanel extends JPanel {
                 BorderFactory.createLineBorder(new Color(0x3A4C5E)),
                 BorderFactory.createEmptyBorder(7, 10, 7, 10)));
         f.setBackground(new Color(0x1A2A39));
-        f.setFont(CustomUI.plain(12));
+        f.setFont(CustomUI.plain(14));
         f.setCaretColor(CustomUI.TEXT_WHITE);
         return f;
     }
@@ -364,7 +364,7 @@ public class BookingInfoPanel extends JPanel {
         JComboBox<T> c = new JComboBox<>(items);
         c.setBackground(new Color(0x16212A));
         c.setForeground(CustomUI.TEXT_LIGHT);
-        c.setFont(CustomUI.plain(11));
+        c.setFont(CustomUI.plain(13));
         c.setBorder(BorderFactory.createLineBorder(new Color(0x2D3F4F)));
         return c;
     }
@@ -373,7 +373,7 @@ public class BookingInfoPanel extends JPanel {
         JPanel p = new JPanel(new BorderLayout(0, 4));
         p.setOpaque(false);
         JLabel l = new JLabel(label);
-        l.setFont(CustomUI.bold(10));
+        l.setFont(CustomUI.bold(12));
         l.setForeground(CustomUI.TEXT_LIGHT);
         p.add(l, BorderLayout.NORTH);
         p.add(combo, BorderLayout.CENTER);

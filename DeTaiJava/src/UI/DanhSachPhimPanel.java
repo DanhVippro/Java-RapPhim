@@ -10,6 +10,9 @@ public class DanhSachPhimPanel extends JPanel {
     private final PhimService service = new PhimService();
     private JTable table;
     private DefaultTableModel model;
+    private JTextField txtSearch;
+    private JComboBox<String> comboFilter;
+    private TableRowSorter<DefaultTableModel> sorter;
 
     public DanhSachPhimPanel() {
         setOpaque(false);
@@ -21,16 +24,48 @@ public class DanhSachPhimPanel extends JPanel {
         card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // Header
-        JPanel header = new JPanel(new BorderLayout());
+        JPanel header = new JPanel(new BorderLayout(20, 10));
         header.setOpaque(false);
+        header.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
+
         JLabel title = new JLabel("DANH SÁCH PHIM");
         title.setFont(customUI.CustomUI.bold(20));
         title.setForeground(Color.WHITE);
         header.add(title, BorderLayout.WEST);
 
-        JButton btnReload = BanVeHelper.ghostBtn("Làm mới 🔄");
-        btnReload.addActionListener(e -> loadData());
-        header.add(btnReload, BorderLayout.EAST);
+        // Search & Filter Panel
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        actions.setOpaque(false);
+
+        txtSearch = BanVeHelper.placeholderField("Tìm tên phim...");
+        txtSearch.setPreferredSize(new Dimension(180, 42));
+        txtSearch.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { filter(); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { filter(); }
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { filter(); }
+        });
+
+        comboFilter = new JComboBox<>(new String[]{"Tất cả trạng thái", "Đang chiếu", "Sắp chiếu", "Ngừng chiếu"});
+        comboFilter.setPreferredSize(new Dimension(150, 42));
+        comboFilter.setBackground(BanVeHelper.BG_FIELD);
+        comboFilter.setForeground(Color.WHITE);
+        comboFilter.addActionListener(e -> filter());
+
+        JButton btnReload = BanVeHelper.ghostBtn("Làm mới");
+        btnReload.setPreferredSize(new Dimension(100, 42));
+        btnReload.addActionListener(e -> {
+            txtSearch.setText("Tìm tên phim...");
+            comboFilter.setSelectedIndex(0);
+            loadData();
+        });
+
+        actions.add(new JLabel("Tìm: "));
+        actions.add(txtSearch);
+        actions.add(new JLabel("Trạng thái: "));
+        actions.add(comboFilter);
+        actions.add(btnReload);
+
+        header.add(actions, BorderLayout.CENTER);
         card.add(header, BorderLayout.NORTH);
 
         // Table
@@ -43,6 +78,8 @@ public class DanhSachPhimPanel extends JPanel {
         };
 
         table = new JTable(model);
+        sorter = new TableRowSorter<>(model);
+        table.setRowSorter(sorter);
         styleTable(table);
         
         JScrollPane scroll = new JScrollPane(table);
@@ -69,9 +106,29 @@ public class DanhSachPhimPanel extends JPanel {
         t.setIntercellSpacing(new Dimension(0, 0));
 
         // Column widths
-        t.getColumnModel().getColumn(0).setPreferredWidth(50);
-        t.getColumnModel().getColumn(1).setPreferredWidth(250);
-        t.getColumnModel().getColumn(6).setPreferredWidth(100);
+        t.getColumnModel().getColumn(0).setPreferredWidth(50);   // Mã
+        t.getColumnModel().getColumn(1).setPreferredWidth(280);  // Tên Phim
+        t.getColumnModel().getColumn(2).setPreferredWidth(220);  // Thể Loại
+        t.getColumnModel().getColumn(3).setPreferredWidth(100);  // Thời Lượng
+        t.getColumnModel().getColumn(4).setPreferredWidth(120);  // Ngày KC
+        t.getColumnModel().getColumn(5).setPreferredWidth(120);  // Trạng Thái
+        t.getColumnModel().getColumn(6).setPreferredWidth(80);   // Thao Tác
+
+        // Center align data cho các cột ngắn, Left align cho chữ dài
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        
+        DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+        leftRenderer.setHorizontalAlignment(JLabel.LEFT);
+        leftRenderer.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 0)); // Lề trái 15px cho thoáng
+
+        for (int i = 0; i < t.getColumnCount() - 1; i++) {
+            if (i == 1 || i == 2) {
+                t.getColumnModel().getColumn(i).setCellRenderer(leftRenderer);
+            } else {
+                t.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+            }
+        }
 
         // Action column with buttons
         t.getColumnModel().getColumn(6).setCellRenderer(new TableCellRenderer() {
@@ -109,6 +166,31 @@ public class DanhSachPhimPanel extends JPanel {
             model.addRow(new Object[]{
                 row[0], row[1], row[2], row[3], row[4], row[6], "Xóa"
             });
+        }
+    }
+
+    private void filter() {
+        String text = txtSearch.getText();
+        if (text.equals("Tìm tên phim...")) text = "";
+        
+        String status = (String) comboFilter.getSelectedItem();
+        
+        java.util.List<RowFilter<Object, Object>> filters = new java.util.ArrayList<>();
+        
+        // Lọc theo tên (cột 1)
+        if (!text.isEmpty()) {
+            filters.add(RowFilter.regexFilter("(?i)" + text, 1));
+        }
+        
+        // Lọc theo trạng thái (cột 5)
+        if (!status.equals("Tất cả trạng thái")) {
+            filters.add(RowFilter.regexFilter("^" + status + "$", 5));
+        }
+        
+        if (filters.isEmpty()) {
+            sorter.setRowFilter(null);
+        } else {
+            sorter.setRowFilter(RowFilter.andFilter(filters));
         }
     }
 

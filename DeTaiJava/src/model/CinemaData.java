@@ -82,16 +82,16 @@ public final class CinemaData {
             { false, false, false, false, false, false, false, false, false, false, false }
     };
 
-    // { icon, tên, mô tả, giá hiển thị, giá int, màu hex }
+    // { icon_fallback, tên, mô tả, giá hiển thị, giá int, màu hex, image_path }
     public static final Object[][] SNACK_DATA = {
-            { "🍿", "Bắp Nhỏ", "50g  |  Bơ / Caramel", "30.000 đ", 30_000, 0xF59E0B },
-            { "🍿", "Bắp Vừa", "80g  |  Bơ / Caramel", "45.000 đ", 45_000, 0xF59E0B },
-            { "🍿", "Bắp Lớn", "120g |  Bơ / Caramel", "60.000 đ", 60_000, 0xF59E0B },
-            { "🥤", "Nước Nhỏ", "250ml |  Cola / Sprite / Fanta", "25.000 đ", 25_000, 0x06B6D4 },
-            { "🥤", "Nước Vừa", "400ml |  Cola / Sprite / Fanta", "35.000 đ", 35_000, 0x06B6D4 },
-            { "🥤", "Nước Lớn", "550ml |  Cola / Sprite / Fanta", "45.000 đ", 45_000, 0x06B6D4 },
-            { "🎬", "Combo 1", "Bắp Vừa + Nước Vừa", "70.000 đ", 70_000, 0x8B5CF6 },
-            { "🎬", "Combo 2", "Bắp Lớn + 2 Nước Vừa", "110.000 đ", 110_000, 0x8B5CF6 },
+        { "🍿", "Bắp Ngô",      "50g  |  Bơ / Caramel",          "30.000 đ",  30_000, 0xF59E0B, "/resources/foods/bong_ngo.jpg"        },
+        { "🌭", "Hotdog",        "Xúc xích nướng giòn tan",        "35.000 đ",  35_000, 0xEF4444, "/resources/foods/hot_dog.jpg"          },
+        { "🍟", "Khoai Tây",     "Giòn thơm  |  Sốt Mayo / BBQ",  "40.000 đ",  40_000, 0xFBBF24, "/resources/foods/khoai_tay_chien.png"  },
+        { "🥤", "Coca-Cola",     "330ml  |  Lạnh sảng khoái",      "25.000 đ",  25_000, 0xEF4444, "/resources/foods/cocacola.jpg"        },
+        { "🥤", "Pepsi",         "330ml  |  Vị ngọt đặc trưng",    "25.000 đ",  25_000, 0x3B82F6, "/resources/foods/pepsi.jpg"           },
+        { "💧", "Nước Suối",     "500ml  |  Thanh mát",            "15.000 đ",  15_000, 0x06B6D4, "/resources/foods/nuoc_suoi.jpg"       },
+        { "🎬", "Combo 1",       "Bắp Ngô + Coca hoặc Pepsi",      "50.000 đ",  50_000, 0x8B5CF6, null                                   },
+        { "🎉", "Combo 2",       "Bắp Ngô + Hotdog + Nước Suối",   "75.000 đ",  75_000, 0xEC4899, null                                   },
     };
     // Map mỗi phòng → 1 roomKey (để SeatMapPanel biết load kiểu ghế)
     public static final int[][] PHONG_ROOM_KEY = {
@@ -103,12 +103,12 @@ public final class CinemaData {
             { 1, 0 } // Bố Già
     };
 public static final String[] POSTER_PATH = {
-    "resources/avengers.jpg",
-    "resources/conan.jpg",
-    "resources/doraemon.jpg",
-    "resources/xmen.jpg",
-    "resources/spiderman.jpg",
-    "resources/bogia.jpg"
+    "/resources/list_film/avengers.jpg",
+    "/resources/list_film/conan.jpg",
+    "/resources/list_film/doraemon.jpg",
+    "/resources/list_film/xmen.jpg",
+    "/resources/list_film/spiderman.jpg",
+    "/resources/list_film/bogia.jpg"
 };
     private CinemaData() {}
 }

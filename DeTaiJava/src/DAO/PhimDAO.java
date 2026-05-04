@@ -82,7 +82,7 @@ public class PhimDAO {
         List<Object[]> result = new ArrayList<>();
         String sql = "SELECT [maPhim],[tenPhim],[theLoai],[thoiLuong]," +
                 "[ngayKhoiChieu],[moTa],[trangThai],[poster_path] " +
-                "FROM [Phim] ORDER BY maPhim DESC";
+                "FROM [Phim] ORDER BY maPhim ASC";
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {

@@ -53,7 +53,7 @@ public class SeatMapPanel extends JPanel {
 
         // ── Màn hình ────────────────────────────────────────
         JLabel screen = new JLabel("▬▬▬▬▬▬  MÀN HÌNH  ▬▬▬▬▬▬", JLabel.CENTER);
-        screen.setFont(new Font("Monospaced", Font.BOLD, 11));
+        screen.setFont(new Font("Monospaced", Font.BOLD, 14));
         screen.setForeground(new Color(0x90CAF9));
         screen.setBorder(BorderFactory.createEmptyBorder(4, 0, 10, 0));
         panel.add(screen, BorderLayout.NORTH);
@@ -106,7 +106,7 @@ public class SeatMapPanel extends JPanel {
         dot.setBorder(BorderFactory.createLineBorder(color.brighter(), 1));
 
         JLabel lbl = new JLabel(text);
-        lbl.setFont(CustomUI.plain(11));
+        lbl.setFont(CustomUI.plain(13));
         lbl.setForeground(CustomUI.TEXT_LIGHT);
 
         p.add(dot);
@@ -118,12 +118,12 @@ public class SeatMapPanel extends JPanel {
     private JToggleButton createSeatBtn(String label, boolean isSold, boolean isVip) {
 
         JToggleButton btn = new JToggleButton(label);
-        btn.setFont(new Font("Monospaced", Font.PLAIN, 9));
+        btn.setFont(new Font("Monospaced", Font.BOLD, 12));
         btn.setForeground(new Color(0xCCDDEE));
         btn.setOpaque(true);
         btn.setFocusPainted(false);
         btn.setBorder(BorderFactory.createLineBorder(new Color(0x374B5C)));
-        btn.setPreferredSize(new Dimension(34, 32));
+        btn.setPreferredSize(new Dimension(40, 38));
 
         if (isSold) {
             btn.setEnabled(false);

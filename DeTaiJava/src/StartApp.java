@@ -12,7 +12,7 @@ public class StartApp {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("MEGADE Cinema  Đăng Nhập");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(900, 580);
+            frame.setSize(1100, 700);
             frame.setLocationRelativeTo(null);
             frame.setResizable(false);
 

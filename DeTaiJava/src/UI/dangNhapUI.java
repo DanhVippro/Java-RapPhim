@@ -34,6 +34,10 @@ public class dangNhapUI extends JPanel {
         setLayout(new BorderLayout());
         setBackground(CustomUI.BG_MAIN);
         add(buildCenter(), BorderLayout.CENTER);
+
+        // Chặn auto-focus vào ô JTextField khi mới mở màn hình
+        setFocusable(true);
+        SwingUtilities.invokeLater(this::requestFocusInWindow);
     }
 
     // ── Vùng giữa: chia đôi trái/phải ───────────────────────────────────────
@@ -133,10 +137,10 @@ public class dangNhapUI extends JPanel {
                 g2.setColor(new Color(0, 0, 0, 18));
                 g2.fill(new RoundRectangle2D.Float(3, 5, getWidth() - 4, getHeight() - 4, 20, 20));
                 g2.setColor(CustomUI.BG_WHITE);
-                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth() - 3, getHeight() - 4, 20, 20));
+                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth() - 3, getHeight() - 4, 24, 24));
                 g2.setColor(CustomUI.BORDER);
                 g2.setStroke(new BasicStroke(1f));
-                g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, getWidth() - 4, getHeight() - 5, 20, 20));
+                g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, getWidth() - 4, getHeight() - 5, 24, 24));
                 g2.dispose();
             }
         };
@@ -159,7 +163,8 @@ public class dangNhapUI extends JPanel {
         // Trường tên đăng nhập
         JLabel lblUser = fieldLabel("Tên đăng nhập");
         txtUser = CustomUI.createTextField("Nhập tên đăng nhập...");
-        txtUser.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+        txtUser.setPreferredSize(new Dimension(Integer.MAX_VALUE, 50));
+        txtUser.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         txtUser.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Trường mật khẩu
@@ -173,10 +178,11 @@ public class dangNhapUI extends JPanel {
         lblError.setForeground(CustomUI.DANGER);
         lblError.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Nút đăng nhập
         JButton btnLogin = buildLoginButton();
         btnLogin.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnLogin.setMaximumSize(new Dimension(Integer.MAX_VALUE, 46));
+        btnLogin.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        btnLogin.setPreferredSize(new Dimension(400, 50));
+        btnLogin.setMinimumSize(new Dimension(0, 50));
 
         // Footer hint
         JLabel footer = new JLabel("Admin: admin / admin123  |  NV: nv01 / nv123");
@@ -233,20 +239,29 @@ public class dangNhapUI extends JPanel {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(CustomUI.BG_WHITE);
-                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 10, 10));
-                g2.setColor(isFocusOwner() ? CustomUI.PRIMARY : CustomUI.BORDER2);
-                g2.setStroke(new BasicStroke(isFocusOwner() ? 1.5f : 1f));
-                g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, getWidth() - 1, getHeight() - 1, 10, 10));
+                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 24, 24));
+                g2.setColor(hasFocus() ? CustomUI.PRIMARY : CustomUI.BORDER2);
+                g2.setStroke(new BasicStroke(hasFocus() ? 1.5f : 1f));
+                g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, getWidth() - 1, getHeight() - 1, 24, 24));
                 super.paintComponent(g);
                 g2.dispose();
             }
         };
-        pf.setFont(CustomUI.plain(14));
+        pf.setFont(CustomUI.plain(16));
         pf.setForeground(CustomUI.TEXT_DARK);
         pf.setOpaque(false);
-        pf.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
-        pf.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+        pf.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        pf.setPreferredSize(new Dimension(Integer.MAX_VALUE, 50));
+        pf.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         pf.setEchoChar('●');
+        
+        pf.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) { pf.repaint(); }
+            @Override
+            public void focusLost(FocusEvent e) { pf.repaint(); }
+        });
+
         return pf;
     }
 
@@ -272,7 +287,7 @@ public class dangNhapUI extends JPanel {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(hov ? CustomUI.PRIMARY_DARK : CustomUI.PRIMARY);
-                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 12, 12));
+                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 24, 24));
                 g2.setFont(CustomUI.bold(15));
                 g2.setColor(Color.WHITE);
                 FontMetrics fm = g2.getFontMetrics();
