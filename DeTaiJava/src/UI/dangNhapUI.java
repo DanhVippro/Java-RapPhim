@@ -79,8 +79,14 @@ public class dangNhapUI extends JPanel {
         inner.setOpaque(false);
 
         // Icon
-        JLabel ico = new JLabel("🎬");
-        ico.setFont(new Font("SansSerif", Font.PLAIN, 72));
+        ImageIcon icon = new ImageIcon(
+                getClass().getResource("/resources/logo.png"));
+
+        // resize nếu cần
+        Image img = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+        JLabel ico = new JLabel(new ImageIcon(img));
+
+        ico.setAlignmentX(Component.CENTER_ALIGNMENT);
         ico.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Tên app
@@ -162,7 +168,7 @@ public class dangNhapUI extends JPanel {
 
         // Trường tên đăng nhập
         JLabel lblUser = fieldLabel("Tên đăng nhập");
-        txtUser = CustomUI.createTextField("Nhập tên đăng nhập...");
+        txtUser = BanVeHelper.placeholderField("Nhập tên đăng nhập...");
         txtUser.setPreferredSize(new Dimension(Integer.MAX_VALUE, 50));
         txtUser.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         txtUser.setAlignmentX(Component.LEFT_ALIGNMENT);

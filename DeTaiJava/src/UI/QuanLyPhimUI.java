@@ -8,17 +8,17 @@ public class QuanLyPhimUI extends JPanel {
     public QuanLyPhimUI(String mode) {
         setOpaque(false);
         setLayout(new BorderLayout());
-        
+
         // Header Area
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        
+
         JLabel title = new JLabel("Hệ Thống Quản Lý Phim");
         title.setFont(CustomUI.bold(26));
         title.setForeground(CustomUI.TEXT_LIGHT);
         header.add(title, BorderLayout.WEST);
-        
+
         add(header, BorderLayout.NORTH);
 
         // Custom Styled JTabbedPane
@@ -26,7 +26,6 @@ public class QuanLyPhimUI extends JPanel {
         tab.setFont(CustomUI.bold(14));
         tab.setBackground(BanVeHelper.BG_CARD);
         tab.setForeground(Color.WHITE);
-        
         tab.addTab("Danh Sách Phim", new DanhSachPhimPanel());
         tab.addTab("Thêm Phim Mới", new ThemPhimPanel());
 

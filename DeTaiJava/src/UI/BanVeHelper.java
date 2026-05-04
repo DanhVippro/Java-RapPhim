@@ -15,20 +15,23 @@ public final class BanVeHelper {
     public static final Color SEAT_EMPTY    = new Color(0x3E5065);
     public static final Color SEAT_SOLD     = new Color(0x2A3F52);
     public static final Color SEAT_SELECTED = new Color(0x0098C0);
-    public static final Color SEAT_VIP      = new Color(0x5B4DB8);
+    public static final Color SEAT_VIP = new Color(0x5B4DB8);
 
     // ── Màu accent ────────────────────────────────────────────────────────────
-    public static final Color ACCENT    = new Color(0x00B8D4);
-    public static final Color BG_FIELD  = new Color(0x1A2A39);
-    public static final Color BG_CARD   = new Color(0x192330);
-    public static final Color DIVIDER   = new Color(0x2D3F4F);
+    public static final Color ACCENT = new Color(0x00B8D4);
+    public static final Color BG_FIELD = new Color(0x1A2A39);
+    public static final Color BG_CARD = new Color(0x192330);
+    public static final Color DIVIDER = new Color(0x2D3F4F);
+    public static final Color BG_MAIN = null;
 
-    private BanVeHelper() {}
+    private BanVeHelper() {
+    }
 
     // ── Card bo góc cực mềm (30px) ───────────────────────────────────────────────────────
     public static JPanel darkCard() {
         JPanel card = new JPanel() {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(BG_CARD);
@@ -48,7 +51,8 @@ public final class BanVeHelper {
     // ── Step card bo góc nhạt hơn (24px) ─────────────────────────────────────────────
     public static JPanel stepCard(Color accent) {
         JPanel card = new JPanel() {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(BG_CARD);
@@ -115,10 +119,17 @@ public final class BanVeHelper {
         f.setForeground(new Color(0x607D8B));
         f.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent e) {
-                if (f.getText().equals(placeholder)) { f.setText(""); f.setForeground(CustomUI.TEXT_WHITE); }
+                if (f.getText().equals(placeholder)) {
+                    f.setText("");
+                    f.setForeground(CustomUI.TEXT_WHITE);
+                }
             }
+
             public void focusLost(java.awt.event.FocusEvent e) {
-                if (f.getText().isBlank()) { f.setText(placeholder); f.setForeground(new Color(0x607D8B)); }
+                if (f.getText().isBlank()) {
+                    f.setText(placeholder);
+                    f.setForeground(new Color(0x607D8B));
+                }
             }
         });
         f.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
@@ -170,6 +181,24 @@ public final class BanVeHelper {
         row.add(valLabel, BorderLayout.CENTER);
         return row;
     }
+
+    // ── Divider ngang ─────────────────────────────────────────────────────────
+    public static Component divider() {
+        JPanel d = new JPanel();
+        d.setBackground(DIVIDER);
+        d.setOpaque(true);
+        d.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+        d.setPreferredSize(new Dimension(0, 1));
+        d.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return d;
+    }
+
+    // ── Vertical gap ─────────────────────────────────────────────────────────
+    public static Component vgap(int h) {
+        return Box.createVerticalStrut(h);
+    }
+
+
 
     // ── Nút stepper +/− bo tròn dạng tròn ──────────────────────────────────────────────────────
     public static JButton stepperBtn(String t, int size) {
