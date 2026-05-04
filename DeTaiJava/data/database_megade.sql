@@ -253,3 +253,24 @@ GO
 -- Kiểm tra kết quả
 SELECT maPhim, tenPhim, poster_path FROM Phim;
 GO
+
+INSERT INTO [MegadeCinema].[dbo].[Phim]
+([tenPhim], [theLoai], [thoiLuong], [ngayKhoiChieu], [moTa], [trangThai], [poster_path])
+VALUES
+(N'Avengers: Endgame', N'Hành động, Siêu anh hùng', 181, '2019-04-26',
+ N'Biệt đội Avengers tập hợp để đảo ngược hậu quả từ cú búng tay của Thanos.', N'Đang chiếu', 'avengers.jpg'),
+
+(N'Detective Conan: The Movie', N'Hoạt hình, Trinh thám', 110, '2021-04-16',
+ N'Conan phá giải vụ án bí ẩn liên quan đến một tổ chức nguy hiểm.', N'Đang chiếu', 'conan.jpg'),
+
+(N'Doraemon: Nobita và chuyến phiêu lưu', N'Hoạt hình, Gia đình', 95, '2020-07-03',
+ N'Nobita cùng Doraemon bước vào chuyến phiêu lưu kỳ thú.', N'Đang chiếu', 'doraemon.jpg'),
+
+(N'Spider-Man: No Way Home', N'Hành động, Siêu anh hùng', 148, '2021-12-17',
+ N'Peter Parker đối mặt với những kẻ thù từ đa vũ trụ.', N'Đang chiếu', 'spiderman.jpg'),
+
+(N'X-Men: Dark Phoenix', N'Hành động, Viễn tưởng', 114, '2019-06-07',
+ N'Jean Grey mất kiểm soát sức mạnh và trở thành Dark Phoenix.', N'Đang chiếu', 'xmen.jpg'),
+
+(N'Bố Già', N'Tâm lý, Gia đình', 128, '2021-03-12',
+ N'Câu chuyện cảm động về tình cha con trong xã hội hiện đại.', N'Đang chiếu', 'bogia.jpg');

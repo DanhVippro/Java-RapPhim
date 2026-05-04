@@ -234,7 +234,7 @@ public class dangNhapUI extends JPanel {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(CustomUI.BG_WHITE);
                 g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 10, 10));
-                g2.setColor(isFocusOwner() ? CustomUI.TEAL : CustomUI.BORDER2);
+                g2.setColor(isFocusOwner() ? CustomUI.PRIMARY : CustomUI.BORDER2);
                 g2.setStroke(new BasicStroke(isFocusOwner() ? 1.5f : 1f));
                 g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, getWidth() - 1, getHeight() - 1, 10, 10));
                 super.paintComponent(g);
@@ -271,7 +271,7 @@ public class dangNhapUI extends JPanel {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(hov ? CustomUI.TEAL_DARK : CustomUI.TEAL);
+                g2.setColor(hov ? CustomUI.PRIMARY_DARK : CustomUI.PRIMARY);
                 g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 12, 12));
                 g2.setFont(CustomUI.bold(15));
                 g2.setColor(Color.WHITE);
