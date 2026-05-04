@@ -20,6 +20,8 @@ public class dashboardUI extends JFrame {
     private String activeNav = "Trang Chủ";
     private JPanel contentArea;
     private JPanel root;
+    private JPanel menuOverlay;
+    private JLayeredPane layeredSidebar;
 
     public dashboardUI(TaiKhoan user) {
         this.currentUser = user;
@@ -32,7 +34,6 @@ public class dashboardUI extends JFrame {
         root.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         root.setBackground(CustomUI.BG_MAIN);
 
-        // Thêm sidebar trực tiếp, không có topbar
         root.add(buildSidebar(), BorderLayout.WEST);
 
         if (user.isAdmin()) {
@@ -54,7 +55,6 @@ public class dashboardUI extends JFrame {
         page.setBackground(CustomUI.BG_MAIN);
         page.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // ── Header ──
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
@@ -71,7 +71,6 @@ public class dashboardUI extends JFrame {
         header.add(sub, BorderLayout.SOUTH);
         page.add(header, BorderLayout.NORTH);
 
-        // ── Lưới phim (2 cột) ──
         JPanel gridWrapper = new JPanel(new BorderLayout());
         gridWrapper.setOpaque(false);
 
@@ -79,7 +78,6 @@ public class dashboardUI extends JFrame {
         grid.setOpaque(false);
         grid.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 4));
 
-        // Load dữ liệu phim
         PhimDAO dao = new PhimDAO();
         List<Object[]> phimList = dao.getPhimDangChieu();
 
@@ -92,7 +90,6 @@ public class dashboardUI extends JFrame {
             for (Object[] row : phimList) {
                 grid.add(buildPhimCard(row));
             }
-            // Đảm bảo grid luôn chẵn (thêm ô trống nếu lẻ)
             if (phimList.size() % 2 != 0) {
                 grid.add(new JLabel());
             }
@@ -109,11 +106,6 @@ public class dashboardUI extends JFrame {
         return page;
     }
 
-    /**
-     * Tạo card cho 1 phim
-     * row = [maPhim, tenPhim, theLoai, thoiLuong, ngayKhoiChieu, moTa, trangThai,
-     * poster_path]
-     */
     private JPanel buildPhimCard(Object[] row) {
         String tenPhim = (String) row[1];
         String theLoai = row[2] != null ? (String) row[2] : "Chưa phân loại";
@@ -127,10 +119,8 @@ public class dashboardUI extends JFrame {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                // Shadow
                 g2.setColor(new Color(0, 0, 0, 12));
                 g2.fill(new RoundRectangle2D.Float(3, 3, getWidth() - 3, getHeight() - 3, 14, 14));
-                // Card bg
                 g2.setColor(Color.WHITE);
                 g2.fill(new RoundRectangle2D.Float(0, 0, getWidth() - 3, getHeight() - 3, 14, 14));
                 g2.dispose();
@@ -139,7 +129,6 @@ public class dashboardUI extends JFrame {
         card.setOpaque(false);
         card.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
-        // ── Poster ──
         JPanel posterPanel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -167,7 +156,6 @@ public class dashboardUI extends JFrame {
         }
         card.add(posterPanel, BorderLayout.WEST);
 
-        // ── Thông tin phim ──
         JPanel info = new JPanel();
         info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
         info.setOpaque(false);
@@ -179,7 +167,6 @@ public class dashboardUI extends JFrame {
         info.add(lblTen);
         info.add(Box.createVerticalStrut(6));
 
-        // Badge thể loại
         JLabel lblTheLoai = new JLabel(theLoai) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -199,7 +186,6 @@ public class dashboardUI extends JFrame {
         info.add(lblTheLoai);
         info.add(Box.createVerticalStrut(8));
 
-        // Thời lượng
         JLabel lblThoiLuong = new JLabel("⏱ " + thoiLuong + " phút");
         lblThoiLuong.setFont(CustomUI.plain(12));
         lblThoiLuong.setForeground(new Color(0x6B8099));
@@ -207,7 +193,6 @@ public class dashboardUI extends JFrame {
         info.add(lblThoiLuong);
         info.add(Box.createVerticalStrut(4));
 
-        // Ngày khởi chiếu
         if (ngayKC != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             String ngayStr = sdf.format(ngayKC);
@@ -219,7 +204,6 @@ public class dashboardUI extends JFrame {
             info.add(Box.createVerticalStrut(8));
         }
 
-        // Mô tả (giới hạn 2 dòng)
         if (!moTa.isEmpty()) {
             String shortDesc = moTa.length() > 120 ? moTa.substring(0, 120) + "…" : moTa;
             JTextArea desc = new JTextArea(shortDesc);
@@ -235,7 +219,6 @@ public class dashboardUI extends JFrame {
             info.add(Box.createVerticalStrut(10));
         }
 
-        // Nút Đặt vé
         JButton btnDatVe = new JButton("🎟 Đặt Vé") {
             boolean hov = false;
             {
@@ -290,12 +273,10 @@ public class dashboardUI extends JFrame {
     private ImageIcon loadPoster(String posterPath) {
         if (posterPath == null || posterPath.isBlank())
             return null;
-
         try {
             if (posterPath.startsWith("http")) {
                 return new ImageIcon(new URL(posterPath));
             } else {
-                // load từ resources
                 URL url = getClass().getResource("/resources/" + posterPath);
                 if (url != null) {
                     return new ImageIcon(url);
@@ -311,7 +292,7 @@ public class dashboardUI extends JFrame {
     }
 
     // ══════════════════════════════════════════════════════════════════
-    // SIDEBAR - Layout: LOGO -> MENU -> ACCOUNT (Account nằm ngang)
+    // SIDEBAR - Layout: LOGO -> NÚT MENU (bật/tắt) -> JTree -> ACCOUNT
     // ══════════════════════════════════════════════════════════════════
     private JPanel buildSidebar() {
         final int W = 260;
@@ -325,136 +306,127 @@ public class dashboardUI extends JFrame {
         side.setOpaque(false);
         side.setPreferredSize(new Dimension(W, 0));
 
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setOpaque(false);
+        layeredSidebar = new JLayeredPane() {
+            @Override
+            public void doLayout() {
+                int w = getWidth(), h = getHeight();
+                for (Component c : getComponents()) {
+                    if ("logo".equals(c.getName()))
+                        c.setBounds(0, 0, w, 100);
+                    else if ("menuBtn".equals(c.getName()))
+                        c.setBounds(0, 100, w, 50);
+                    else if ("tree".equals(c.getName()))
+                        c.setBounds(0, 150, w, h - 250);
+                    else if ("account".equals(c.getName()))
+                        c.setBounds(0, h - 100, w, 100);
+                    else if ("menuOverlay".equals(c.getName()))
+                        c.setBounds(0, 150, w, h - 250);
+                }
+            }
+        };
+        layeredSidebar.setOpaque(false);
+        layeredSidebar.setBackground(CustomUI.SIDEBAR_BG);
 
-        // ── PHẦN 1: LOGO (đầu trang) ──
-        JPanel logoArea = new JPanel();
-        logoArea.setLayout(new BoxLayout(logoArea, BoxLayout.Y_AXIS));
+        // ── LOGO (đầu trang) ──
+        JPanel logoArea = new JPanel(new BorderLayout());
         logoArea.setOpaque(false);
-        logoArea.setBorder(BorderFactory.createEmptyBorder(24, 20, 20, 20));
+        logoArea.setName("logo");
+        logoArea.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JPanel logoWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        logoWrapper.setOpaque(false);
         java.net.URL logoUrl = getClass().getResource("/resources/logo.png");
         if (logoUrl != null) {
             ImageIcon logoRaw = new ImageIcon(logoUrl);
             Image logoScaled = logoRaw.getImage().getScaledInstance(120, -1, Image.SCALE_SMOOTH);
             JLabel logoImg = new JLabel(new ImageIcon(logoScaled));
-            logoWrapper.add(logoImg);
+            logoImg.setHorizontalAlignment(SwingConstants.CENTER);
+            logoArea.add(logoImg, BorderLayout.CENTER);
         } else {
             JLabel nm = new JLabel("MEGADE Cinema");
             nm.setFont(CustomUI.bold(18));
             nm.setForeground(CustomUI.PRIMARY);
-            logoWrapper.add(nm);
+            nm.setHorizontalAlignment(SwingConstants.CENTER);
+            logoArea.add(nm, BorderLayout.CENTER);
         }
-        logoArea.add(logoWrapper);
+        layeredSidebar.add(logoArea, Integer.valueOf(1));
+        logoArea.setName("logo");
 
-        mainPanel.add(logoArea, BorderLayout.NORTH);
+        // ── NÚT MENU (bật/tắt JTree) ──
+        JPanel menuBtnPanel = new JPanel(new BorderLayout());
+        menuBtnPanel.setOpaque(false);
+        menuBtnPanel.setName("menuBtn");
+        menuBtnPanel.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
 
-        // ── PHẦN 2: MENU CHÍNH (ở giữa) ──
-        JPanel navContainer = new JPanel();
-        navContainer.setLayout(new BoxLayout(navContainer, BoxLayout.Y_AXIS));
-        navContainer.setOpaque(false);
-        navContainer.setBorder(BorderFactory.createEmptyBorder(0, 16, 0, 16));
-
-        // Title menu
-        JLabel menuTitle = new JLabel("MENU CHÍNH");
-        menuTitle.setFont(CustomUI.bold(11));
-        menuTitle.setForeground(new Color(0x5A6E85));
-        menuTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-        navContainer.add(menuTitle);
-        navContainer.add(Box.createVerticalStrut(12));
-
-        String[][] navItems;
-        if (currentUser.isAdmin()) {
-            navItems = new String[][] {
-                    { "🏠", "Trang Chủ" },
-                    { "🎟️", "Bán Vé" },
-                    { "🎬", "Quản Lý Phim" },
-                    { "👤", "Quản Lý Nhân Viên" },
-                    { "📊", "Thống Kê" },
-                    { "⚙️", "Cài Đặt" },
-            };
-        } else {
-            navItems = new String[][] {
-                    { "🎟️", "Bán Vé" },
-            };
-        }
-
-        for (String[] item : navItems) {
-            boolean isActive = item[1].equals(activeNav);
-            JPanel navItem = createNavItem(item[0], item[1], isActive);
-            navItem.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
-            final String itemName = item[1];
-            navItem.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    activeNav = itemName;
-                    handleNavigation(itemName);
-                    updateNavActiveState(navContainer, itemName);
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    if (!isActive) {
-                        navItem.setBackground(new Color(43, 200, 163, 20));
+        JButton menuToggleBtn = new JButton("☰ M E N U") {
+            boolean hover = false;
+            {
+                setOpaque(false);
+                setContentAreaFilled(false);
+                setBorderPainted(false);
+                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                setFocusPainted(false);
+                setFont(CustomUI.bold(14));
+                setForeground(Color.WHITE);
+                addMouseListener(new MouseAdapter() {
+                    public void mouseEntered(MouseEvent e) {
+                        hover = true;
+                        repaint();
                     }
-                }
 
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    if (!isActive) {
-                        navItem.setBackground(new Color(0, 0, 0, 0));
+                    public void mouseExited(MouseEvent e) {
+                        hover = false;
+                        repaint();
                     }
-                }
-            });
-            navContainer.add(navItem);
-            navContainer.add(Box.createVerticalStrut(4));
-        }
-
-        // Nút đăng xuất nằm trong menu
-        JPanel logoutItem = createNavItem("🚪", "Đăng xuất", false);
-        logoutItem.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
-        logoutItem.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int confirm = JOptionPane.showConfirmDialog(dashboardUI.this,
-                        "Bạn có chắc muốn đăng xuất?", "Xác nhận",
-                        JOptionPane.YES_NO_OPTION);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    dispose();
-                    new dangNhapUI().setVisible(true);
-                }
+                });
             }
 
             @Override
-            public void mouseEntered(MouseEvent e) {
-                logoutItem.setBackground(new Color(43, 200, 163, 20));
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(hover ? CustomUI.PRIMARY : new Color(43, 200, 163, 180));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                g2.setColor(Color.WHITE);
+                g2.setFont(CustomUI.bold(14));
+                FontMetrics fm = g2.getFontMetrics();
+                int textWidth = fm.stringWidth("☰ MENU");
+                g2.drawString("☰ MENU", (getWidth() - textWidth) / 2,
+                        (getHeight() + fm.getAscent() - fm.getDescent()) / 2 - 2);
+                g2.dispose();
             }
+        };
+        menuToggleBtn.setPreferredSize(new Dimension(0, 40));
+        menuBtnPanel.add(menuToggleBtn, BorderLayout.CENTER);
+        layeredSidebar.add(menuBtnPanel, Integer.valueOf(1));
+        menuBtnPanel.setName("menuBtn");
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-                logoutItem.setBackground(new Color(0, 0, 0, 0));
-            }
+        // ── JTree (hiển thị mặc định, có thể bật/tắt) ──
+        JScrollPane treeScroll = buildNavTree();
+        treeScroll.setName("tree");
+        layeredSidebar.add(treeScroll, Integer.valueOf(0));
+        treeScroll.setName("tree");
+
+        // ── Menu Overlay (thay thế JTree khi nhấn nút) ──
+        menuOverlay = createMenuOverlay();
+        menuOverlay.setName("menuOverlay");
+        menuOverlay.setVisible(false);
+        layeredSidebar.add(menuOverlay, Integer.valueOf(1));
+        menuOverlay.setName("menuOverlay");
+
+        // Sự kiện bật/tắt menu
+        menuToggleBtn.addActionListener(e -> {
+            boolean showMenu = !menuOverlay.isVisible();
+            menuOverlay.setVisible(showMenu);
+            treeScroll.setVisible(!showMenu);
+            layeredSidebar.revalidate();
+            layeredSidebar.repaint();
         });
-        navContainer.add(logoutItem);
 
-        JScrollPane navScroll = new JScrollPane(navContainer);
-        navScroll.setBorder(null);
-        navScroll.setOpaque(false);
-        navScroll.getViewport().setOpaque(false);
-        navScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        navScroll.getVerticalScrollBar().setUnitIncrement(10);
-        navScroll.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
-
-        mainPanel.add(navScroll, BorderLayout.CENTER);
-
-        // ── PHẦN 3: ACCOUNT (nằm ngang, ở cuối sidebar) ──
+        // ── ACCOUNT (cuối trang, chỉ tên và vai trò) ──
         JPanel accountArea = new JPanel();
         accountArea.setLayout(new BoxLayout(accountArea, BoxLayout.Y_AXIS));
         accountArea.setOpaque(false);
-        accountArea.setBorder(BorderFactory.createEmptyBorder(16, 16, 24, 16));
+        accountArea.setName("account");
+        accountArea.setBorder(BorderFactory.createEmptyBorder(16, 20, 20, 20));
 
         JSeparator sep = new JSeparator();
         sep.setForeground(new Color(0x2D4055));
@@ -462,15 +434,13 @@ public class dashboardUI extends JFrame {
         accountArea.add(sep);
         accountArea.add(Box.createVerticalStrut(16));
 
-        // Account panel - nằm ngang (avatar + info bên cạnh nhau)
-        JPanel accountPanel = new JPanel(new BorderLayout(12, 0));
+        // Avatar và tên
+        JPanel accountPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
         accountPanel.setOpaque(false);
-        accountPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
-        // Avatar nhỏ hơn (40x40)
         JPanel avatarPanel = new JPanel() {
             {
-                setPreferredSize(new Dimension(40, 40));
+                setPreferredSize(new Dimension(44, 44));
                 setOpaque(false);
             }
 
@@ -479,8 +449,8 @@ public class dashboardUI extends JFrame {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(CustomUI.PRIMARY);
-                g2.fillOval(0, 0, 40, 40);
-                g2.setFont(CustomUI.bold(14));
+                g2.fillOval(0, 0, 44, 44);
+                g2.setFont(CustomUI.bold(16));
                 g2.setColor(Color.WHITE);
                 String text = currentUser.isAdmin() ? "AD"
                         : (currentUser.getHoTen().length() >= 2 ? currentUser.getHoTen().substring(0, 2).toUpperCase()
@@ -488,44 +458,33 @@ public class dashboardUI extends JFrame {
                 FontMetrics fm = g2.getFontMetrics();
                 int textWidth = fm.stringWidth(text);
                 int textHeight = fm.getAscent();
-                g2.drawString(text, (40 - textWidth) / 2, (40 + textHeight) / 2 - 5);
+                g2.drawString(text, (44 - textWidth) / 2, (44 + textHeight) / 2 - 5);
                 g2.dispose();
             }
         };
 
-        // Thông tin user
-        JPanel userInfoPanel = new JPanel();
-        userInfoPanel.setLayout(new BoxLayout(userInfoPanel, BoxLayout.Y_AXIS));
-        userInfoPanel.setOpaque(false);
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setOpaque(false);
 
         JLabel userName = new JLabel(currentUser.getHoTen());
-        userName.setFont(CustomUI.bold(13));
+        userName.setFont(CustomUI.bold(14));
         userName.setForeground(Color.WHITE);
         userName.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel userRole = new JLabel(currentUser.isAdmin() ? "Quản trị viên" : "Nhân viên");
-        userRole.setFont(CustomUI.plain(10));
+        userRole.setFont(CustomUI.plain(11));
         userRole.setForeground(new Color(0x90A8BF));
         userRole.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        userInfoPanel.add(userName);
-        userInfoPanel.add(Box.createVerticalStrut(4));
-        userInfoPanel.add(userRole);
+        infoPanel.add(userName);
+        infoPanel.add(Box.createVerticalStrut(4));
+        infoPanel.add(userRole);
 
-        accountPanel.add(avatarPanel, BorderLayout.WEST);
-        accountPanel.add(userInfoPanel, BorderLayout.CENTER);
-
-        // Thêm icon settings nhỏ bên phải (tùy chọn)
-        JLabel settingsIcon = new JLabel("⚙️");
-        settingsIcon.setFont(CustomUI.plain(14));
-        settingsIcon.setForeground(new Color(0x90A8BF));
-        settingsIcon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        settingsIcon.setToolTipText("Cài đặt tài khoản");
-        accountPanel.add(settingsIcon, BorderLayout.EAST);
-
+        accountPanel.add(avatarPanel);
+        accountPanel.add(infoPanel);
         accountArea.add(accountPanel);
 
-        // Version text nhỏ
         JLabel versionLabel = new JLabel("MEGADE Cinema v1.0");
         versionLabel.setFont(CustomUI.plain(9));
         versionLabel.setForeground(new Color(0x5A6E85));
@@ -533,85 +492,194 @@ public class dashboardUI extends JFrame {
         versionLabel.setBorder(BorderFactory.createEmptyBorder(12, 0, 0, 0));
         accountArea.add(versionLabel);
 
-        mainPanel.add(accountArea, BorderLayout.SOUTH);
+        layeredSidebar.add(accountArea, Integer.valueOf(1));
+        accountArea.setName("account");
 
-        side.add(mainPanel, BorderLayout.CENTER);
+        side.add(layeredSidebar, BorderLayout.CENTER);
         return side;
     }
 
-    private JPanel createNavItem(String icon, String text, boolean isActive) {
-        JPanel item = new JPanel(new BorderLayout());
-        item.setOpaque(false);
+    /**
+     * JTree điều hướng với cấu trúc:
+     * Trang Chủ
+     * Bán Vé
+     * ├─ Vé Phim
+     * └─ Đồ Ăn
+     * Quản Lý Nhân Viên
+     * Quản Lý Phim
+     * ├─ Danh Sách Phim
+     * └─ Thêm Phim
+     * Thống Kê
+     */
+    private JScrollPane buildNavTree() {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
 
-        if (isActive) {
-            item.setBackground(new Color(43, 200, 163, 30));
-            item.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createMatteBorder(0, 3, 0, 0, CustomUI.PRIMARY),
-                    BorderFactory.createEmptyBorder(10, 12, 10, 12)));
-        } else {
-            item.setBackground(new Color(0, 0, 0, 0));
-            item.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
-        }
+        DefaultMutableTreeNode nodeTrangChu = new DefaultMutableTreeNode("🏠  Trang Chủ");
+        root.add(nodeTrangChu);
 
-        JLabel iconLabel = new JLabel(icon);
-        iconLabel.setFont(CustomUI.plain(18));
-        iconLabel.setForeground(isActive ? CustomUI.PRIMARY : new Color(0x90A8BF));
+        DefaultMutableTreeNode nodeBanVe = new DefaultMutableTreeNode("🎟️  Bán Vé");
+        nodeBanVe.add(new DefaultMutableTreeNode("🎞️  Vé Phim"));
+        nodeBanVe.add(new DefaultMutableTreeNode("🍿  Đồ Ăn"));
+        root.add(nodeBanVe);
 
-        JLabel textLabel = new JLabel(text);
-        textLabel.setFont(isActive ? CustomUI.bold(13) : CustomUI.plain(13));
-        textLabel.setForeground(isActive ? CustomUI.PRIMARY : new Color(0x90A8BF));
+        DefaultMutableTreeNode nodeNhanVien = new DefaultMutableTreeNode("👤  Quản Lý Nhân Viên");
+        root.add(nodeNhanVien);
 
-        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
-        leftPanel.setOpaque(false);
-        leftPanel.add(iconLabel);
-        leftPanel.add(textLabel);
+        DefaultMutableTreeNode nodePhim = new DefaultMutableTreeNode("🎬  Quản Lý Phim");
+        nodePhim.add(new DefaultMutableTreeNode("📋  Danh Sách Phim"));
+        nodePhim.add(new DefaultMutableTreeNode("➕  Thêm Phim"));
+        root.add(nodePhim);
 
-        item.add(leftPanel, BorderLayout.WEST);
+        DefaultMutableTreeNode nodeThongKe = new DefaultMutableTreeNode("📊  Thống Kê");
+        root.add(nodeThongKe);
 
-        return item;
+        DefaultTreeModel model = new DefaultTreeModel(root);
+        JTree tree = new JTree(model);
+        tree.setRootVisible(false);
+        tree.setShowsRootHandles(true);
+        tree.setBackground(CustomUI.SIDEBAR_BG);
+        tree.setForeground(new Color(0x90A8BF));
+        tree.setFont(CustomUI.plain(13));
+        tree.setBorder(BorderFactory.createEmptyBorder(8, 6, 8, 6));
+        tree.setRowHeight(36);
+
+        for (int i = 0; i < tree.getRowCount(); i++)
+            tree.expandRow(i);
+
+        tree.setCellRenderer(new javax.swing.tree.DefaultTreeCellRenderer() {
+            @Override
+            public Component getTreeCellRendererComponent(JTree t, Object val,
+                    boolean sel, boolean exp, boolean leaf, int row, boolean focus) {
+                super.getTreeCellRendererComponent(t, val, sel, exp, leaf, row, focus);
+                setBackgroundSelectionColor(new Color(43, 200, 163, 50));
+                setBorderSelectionColor(new Color(0, 0, 0, 0));
+                setBackground(sel ? new Color(43, 200, 163, 50) : CustomUI.SIDEBAR_BG);
+                setForeground(sel ? CustomUI.PRIMARY : new Color(0x90A8BF));
+                setFont(sel ? CustomUI.bold(13) : CustomUI.plain(13));
+                setOpaque(true);
+                setLeafIcon(null);
+                setOpenIcon(null);
+                setClosedIcon(null);
+                setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+                return this;
+            }
+        });
+
+        tree.addTreeSelectionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+            if (node == null)
+                return;
+
+            String val = node.toString().replaceAll("^[^\\p{L}a-zA-Z]+\\s*", "").trim();
+
+            if (val.endsWith("Trang Chủ")) {
+                if (currentUser.isAdmin())
+                    switchContent(buildHomeContent());
+            } else if (val.endsWith("Vé Phim") || val.endsWith("Bán Vé")) {
+                switchContent(new BanVeUI());
+            } else if (val.endsWith("Đồ Ăn")) {
+                JOptionPane.showMessageDialog(dashboardUI.this, "Chức năng Đồ Ăn đang phát triển");
+            } else if (val.endsWith("Quản Lý Nhân Viên")) {
+                if (currentUser.isAdmin())
+                    switchContent(new QuanLyNhanVienUI());
+            } else if (val.endsWith("Danh Sách Phim")) {
+                if (currentUser.isAdmin())
+                    switchContent(new QuanLyPhimUI("List"));
+            } else if (val.endsWith("Thêm Phim")) {
+                if (currentUser.isAdmin())
+                    switchContent(new QuanLyPhimUI("add"));
+            } else if (val.endsWith("Thống Kê")) {
+                if (currentUser.isAdmin())
+                    switchContent(new ThongKeUI());
+            }
+        });
+
+        JScrollPane sp = new JScrollPane(tree);
+        sp.setBorder(null);
+        sp.setOpaque(false);
+        sp.getViewport().setBackground(CustomUI.SIDEBAR_BG);
+        sp.getViewport().setOpaque(true);
+        sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        sp.getVerticalScrollBar().setUnitIncrement(10);
+        return sp;
     }
 
-    private void updateNavActiveState(JPanel navContainer, String activeItemName) {
-        Component[] comps = navContainer.getComponents();
-        for (Component comp : comps) {
-            if (comp instanceof JPanel) {
-                JPanel panel = (JPanel) comp;
-                // Tìm text label trong panel
-                for (Component inner : panel.getComponents()) {
-                    if (inner instanceof JPanel) {
-                        JPanel leftPanel = (JPanel) inner;
-                        for (Component labelComp : leftPanel.getComponents()) {
-                            if (labelComp instanceof JLabel) {
-                                JLabel lbl = (JLabel) labelComp;
-                                // Nếu là text label (không phải icon)
-                                if (!lbl.getText().matches("[🏠🎟️🎬👤📊⚙️🚪]") &&
-                                        !lbl.getText().matches(".*[🏠🎟️🎬👤📊⚙️🚪].*")) {
-                                    if (lbl.getText().equals(activeItemName)) {
-                                        // Active state
-                                        panel.setBackground(new Color(43, 200, 163, 30));
-                                        panel.setBorder(BorderFactory.createCompoundBorder(
-                                                BorderFactory.createMatteBorder(0, 3, 0, 0, CustomUI.PRIMARY),
-                                                BorderFactory.createEmptyBorder(10, 12, 10, 12)));
-                                        lbl.setForeground(CustomUI.PRIMARY);
-                                        lbl.setFont(CustomUI.bold(13));
-                                    } else {
-                                        // Normal state
-                                        panel.setBackground(new Color(0, 0, 0, 0));
-                                        panel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
-                                        lbl.setForeground(new Color(0x90A8BF));
-                                        lbl.setFont(CustomUI.plain(13));
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    }
+    private JPanel createMenuOverlay() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(CustomUI.SIDEBAR_BG);
+        panel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+
+        String[][] menuItems = {
+                { "🏠", "Trang Chủ" },
+                { "🎟️", "Bán Vé" },
+                { "👤", "Quản Lý Nhân Viên" },
+                { "🎬", "Quản Lý Phim" },
+                { "📊", "Thống Kê" },
+                { "🚪", "Đăng xuất" }
+        };
+
+        for (String[] item : menuItems) {
+            JPanel menuItem = new JPanel(new BorderLayout());
+            menuItem.setOpaque(false);
+            menuItem.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+            menuItem.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+            JLabel iconLabel = new JLabel(item[0]);
+            iconLabel.setFont(CustomUI.plain(20));
+
+            JLabel textLabel = new JLabel(item[1]);
+            textLabel.setFont(CustomUI.plain(14));
+            textLabel.setForeground(Color.WHITE);
+
+            JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 0));
+            leftPanel.setOpaque(false);
+            leftPanel.add(iconLabel);
+            leftPanel.add(textLabel);
+            menuItem.add(leftPanel, BorderLayout.WEST);
+
+            final String itemName = item[1];
+            menuItem.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    handleNavigationFromMenu(itemName);
+                    // Đóng menu overlay
+                    toggleMenuOff();
                 }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    menuItem.setBackground(new Color(43, 200, 163, 40));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    menuItem.setBackground(CustomUI.SIDEBAR_BG);
+                }
+            });
+
+            panel.add(menuItem);
+            panel.add(Box.createVerticalStrut(4));
+        }
+
+        panel.add(Box.createVerticalGlue());
+        return panel;
+    }
+
+    private void toggleMenuOff() {
+        for (Component comp : layeredSidebar.getComponents()) {
+            if ("menuOverlay".equals(comp.getName())) {
+                comp.setVisible(false);
+            }
+            if ("tree".equals(comp.getName())) {
+                comp.setVisible(true);
             }
         }
+        layeredSidebar.revalidate();
+        layeredSidebar.repaint();
     }
 
-    private void handleNavigation(String itemName) {
+    private void handleNavigationFromMenu(String itemName) {
         switch (itemName) {
             case "Trang Chủ":
                 if (currentUser.isAdmin())
@@ -620,20 +688,26 @@ public class dashboardUI extends JFrame {
             case "Bán Vé":
                 switchContent(new BanVeUI());
                 break;
-            case "Quản Lý Phim":
-                if (currentUser.isAdmin())
-                    switchContent(new QuanLyPhimUI("List"));
-                break;
             case "Quản Lý Nhân Viên":
                 if (currentUser.isAdmin())
                     switchContent(new QuanLyNhanVienUI());
+                break;
+            case "Quản Lý Phim":
+                if (currentUser.isAdmin())
+                    switchContent(new QuanLyPhimUI("List"));
                 break;
             case "Thống Kê":
                 if (currentUser.isAdmin())
                     switchContent(new ThongKeUI());
                 break;
-            case "Cài Đặt":
-                JOptionPane.showMessageDialog(dashboardUI.this, "Chức năng đang phát triển");
+            case "Đăng xuất":
+                int confirm = JOptionPane.showConfirmDialog(dashboardUI.this,
+                        "Bạn có chắc muốn đăng xuất?", "Xác nhận",
+                        JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    dispose();
+                    new dangNhapUI().setVisible(true);
+                }
                 break;
         }
     }
