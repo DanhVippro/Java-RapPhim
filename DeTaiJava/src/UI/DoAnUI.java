@@ -9,7 +9,8 @@ import customUI.CustomUI;
 import DAO.DoAnDAO;
 import entity.DoAn;
 import model.BookingState;
-
+// USE MegadeCinema;
+// SELECT * FROM OrderItems;
 public class DoAnUI extends JPanel {
 
     private static final int COLS = 4;
@@ -32,6 +33,7 @@ public class DoAnUI extends JPanel {
         // Load từ DB (hoặc fallback)
         DoAnDAO dao = new DoAnDAO();
         dao.createTableIfNotExists();
+        dao.createOrderTableIfNotExists();
         this.items = dao.getAllDoAn();
         this.qty = new int[items.size()];
         this.qtyLabels = new JLabel[items.size()];
@@ -273,6 +275,7 @@ public class DoAnUI extends JPanel {
                 BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(0x1E3048)),
                 BorderFactory.createEmptyBorder(14, 0, 0, 0)));
 
+        // ── Tổng tiền ──
         JPanel row = new JPanel(new BorderLayout());
         row.setOpaque(false);
 
@@ -286,17 +289,67 @@ public class DoAnUI extends JPanel {
 
         row.add(lbl, BorderLayout.WEST);
         row.add(lblTotal, BorderLayout.EAST);
-        footer.add(row, BorderLayout.CENTER);
 
+        footer.add(row, BorderLayout.NORTH);
+
+        // ✅ TẠO BUTTON TRƯỚC
+        JButton btnPay = makeBtn("Thanh toán", CustomUI.PRIMARY, CustomUI.PRIMARY);
+        btnPay.setForeground(Color.WHITE);
+        btnPay.setFont(CustomUI.bold(13));
+        btnPay.addActionListener(e -> handlePayment());
+
+        JPanel action = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        action.setOpaque(false);
+        action.add(btnPay);
+
+        footer.add(action, BorderLayout.CENTER);
+
+        // ── Note ──
         JLabel note = new JLabel("* Đặt đồ ăn tại quầy trước suất chiếu 30 phút", JLabel.RIGHT);
         note.setFont(CustomUI.plain(10));
         note.setForeground(new Color(0x4A6278));
+
         footer.add(note, BorderLayout.SOUTH);
 
-        // Khoảng trống an toàn để không bị bot che khuất
         footer.add(Box.createVerticalStrut(40), BorderLayout.AFTER_LAST_LINE);
 
         return footer;
+    }
+
+    private void handlePayment() {
+        try {
+            DoAnDAO dao = new DoAnDAO();
+            long total = 0;
+
+            for (int i = 0; i < qty.length; i++) {
+                if (qty[i] > 0) {
+                    DoAn item = items.get(i);
+
+                    dao.insertOrderItem(
+                            item.getMaDoAn(), 
+                            item.getTen(),
+                            qty[i],
+                            item.getGia());
+
+                    total += (long) qty[i] * item.getGia();
+                    System.out.println("INSERT: " + item.getTen() + " x" + qty[i]);
+                }
+            }
+
+            if (total == 0) {
+                JOptionPane.showMessageDialog(this, "Chưa chọn món!");
+                return;
+            }
+
+            JOptionPane.showMessageDialog(this,
+                    "Thanh toán thành công!\nTổng tiền: " + BanVeHelper.formatVND(total));
+
+            resetAll();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi thanh toán!");
+        }
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────

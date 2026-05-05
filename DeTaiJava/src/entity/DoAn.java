@@ -8,8 +8,8 @@ public class DoAn {
     private String ten;
     private String moTa;
     private int    gia;
-    private String loai;       // "BAP", "NUOC", "COMBO", "KHAI_VI"
-    private String imagePath;  // Đường dẫn ảnh trong resources/
+    private String loai;       
+    private String imagePath;  
 
     public DoAn() {}
 
