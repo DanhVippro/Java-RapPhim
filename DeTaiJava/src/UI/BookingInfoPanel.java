@@ -67,6 +67,7 @@ public class BookingInfoPanel extends JPanel {
         lblGhe.setLineWrap(true);
         lblGhe.setOpaque(false);
         lblGhe.setForeground(Color.WHITE);
+        lblGhe.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
         lblLoai = boldVal("-");
         content.add(seatRow("Ghế đã chọn", lblGhe));
         content.add(infoRow("Loại ghế", lblLoai));
@@ -119,9 +120,16 @@ public class BookingInfoPanel extends JPanel {
         return card;
     }
 
+    private void fullWidth(JComponent c) {
+        c.setAlignmentX(Component.LEFT_ALIGNMENT);
+        c.setMaximumSize(new Dimension(Integer.MAX_VALUE, c.getPreferredSize().height));
+    }
+
     private JPanel buildSelectionSection() {
         JPanel wrap = new JPanel(new BorderLayout(12, 0));
         wrap.setOpaque(false);
+        wrap.setAlignmentX(Component.LEFT_ALIGNMENT);
+        wrap.setMaximumSize(new Dimension(Integer.MAX_VALUE, wrap.getPreferredSize().height));
 
         posterLabel = new JLabel(buildPosterIcon(0, 80, 115));
         wrap.add(posterLabel, BorderLayout.WEST);
@@ -230,14 +238,35 @@ public class BookingInfoPanel extends JPanel {
     public void refreshSeatInfo() {
         if (state.seats.isEmpty()) {
             lblGhe.setText("-");
-            if (lblLoai != null)
-                lblLoai.setText("-");
-            if (lblTong != null)
-                lblTong.setText("0 đ");
+            lblLoai.setText("-");
+            lblTong.setText("0 đ");
         } else {
             lblGhe.setText(state.gheDisplay());
             lblTong.setText(BanVeHelper.formatVND(state.tienVe()));
+
+            // 👉 FIX Ở ĐÂY
+            boolean hasVip = false;
+            boolean hasNormal = false;
+
+            for (Boolean isVip : state.seatsVip) {
+                if (isVip)
+                    hasVip = true;
+                else
+                    hasNormal = true;
+            }
+
+            if (hasVip && hasNormal) {
+                lblLoai.setText("Thường + VIP");
+            } else if (hasVip) {
+                lblLoai.setText("VIP");
+            } else {
+                lblLoai.setText("Thường");
+            }
         }
+
+        // 👉 thêm dòng này cho chắc UI refresh
+        revalidate();
+        repaint();
     }
 
     // ── Poster ───────────────────────────────────────────────────────────────
@@ -268,14 +297,29 @@ public class BookingInfoPanel extends JPanel {
     }
 
     private JPanel infoRow(String label, JLabel val) {
-        JPanel row = new JPanel(new BorderLayout(8, 0));
+        JPanel row = new JPanel(new GridBagLayout());
         row.setOpaque(false);
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        GridBagConstraints c = new GridBagConstraints();
+
+        // Label bên trái
+        c.gridx = 0;
+        c.gridy = 0;
+        c.insets = new Insets(4, 0, 4, 10);
+        c.anchor = GridBagConstraints.NORTHWEST;
         JLabel l = new JLabel(label);
         l.setFont(CustomUI.plain(14));
         l.setForeground(CustomUI.TEXT_LIGHT);
-        row.add(l, BorderLayout.WEST);
-        row.add(val, BorderLayout.EAST);
+        row.add(l, c);
+
+        // Value bên phải (giãn full)
+        c.gridx = 1;
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        row.add(val, c);
+
         return row;
     }
 
@@ -283,22 +327,40 @@ public class BookingInfoPanel extends JPanel {
         JPanel row = new JPanel(new GridBagLayout());
         row.setOpaque(false);
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // ===== LABEL (trái) =====
         GridBagConstraints cL = new GridBagConstraints();
         cL.gridx = 0;
         cL.gridy = 0;
-        cL.anchor = GridBagConstraints.NORTHWEST;
-        cL.insets = new Insets(2, 0, 0, 8);
-        JLabel l = new JLabel(labelText);
-        l.setFont(CustomUI.plain(14));
-        l.setForeground(CustomUI.TEXT_LIGHT);
-        row.add(l, cL);
+        cL.anchor = GridBagConstraints.NORTHWEST; // 🔥 FIX: luôn dính TOP
+        cL.insets = new Insets(4, 0, 0, 10);
+
+        JLabel label = new JLabel(labelText);
+        label.setFont(CustomUI.plain(14));
+        label.setForeground(CustomUI.TEXT_LIGHT);
+        label.setPreferredSize(new Dimension(120, 40)); // 🔥 giữ chiều cao ổn định
+
+        row.add(label, cL);
+
+        // ===== TEXT AREA (phải) =====
         GridBagConstraints cR = new GridBagConstraints();
         cR.gridx = 1;
         cR.gridy = 0;
         cR.weightx = 1.0;
         cR.fill = GridBagConstraints.HORIZONTAL;
-        cR.anchor = GridBagConstraints.NORTHEAST;
+        cR.anchor = GridBagConstraints.NORTHWEST; // 🔥 FIX luôn TOP
+
+        area.setFont(CustomUI.bold(14));
+        area.setForeground(CustomUI.TEXT_WHITE);
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+
+        // 🔥 QUAN TRỌNG: không cho nó phình vô hạn
+        area.setRows(2);
+        area.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+
         row.add(area, cR);
+
         return row;
     }
 
