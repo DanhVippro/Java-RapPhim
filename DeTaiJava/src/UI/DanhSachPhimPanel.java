@@ -187,7 +187,7 @@ public class DanhSachPhimPanel extends JPanel {
         List<Object[]> data = service.getAllPhim();
         for (Object[] row : data) {
             model.addRow(new Object[]{
-                row[0], row[1], row[2], row[3], row[4], row[6], "Xóa"
+                row[0], row[1], row[2], row[3] + " (phút)", row[4], row[6], "Xóa"
             });
         }
     }
